@@ -1,0 +1,277 @@
+<?php
+
+/* 
+ * @file
+ * Functions to support cotfoo theming.
+ * Author: Vishal Khode <vishal_khode@hotmail.com>
+ */
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\NodeType;
+use \Drupal\taxonomy\Entity\Term;
+use \Drupal\file\Entity\File;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Url;
+
+function cotfoo_preprocess_input(&$variables, $hook) {
+ // unset($variables['attributes']['placeholder']);
+}
+
+function cotfoo_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+
+  if ($hook == 'form' & !empty($variables['element']['#id'])) {
+    $suggestions[] = 'form__' . str_replace('-', '_', $variables['element']['#id']);
+  }
+}
+
+function cotfoo_theme_suggestions_block_alter(array &$suggestions, array $variables) {
+  $block = $variables['elements'];
+  $blockType = $block['#configuration']['provider'];
+  if ($blockType == "block_content") {
+    $bundle = $block['content']['#block_content']->bundle();
+    array_splice($suggestions, 2, 0, 'block__' . $bundle);
+  }
+}
+
+function cotfoo_preprocess_form_element(&$variables, $hook) {
+  if($variables['type'] != 'textfield') {
+    $variables['label_display'] = 'after';
+  }
+  if($variables['type'] == 'textarea') {
+    unset($variables['label_display']);
+  }
+  $variables['label']['#attributes']= [
+      'data-error' => 'wrong',
+      'data-success' => 'right'
+  ];
+}
+
+function cotfoo_preprocess_select(&$variables, $hook) {
+  if(!$variables['options']) {
+    $variables['options'][]= [
+      'selected' => false,
+      'type' => "option",
+      'value' =>  "_none",
+      'label' => "- Select a value -"
+    ];
+  }
+}
+
+function cotfoo_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $form['field_about_you']['widget']['#after_build'][] = '_allowed_formats_remove_textarea_help';
+ 
+  if ($form_id == "user_login_form"){
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn';
+    $form['name']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Email/Phone No'];
+    $form['name']['#description'] = 'Enter Email/Phone No';
+    $form['pass']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Password'];
+    $form['name']['#title_display'] = 'invisible';
+    $form['pass']['#title_display'] = 'invisible';
+  }
+ 
+  if ($form_id == "user_register_form"){
+    // handle username field programatically
+    $form['account']['name']['#access'] = FALSE;
+    $random = new \Drupal\Component\Utility\Random();
+    $form['account']['name']['#default_value'] = $random->name();
+    array_unshift($form['actions']['submit']['#submit'], 'cotfoo_autofill_username_in_register_form');
+  
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn create-accountbtn';
+    $form['account']['mail']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Email Address'];
+//    $form['account']['name']['#attributes'] = ['class'=> ["form-control"], 'placeholder' => 'Username'];
+    $form['field_first_name']['widget'][0]['value']['#attributes'] = ['class'=> ["form-control"], 'placeholder' => 'First Name'];
+    $form['field_last_name']['widget'][0]['value']['#attributes'] = ['class'=> ["form-control"], 'placeholder' => 'Last Name'];
+    $form['field_phone_no']['widget'][0]['value']['#attributes'] = ['class'=> ["form-control"], 'placeholder' => 'Mobile No'];
+    //hide title
+//    $form['account']['name']['#title_display'] = 'invisible';
+    $form['account']['mail']['#title_display'] = 'invisible';
+    $form['field_first_name']['widget'][0]['value']['#title_display'] = 'invisible';
+    $form['field_last_name']['widget'][0]['value']['#title_display'] = 'invisible';
+    $form['field_phone_no']['widget'][0]['value']['#title_display'] = 'invisible';
+  }
+ 
+  if ($form_id == "user_pass_reset"){
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn btn-primary';
+    $form['actions']['submit']['#value'] = 'Set Password';
+  }
+ 
+  if ($form_id == "user_pass"){
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn';
+    $form['name']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Username or Email address'];
+    $form['name']['#title_display'] = 'invisible';
+  }
+ 
+  if ($form_id == "user_form"){
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn btn-primary';
+    $form['account']['mail']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Email address'];
+    $form['account']['mail']['#title_display'] = 'invisible';
+    // cotfoo_after_build hook
+    $form['#after_build'][] = 'cotfoo_after_build';
+    $form['actions']['submit']['#submit'][] = 'cotfoo_redirect_user_to_dashboard';
+  }
+ 
+  if ($form_id == "contact_message_contact_us_form"){
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn btn-primary';
+    $form['mail']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Where can we mail you back'];
+    $form['name']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'What can we call you'];
+    $form['subject']['widget'][0]['value']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'What on your mind'];
+    $form['message']['widget'][0]['value']['#attributes'] = ['placeholder' => 'Please tell us few more words about it'];
+    if (\Drupal::currentUser()->isAnonymous()) {
+      $form['name']['#title_display'] = 'invisible';
+      $form['mail']['#title_display'] = 'invisible';
+    }
+  }
+  if ($form_id == "contact_message_contact_us_form"){
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn btn-primary';
+    $form['mail']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'Where can we mail you back'];
+    $form['name']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'What can we call you'];
+    $form['subject']['widget'][0]['value']['#attributes'] = ['class' => ["form-control"], 'placeholder' => 'What on your mind'];
+    $form['message']['widget'][0]['value']['#attributes'] = ['placeholder' => 'Please tell us few more words about it'];
+    if (\Drupal::currentUser()->isAnonymous()) {
+      $form['name']['#title_display'] = 'invisible';
+      $form['mail']['#title_display'] = 'invisible';
+    }
+  }
+  if ($form_id == "node_blogs_form"){
+    $form['#attributes'] = ['class' => ["padd-l-30","padd-r-30"]];
+    $form['field_category']['widget'][0]['target_id']['#attributes'] = ['class' => ["blog-form-control"],'placeholder' => 'Add category'];
+    $form['field_category']['widget'][0]["#title_display"] = "none";
+    $form['field_image']['#attributes'] = ['class' => ["padd-top-40"]];
+    $form['field_tag']['widget'][0]['target_id']['#attributes'] = ['class' => ["blog-form-control"],'placeholder' => 'Add tags'];
+    $form['title']['widget'][0]['value']['#attributes'] = ['class' => ["blog-form-control"],'placeholder' => 'Blog title'];
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn';
+    $form['body']['widget'][0]['summary']['#access'] = FALSE;
+    $form['body']['widget'][0]["#placeholder"] = 'Write your blog here...';
+    $form['actions']['preview']['#access'] = FALSE;
+    $form['revision_information']['#access'] = FALSE;
+    $form['#prefix'] = '<!-- ================ Start Page Title ======================= --><section class="page-title"><div class="container"></div></section><div class="clearfix"></div><!-- ================ End Page Title ======================= --><!-- ================ Add blog Section Start ======================= --><section class="padd-0"><div class="container"><div class="col-md-10 translateY-60 col-sm-12 col-md-offset-1"><!-- General Information --><div class="add-listing-box mrg-bot-25 padd-bot-30 padd-top-25"><div class="listing-box-header"><i class="glyphicon glyphicon-edit theme-cl"></i><h3>Write Your Blog</h3></div>';
+    $form['#suffix'] = '</div></div></div><!-- End add blog --></section>';
+    $form['title']['#prefix'] = '<div class="row mrg-r-10 mrg-l-10">';
+    $form['field_category']['#suffix'] = '</div>';
+    $form['actions']['submit']['#prefix'] = '<div class="form-group text-center">';
+    $form['actions']['submit']['#suffix'] = '</div>';
+  }
+  
+  if ($form_id == "commerce_product_menu_add_form"){
+    $form['#prefix'] = '<!-- ================ Start Page Title ======================= --><section class="page-title"><div class="container"></div></section><div class="clearfix"></div><!-- ================ End Page Title ======================= --><!-- ================ Add meal Section Start ======================= --><section class="padd-0"><div class="container"><div class="col-md-10 translateY-60 col-sm-12 col-md-offset-1"><!-- General Information --><div class="add-listing-box mrg-bot-25 padd-bot-30 padd-top-25"><div class="listing-box-header"><i class="glyphicon glyphicon-edit theme-cl"></i><h3>Add Your Meal</h3></div>';
+    $form['#suffix'] = '</div></div></div><!-- End add meal --></section>';
+    $form['#attributes'] = ['class' => ["add-product-form"]];
+    $form['title']['widget'][0]['value']['#attributes'] = ['class' => ["blog-form-control"],'placeholder' => 'Meal title'];
+    $form['field_date']['widget'][0]['value']['#attributes'] = ['id' => ["reservation-date"]];
+    $form['actions']['submit']['#attributes']['class'][] = 'btn theme-btn';
+    $form['author']['#access'] = FALSE;
+    $form['meta']['#access'] = FALSE;
+    $form['actions']['preview']['#access'] = FALSE;
+    $form['revision_information']['#access'] = FALSE;    
+    $form['title']['#prefix'] = '<div class="row mrg-r-10 mrg-l-10">';
+    $form['field_category']['#suffix'] = '</div>';
+    $form['actions']['submit']['#prefix'] = '<div class="form-group text-center">';
+    $form['actions']['submit']['#suffix'] = '</div>';
+  }
+  
+}
+
+
+/**
+ * Custom submit callback for user_register_form.
+ */
+function cotfoo_autofill_username_in_register_form(array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $mail = $form_state->getValue('mail');
+  $form_state->setValue('name', $mail);
+}
+
+/**
+ * Custom submit callback for user_register_form.
+ */
+function cotfoo_redirect_user_to_dashboard(array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $url = Url::fromUri('internal:' . "/dashboard/user");
+  $form_state->setRedirectUrl($url);
+}
+
+/**
+ * 
+ */
+function cotfoo_after_build($form, &$form_state) {
+  $form['account']['pass']['pass1']['#attributes']['placeholder'] = 'Password';
+  $form['account']['pass']['pass2']['#attributes']['placeholder'] = 'Confirm Password';    
+  $form['account']['pass']['pass1']['#attributes']['class'][] = "form-control";
+  $form['account']['pass']['pass2']['#attributes']['class'][] = "form-control";
+  $form['account']['pass']['pass1']['#attributes']['required'] = true;
+  $form['account']['pass']['pass2']['#attributes']['required'] = true;
+  $form['account']['pass']['pass1']['#attributes']['size'] = 60;
+  $form['account']['pass']['pass2']['#attributes']['size'] = 60;
+  $form['account']['pass']['pass1']['#title'] = ' ';
+  $form['account']['pass']['pass2']['#title'] = ' ';
+  return $form;
+}
+
+function _allowed_formats_remove_textarea_help($form_element, FormStateInterface $form_state) {
+  if (isset($form_element[0]['format'])) {
+    // All this stuff is needed to hide the help text.
+    unset($form_element[0]['format']['guidelines']);
+    unset($form_element[0]['format']['help']);
+    unset($form_element[0]['format']['#type']);
+    unset($form_element[0]['format']['#theme_wrappers']);
+    $form_element[0]['format']['format']['#access'] = FALSE;
+  }
+  return $form_element;
+}
+
+function cotfoo_preprocess_block(&$variables) {
+  if (in_array($variables['elements']['#id'], array('useraccountmenu'))) {
+    $variables['attributes']['class'][] = 'nav-wrapper hide-on-med-and-down';
+  }
+}
+
+function cotfoo_preprocess_page(&$variables) {
+  $renderable = [
+   '#theme' => 'front_slider',
+ ];  
+ $config = \Drupal::config('cotfoo_address.settings');
+ $items = [
+   'api' => $config->get('google_places_api'),
+   'use_google' => $config->get('use_google'),
+   'min_search_char' => $config->get('min_search_char'),
+ ];
+ if ($items['use_google']) {
+   $renderable += [
+     '#attached' => array('library' => ('cotfoo_address/autocomplete'))
+   ];
+ }
+ $nids = \Drupal::entityQuery('node')
+         ->condition('type','front_page_slider')
+          ->condition('status',1)
+         ->execute();
+ $nodes =  \Drupal\node\Entity\Node::loadMultiple($nids);
+ foreach ($nodes as $node) {
+   $item = array(
+     'title' => $node->get('title')->getString(),
+     'sub_title' => $node->get('field_sub_heading')->getString(),
+     'image'=> file_create_url($node->field_image->entity->getFileUri())
+   );
+   $items['slides'][] = $item;
+ }
+ $renderable['#items'] = $items;
+ $rendered = drupal_render($renderable);
+ $variables['front_slider'] = $renderable;
+}
+
+function cotfoo_preprocess_node(&$variables) {
+  if ($variables['node']->bundle() && $variables['node']->bundle() == "blogs") {   
+    $node = $variables['node'];   
+    $category = taxonomy_term_load($node->get('field_category')->getString());
+    $items = [];
+    $items = array(
+      'title' => $node->get('title')->getString(),
+      'body' => $node->get('body')->getString(),
+      'image'=> file_create_url($node->get('field_image')->entity->getFileUri()),
+      'category' => $category->get('name')->value
+    );
+    
+    $renderable = [
+      '#theme' => 'node--blogs--full.html',
+      '#$items' => $items
+    ];
+    $variables['items'] = $items;   
+  }  
+}

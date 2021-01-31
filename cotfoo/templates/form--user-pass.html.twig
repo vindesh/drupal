@@ -1,0 +1,23 @@
+<section class="log-wrapper">
+    <div class="container">
+        <div class="col-md-6 col-sm-10 col-md-offset-3 col-sm-offset-1">
+            <div class="log-box login-box">
+                <h2> Request A <span class="theme-cl"> Password Link!</span></h2>                
+                <form {{ attributes }}>
+                    <div class="input-group">
+                        {{ element.name }}                        
+                    </div>
+                    <div class="input-group">
+                        {{ element.message }}                       
+                    </div>                    
+                    <div class="text-center">
+                        {{ element.actions.submit }}                    
+                    </div>
+                    {{ element.form_build_id }} {# required #}
+                    {{ element.form_id }} {# required #}
+                    {{ element.form_token }}{# required #}
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,47 @@
+<section class="log-wrapper">
+  <div class="container">
+    <div class="col-md-6 col-sm-10 col-md-offset-3 col-sm-offset-1">
+      <div class="log-box login-box">
+        <h2>Welcome <span class="theme-cl"> to Cotfoo!</span></h2>                
+        <form {{ attributes }}>
+          <div class="input-group">
+            {{ element.field_first_name}}                        
+          </div>
+          <div class="input-group">
+            {{ element.field_last_name}}                        
+          </div>
+          <div class="input-group">
+            {{ element.account.mail}}                        
+          </div>
+          <div class="input-group" style="width: 100%;">
+            {{ element.field_phone_no}}                        
+          </div>
+          <div class="input-group">
+            {{ element.verify_otp}}                        
+          </div>
+          <div class="input-group">
+            {{ element.terms_condition }}                        
+          </div>
+          <div class="text-center">
+            {{ element.actions.submit }}                    
+          </div>
+          {{ element.form_build_id }} {# required #}
+          {{ element.form_id }} {# required #}
+          {{ element.form_token }}{# required #}
+          <hr>
+          <div class="social-logins text-center"> 
+            <a href="login/facebook" data-toggle="tooltip" data-original-title="Register Using Facebook"><div class="facebook-login">
+                <i class="fa fa-fw fa-facebook-square"></i> <span> Facebook</span></div>
+            </a>
+            <a href="login/google" data-toggle="tooltip" data-original-title="Register Using Google Account"><div class="google-login">
+                <i class="fa fa-fw fa-google-plus-square"></i> <span> Google </span></div>
+            </a>
+          </div>
+          <div class="text-center create-acnt">
+            <a href="login">Already have an account</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

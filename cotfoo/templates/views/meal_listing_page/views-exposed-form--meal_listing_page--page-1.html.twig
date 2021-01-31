@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Theme override of a views exposed form.
+ *
+ * Available variables:
+ * - form: A render element representing the form.
+ *
+ * @see template_preprocess_views_exposed_form()
+ */
+#}
+{% if q is not empty %}
+  {#
+    This ensures that, if clean URLs are off, the 'q' is added first,
+    as a hidden form element, so that it shows up first in the POST URL.
+  #}
+{{ q }}
+{% endif %}
+<div>{{ form.field_category_value }}</div>
+<div>{{ form.interest }}</div>
+<div>{{ form.meal_type }}</div>
+<div>{{ form.dine_in_option }}</div>
+<div class="submit-button">{{ form.actions.submit }}</div>

@@ -1,0 +1,119 @@
+{#
+/**
+ * @file
+ * Theme override to display a block.
+ *
+ * Available variables:
+ * - plugin_id: The ID of the block implementation.
+ * - label: The configured label of the block if visible.
+ * - configuration: A list of the block's configuration values.
+ *   - label: The configured label for the block.
+ *   - label_display: The display settings for the label.
+ *   - provider: The module or other provider that provided this block plugin.
+ *   - Block plugin specific settings will also be stored here.
+ * - content: The content of this block.
+ * - attributes: array of HTML attributes populated by modules, intended to
+ *   be added to the main container tag of this template.
+ *   - id: A valid HTML ID and guaranteed unique.
+ * - title_attributes: Same as attributes, except applied to the main title
+ *   tag that appears in the template.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the main title tag that appears in the template.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the main title tag that appears in the template.
+ *
+ * @see template_preprocess_block()
+ */
+#}
+{%
+  set classes = [
+    'block',
+    'block-' ~ configuration.provider|clean_class,
+    'block-' ~ plugin_id|clean_class,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+    {{ title_prefix }}
+    {% if label %}
+        {# <h2{{ title_attributes }}>{{ label }}</h2>#}
+    {% endif %}
+    {#{{ title_suffix }} #} 
+    {% block content %}
+        <section id="howitworks">
+<div class="container">
+    <div class="row">
+        <div class="heading">
+	<h2>How it <span> Works</span></h2>
+	</div>
+        <div class="col-md-12 col-sm-12">
+           <div class="tab style-1" role="tabpanel">
+	<!-- Nav tabs -->
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation" class="col-md-4 active"><a href="#home2" aria-controls="home2" role="tab" data-toggle="tab">User</a></li>
+		<li role="presentation" class="col-md-4"><a href="#profile2" aria-controls="profile2" role="tab" data-toggle="tab">Host</a></li>
+		<li role="presentation" class="col-md-4"><a href="#messages2" aria-controls="messages2" role="tab" data-toggle="tab">Visiting Chef</a></li>
+	</ul>
+	<!-- Tab panes -->
+	<div class="tab-content tabs">
+		<div role="tabpanel" class="tab-pane fade in active" id="home2">
+			<div id="host" class="howItWorks row">
+                            {% if items %}
+                            {% for key, item in items %}
+                            <div class="howItWorksItem col-md-4" >
+                                <a href="#booking-block"><img class="howItWorksItem__icon" src="{{item.image}}"></a>
+                                <h4 class="howItWorksItem__title" >{{item.title}}</h4>
+                                <p class="howItWorksItem__text" >{{item.description|raw}}</p>
+                            </div>
+                             {% endfor %}
+                             {% endif %}
+                        </div>
+		</div>
+		<div role="tabpanel" class="tab-pane fade" id="profile2">
+			<div id="host" class="howItWorks row">
+                            
+                            <div class="howItWorksItem col-md-4" >
+                                <a href="#booking-block"><img class="howItWorksItem__icon" src="images/signup.png"></a>
+                                <h4 class="howItWorksItem__title" >Sign-up</h4>
+                                <p class="howItWorksItem__text" >Become a host, tell us more about yourself and add your menu/date/price ! <a href="{{url('<front>')}}faqs">know more..</a></p>
+                            </div>
+                            <div class="howItWorksItem col-md-4" >
+                                <a href="#booking-block"><img class="howItWorksItem__icon" src="images/booking-confirm.png"></a>
+                                <h4 class="howItWorksItem__title" >Confirm</h4>
+                                <p class="howItWorksItem__text" >Respond to meal requests from guests !</p>
+                            </div>
+                            <div class="howItWorksItem col-md-4" >
+                                <a href="#booking-block"><img class="howItWorksItem__icon" src="images/home-visit.png"></a>
+                                <h4 class="howItWorksItem__title" >Host</h4>
+                                <p class="howItWorksItem__text" >Welcome your guest and have a great time !</p>
+                            </div>
+                        </div>
+		</div>
+		<div role="tabpanel" class="tab-pane fade" id="messages2">
+			<div id="host" class="howItWorks row">
+                            
+                            <div class="howItWorksItem col-md-4" >
+                                <a href=""><img class="howItWorksItem__icon" src="images/signup.png"></a>
+                                <h4 class="howItWorksItem__title" >Signup</h4>
+                                <p class="howItWorksItem__text" >Become a visiting chef, tell us more about yourself and add your recipes/availability ! <a href="{{url('<front>')}}faqs">know more..</a></p>
+                            </div>
+                            <div class="howItWorksItem col-md-4" >
+                                <a href=""><img class="howItWorksItem__icon" src="images/booking-confirm.png"></a>
+                                <h4 class="howItWorksItem__title" >Confirm</h4>
+                                <p class="howItWorksItem__text" >Confirm booking request from guest for your visit for cooking your recipe !</p>
+                            </div>
+                            <div class="howItWorksItem col-md-4" >
+                                <a href=""><img class="howItWorksItem__icon" src="images/home-visit.png"></a>
+                                <h4 class="howItWorksItem__title" >Visit</h4>
+                                <p class="howItWorksItem__text" >Visit Your host and have a great time cooking !</p>
+                            </div>
+                        </div>
+		</div>
+	</div>
+            </div>
+        </div>
+    </div>
+</div> 
+        </section>
+    {% endblock %}       
+    
+</div>

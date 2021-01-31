@@ -1,0 +1,67 @@
+<section>
+<div class="heading">
+            <h2> Cotfoo <span> Blogs </span></h2>
+        </div>
+
+<!-- ================ Vertical Listing Style ======================= -->
+{% if blogsitems %}
+    <div class="container">
+        <div class="row">
+            <!-- Single List Item -->
+         {% for nid, item in blogsitems %}
+            <div class="col-md-6 col-sm-6">
+                <div class="verticleilist listing-shot">
+                    
+                    <a class="listing-item" href="#">
+                        <div class="listing-shot-img">
+                            <img src="{{ item.image }}" class="img-responsive" alt="">
+                        </div>
+                    </a>
+
+                    <div class="verticle-listing-caption">
+
+                        {#<span class="like-listing"><i class="fa fa-heart-o" aria-hidden="true"></i></span>#}
+                        <div class="listing-shot-caption">
+                            <h4>{{item.title}}</h4>
+                            <p class="listing-description">{{item.body[:200]|striptags }}</p>
+                        </div>
+
+                        <div class="listing-shot-info">
+                            <div class="row extra">
+                                <div class="col-md-12">
+                                    <div class="listing-detail-info">
+                                        <span><i class="glyphicon glyphicon-user" aria-hidden="true"></i>{% if item.author %}{{ item.author }}{% else %} Anonymous {% endif %} </span>
+                                        <span><i class="fa fa-fw fa-calendar-check-o" aria-hidden="true"></i>{{item.created}} </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="listing-shot-info rating">
+                            <div class="row extra">
+                                {#<div class="col-md-7 col-sm-7 col-xs-6">
+                                    <i class="color fa fa-star" aria-hidden="true"></i>
+                                    <i class="color fa fa-star" aria-hidden="true"></i>
+                                    <i class="color fa fa-star" aria-hidden="true"></i>
+                                    <i class="color fa fa-star-half-o" aria-hidden="true"></i>
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    <span>27 Reviews</span>
+                                </div>#}
+                                <div class="col-md-5 col-sm-5 col-xs-6 pull-right">
+                                    <a href="node/{{nid}}" class="detail-link">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+        {% else %}
+            <div class="container">
+            <div class="notice notice-danger">Sorry!! No Blogs Posted yet.</div>
+            </div>
+        {% endif %}
+</section>

@@ -1,0 +1,63 @@
+{#
+/**
+ * @file
+ * Theme override to display all the fields in a row.
+ *
+ * Available variables:
+ * - view: The view in use.
+ * - fields: A list of fields, each one contains:
+ *   - content: The output of the field.
+ *   - raw: The raw data for the field, if it exists. This is NOT output safe.
+ *   - class: The safe class ID to use.
+ *   - handler: The Views field handler controlling this field.
+ *   - inline: Whether or not the field should be inline.
+ *   - wrapper_element: An HTML element for a wrapper.
+ *   - wrapper_attributes: List of attributes for wrapper element.
+ *   - separator: An optional separator that may appear before a field.
+ *   - label: The field's label text.
+ *   - label_element: An HTML element for a label wrapper.
+ *   - label_attributes: List of attributes for label wrapper.
+ *   - label_suffix: Colon after the label.
+ *   - element_type: An HTML element for the field content.
+ *   - element_attributes: List of attributes for HTML element for field content.
+ *   - has_label_colon: A boolean indicating whether to display a colon after
+ *     the label.
+ *   - element_type: An HTML element for the field content.
+ *   - element_attributes: List of attributes for HTML element for field content.
+ * - row: The raw result from the query, with all data it fetched.
+ *
+ * @see template_preprocess_views_view_fields()
+ */
+#}
+{%  set base_url = url('<front>')  %}
+<div class="col-md-4 col-sm-6">
+  <div class="listing-shot grid-style">
+    <a href="{{ base_url }}meal/{{ fields.product_id.content }}">
+      <div class="listing-shot-img">{{ fields.field_image.content }}</div>
+      <div class="listing-shot-caption">{{ fields.title.content | striptags | trim }}
+        <span class="mrg-l-5 category-tag category-veg">{{ fields.field_category.content }}</span></h4>
+        <p class="listing-location"><i class="ti-location-pin padd-r-5"></i>{{ fields.field_address.content }}</p>
+      </div>
+    </a>
+    <div class="listing-shot-info">
+      <div class="row extra">
+        <div class="col-md-12">
+          <div class="listing-detail-info">
+            <span><i class="fa fa-cutlery" aria-hidden="true"></i> {{ fields.field_cuisine.content }}</span>                                                    
+            <span>{{ fields.price__number.content }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="listing-shot-info rating">
+      <div class="row extra">
+        {#<div class="col-md-7 col-sm-7 col-xs-6">{{ fields.field_rating.content }}</div>#}
+        <div class="col-md-5 col-sm-5 col-xs-6 pull-right">
+          <a href="{{ base_url }}meal/{{ fields.product_id.content }}" class="detail-link book-btn">Book</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>      
+
+

@@ -1,0 +1,63 @@
+<section>
+    <div class="container">
+        <div class="heading">
+            <h2> Cotfoo <span> FAQ's </span></h2>
+        </div>
+        {% if items %}
+        <div class="col-md-12 col-sm-12">
+            <div class="faq-section tab style-1" role="tabpanel">                
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    {% set tabval = 0 %}
+                    {% for item in items %}
+                        {% for title,faqs in item %}
+                            {% if tabval == 0  %}
+                                <li role="presentation" class="col-md-3 active"><a href="#{{title|replace({' ':'-'})}}" aria-controls="{{title|replace({' ':'-'})}}" role="tab" data-toggle="tab">{{title}}</a></li>
+                                    {% set tabval = tabval + 1 %}
+                                {% else %}
+                                <li role="presentation" class="col-md-3"><a href="#{{title|replace({' ':'-'})}}" aria-controls="{{title|replace({' ':'-'})}}" role="tab" data-toggle="tab">{{title}}</a></li>
+                                {% endif %}
+                            {% endfor %}                     
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content tabs">
+                        {% set val = 0 %}
+                        {% for title,faqs in item %}                        
+                            {% if val == 0  %}
+                                <div role="tabpanel" class="tab-pane fade in active" id="{{title|replace({' ':'-'})}}">
+                                {% else %}
+                                    <div role="tabpanel" class="tab-pane fade in " id="{{title|replace({' ':'-'})}}">
+                                    {% endif %}        
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="panel-group style-2" id="accordion2" role="tablist" aria-multiselectable="true">                                
+                                            {% for key,value in faqs %}   
+                                                {% set val = val + 1 %}
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading" role="tab" id="question{{val}}">
+                                                        <h4 class="panel-title">
+                                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{val}}" aria-expanded="true" aria-controls="collapse{{val}}">
+                                                                {{value['question']}}
+                                                            </a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapse{{val}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="question{{val}}">
+                                                        <div class="panel-body">
+                                                            <p> {{value['answer']}} </p>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>   
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="notice notice-danger">Please Add Or Publish FAQ Content.</div>
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,101 @@
+{#
+/**
+ * @file
+ * Theme override for main view template.
+ *
+ * Available variables:
+ * - attributes: Remaining HTML attributes for the element.
+ * - css_name: A css-safe version of the view name.
+ * - css_class: The user-specified classes names, if any.
+ * - header: The optional header.
+ * - footer: The optional footer.
+ * - rows: The results of the view query, if any.
+ * - empty: The content to display if there are no rows.
+ * - pager: The optional pager next/prev links to display.
+ * - exposed: Exposed widget form/info to display.
+ * - feed_icons: Optional feed icons to display.
+ * - more: An optional link to the next page of results.
+ * - title: Title of the view, only used when displaying in the admin preview.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the view title.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the view title.
+ * - attachment_before: An optional attachment view to be displayed before the
+ *   view content.
+ * - attachment_after: An optional attachment view to be displayed after the
+ *   view content.
+ * - dom_id: Unique id for every view being printed to give unique class for
+ *   Javascript.
+ *
+ * @see template_preprocess_views_view()
+ */
+#}
+<!-- ================ Start Page Title ======================= -->
+<section class="title-transparent page-title">
+  <div class="container">
+  </div>
+</section>
+<!-- ================ Listing In Grid Style ======================= -->
+<section class="padd-top-0 padd-bot-0">
+  <div class="container">
+    <!-- Searc Filter -->
+    <div class="row">
+      <div class="white-box white-shadow padd-top-30 padd-bot-30 translateY-60">
+        <h3 class="text-center padd-bot-15">Search For Menu</h3>
+        {{ drupal_form('Drupal\\cotfoo_meal\\Form\\MenuSearchFilterForm') }}
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ================ Search listing With Filter Option ======================= -->
+<div class="container">
+  <div class="row">
+
+    <!-- Filter Option -->						
+    <div class="col-md-3 col-sm-12">
+      <div class="slide-filter" >
+        <div class="sidebar">
+          <div class="widget-boxed">
+            <div class="widget-boxed-body padd-top-10 padd-bot-0">
+              {{ exposed }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- All Listing -->
+    <div class="col-md-9 col-sm-12"> 
+      <div class="row mrg-bot-20">
+
+      </div>
+
+      <!-- Filter option -->
+      <div class="row mrg-0 mrg-bot-20">	
+        <!-- <div class="col-md-4 col-sm-4 pull-left">						
+                <h5>70 result Found</h5>
+        </div> -->
+        <div class="col-md-6 col-sm-6 pull-left padd-0">
+          <span class="btn theme-btn" id="filterYourSearch" style="display:none" onclick="openNav()">Filter Your Search</span>
+        </div>				
+        <div class="col-md-2 col-sm-6 layout-option padd-0 pull-right">
+          <div class="no-padd">
+            <select class="form-control" data-live-search="true">
+              <option value="">Sort</option>
+              <option value="Low-high">Low to High</option>
+              <option value="High-low">High to Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- End Filter option -->
+
+      <div class="row">
+        {{ rows }}
+        {{ empty }}
+      </div>
+      <!-- row -->
+    </div>
+  </div>
+</div>    
+<!-- /.col-md-5 -->

@@ -1,0 +1,38 @@
+<section class="log-wrapper">
+  <div class="container">
+    <div class="col-md-6 col-sm-10 col-md-offset-3 col-sm-offset-1">
+      <div class="log-box login-box">
+        <h2>Welcome <span class="theme-cl"> Back!</span></h2>                
+        <form {{ attributes }}>
+          <div class="input-group">
+            {{ element.name }}                        
+          </div>
+          <div class="input-group">
+            {{ element.pass }}                       
+          </div>
+          <div class="text-center">
+            {{ element.actions.submit }}                    
+          </div>
+          {{ element.form_build_id }} {# required #}
+          {{ element.form_id }} {# required #}  
+          {{ element.form_token }}{# required #}
+          <hr>
+          <div class="social-logins text-center"> 
+            <a href="login/facebook"><div class="facebook-login">
+                <i class="fa fa-fw fa-facebook-square"></i> <span> Facebook</span></div>
+            </a>
+            <a href="login/google"><div class="google-login">
+                <i class="fa fa-fw fa-google-plus-square"></i> <span> Google </span></div>
+            </a>
+          </div>
+          <div class="text-center create-acnt">
+            <a href="{{ url("<front>") }}user/register">Create new account</a>
+          </div>
+          <div class="text-center reset-pass">
+            <a href="{{ url("<front>") }}user/password">Reset Password</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

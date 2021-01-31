@@ -1,0 +1,76 @@
+
+<!-- ================ Start Page Title ======================= -->
+<section class="page-title">
+    <div class="container">
+        <div class="title-content">
+            <h1>Get In Touch</h1>						
+        </div>
+    </div>
+</section>
+<div class="clearfix"></div>
+<!-- ================ End Page Title ======================= -->
+
+<!-- ================ Office Address ======================= -->
+<section class="padd-0">
+    <div class="container">
+        <div class="col-md-12 col-md-offset-3 col-sm-12 translateY-60">
+            <div class="col-md-6 col-sm-6">
+                <div class="detail-wrapper text-center padd-top-40 mrg-bot-10 padd-bot-40 light-bg">
+                    <i class="theme-cl font-30 ti-location-pin"></i>
+                    <h4>Indore Office</h4>
+                    Asmakam, 22 Sunshine Farms<br>Halka No 10, AB Road<br>
+                    Indore MP.<br>452012
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ================ End Office Address ======================= -->
+
+<!-- ================ Fill Forms ======================= -->
+<section class="padd-top-0">
+    <div class="container">
+        <div class="col-md-6 col-sm-6">
+            <div class="detail-wrapper">
+                <div class="detail-wrapper-header text-center">
+                    <h4><i class="glyphicon glyphicon-envelope theme-cl mrg-r-10"></i>How Can We Help You</h4>
+                </div>
+                <div class="detail-wrapper-body">
+                    <form {{ attributes }}>
+                        <div class="form-group">                           
+                            {{ element.name }}
+                        </div>
+                        <div class="form-group">
+                            {{ element.mail }}
+                        </div>
+                        <div class="form-group">
+                            {{ element.subject }}
+                        </div>
+                        <div class="form-group">
+                            {{ element.message }}
+                        </div>
+                        <div class="form-group">
+                            {{ element.copy }}
+                        </div>
+                        <div class="text-center form-group">
+                            {{ element.actions.submit }}                    
+                        </div>
+                        {{ element.form_token }}
+                        {{ element.form_build_id }} {# required #}
+                        {{ element.form_id }} {# required #}
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="detail-wrapper">                
+                <div class="detail-wrapper-body">                    
+                    <div id="map_full_width_one" class="full-width" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ================ End Fill Forms ======================= -->
