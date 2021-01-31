@@ -1,0 +1,254 @@
+//Font import
+@mixin font-face($name, $font-file, $weight, $svgID, $style: normal){
+	@font-face {
+		font-family: "#{$name}";
+		src: url("../fonts/#{$font-file}.eot");
+		src: url("../fonts/#{$font-file}.eot?#iefix") format('embedded-opentype'),
+			 url("../fonts/#{$font-file}.woff") format('woff'),
+			 url("../fonts/#{$font-file}.ttf") format('truetype'),
+			 url("../fonts/#{$font-file}.svg#"+$svgID) format('svg');
+		font-weight: $weight;
+		font-style: $style;
+	}
+}
+
+// Typography
+$font-stack-1: "helvetica neue", arial, helvetica, sans-serif;
+$font-stack-2: Georgia, Times, serif;
+
+$base-font-size: 16px;
+$base-line-height: 1.5em;
+$base-font-sizing-ratio: 1.2;
+
+// Brand Colors
+$brand-primary: #ed1c4f;
+$brand-secondary: #ed1c4f;
+$brand-tertiary: #888;
+$link-color: $brand-secondary;
+$link-hover-color: darken($link-color,8%);
+
+// UI Colors - starting purely websafe. Change per site at your discretion.
+$text-color: #333;
+$btn-primary: #3c3;
+$btn-secondary: #888;
+$info: #39c;
+$success: #3c3;
+$error: #c00;
+$error-light: #fcc;
+$error-dark: #900;
+$warning: #fc0;
+
+// Layout 
+$breakpoint-1-padding: 30px;
+$breakpoint-3-padding: 20px;
+$breakpoint-5-padding: 15px;
+
+$page-width: 1070px + ($breakpoint-1-padding*2);
+$page-body-width: 640px + ($breakpoint-1-padding);
+$page-sidebar-width: 320px + ($breakpoint-1-padding);
+
+// Screen Size Breakpoints
+$breakpoints: (
+	1020px,
+	860px,
+	768px,
+	640px,
+	570px,
+	480px,
+	320px
+);
+
+@mixin button() {
+
+}
+
+@mixin input() {
+
+}
+
+
+// Responsive Containers
+@mixin container() {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $page-width;
+	padding-left: $breakpoint-1-padding;
+	padding-right: $breakpoint-1-padding;
+
+	@include breakpoint(3, below) {
+		padding-left: $breakpoint-3-padding;
+		padding-right: $breakpoint-3-padding;
+	}
+
+	@include breakpoint(5, below) {
+		padding-left: $breakpoint-5-padding;
+		padding-right: $breakpoint-5-padding;
+	}
+}
+
+@mixin remove-container-padding() {
+	margin-left: -($breakpoint-1-padding);
+	margin-right: -($breakpoint-1-padding);
+
+	@include breakpoint(3, below) {
+		margin-left: -($breakpoint-3-padding);
+		margin-right: -($breakpoint-3-padding);
+	}
+
+	@include breakpoint(5, below) {
+		margin-left: -($breakpoint-5-padding);
+		margin-right: -($breakpoint-5-padding);
+	}
+}
+
+@mixin add-container-padding() {
+	padding-left: $breakpoint-1-padding;
+	padding-right: $breakpoint-1-padding;
+
+	@include breakpoint(3, below) {
+		padding-left: $breakpoint-3-padding;
+		padding-right: $breakpoint-3-padding;
+	}
+
+	@include breakpoint(5, below) {
+		padding-left: $breakpoint-5-padding;
+		padding-right: $breakpoint-5-padding;
+	}
+}
+
+@mixin clearfix() {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+@mixin placeholder($color:#444){
+    &::-webkit-input-placeholder{
+    	color: $color;
+	}
+	&:-moz-placeholder{
+		color: $color;
+	} 
+	&::-moz-placeholder{
+		color: $color;
+		opacity:1;
+	}
+	&:-ms-input-placeholder{
+		color: $color;
+	}
+}
+
+// Settings
+// Moved to _base.scss
+
+// Exponent Calculator
+@function exponent($base, $exponent) {
+
+	// reset value
+	$value: $base;
+
+	// positive intergers get multiplied
+	@if ($exponent > 1) {
+		@for $i from 2 through $exponent {
+			$value: $value * $base;
+		}
+	}
+
+	// negitive intergers get divided. A number divided by itself is 1
+	@if ($exponent < 1) {
+		@for $i from 0 through -$exponent {
+			$value: $value / $base;
+		}
+	}
+
+	// return the last value written
+	@return ($value);
+}
+
+// Ratios
+@function ratio($exponent, $ratio: $base-font-sizing-ratio) {
+	@return exponent($ratio, $exponent);
+}
+
+// Remove px unit from a value
+@function px-to-dec($n) {
+	@return if($n != 0, $n / 1px, 0);
+}
+
+// Remove em unit from a value
+@function em-to-dec($n) {
+	@return if($n != 0, $n / 1em, 0);
+}
+
+// Add px unit to a value
+@function dec-to-px($n) {
+	@return $n + 0px;
+}
+
+// Add em unit to a value
+@function dec-to-em($n) {
+	@return $n + 0em;
+}
+
+@function border-px-to-em($px, $font-size) {
+	@return dec-to-em(px-to-dec($px) / $font-size);
+}
+
+// Vertical Rhythm Multiplier
+@function vr($multiplier: 1) {
+	@return $base-line-height * $multiplier;
+}
+
+// Vertical and horizontal Center (Using position absolute)
+@mixin centerer($horizontal: true, $vertical: true, $z-index: 1) {
+  position: absolute;
+  @if ($horizontal and $vertical) {
+    top: 50%;
+    left: 50%;
+	@include prefixer(transform,translate(-50%, -50%));
+  } @else if ($horizontal) {
+    left: 50%;
+	@include prefixer(transform,translate(-50%, 0));
+  } @else if ($vertical) {
+    top: 50%;
+	@include prefixer(transform,translate(0, -50%));
+  }
+  z-index: $z-index;
+}
+
+//Set background image
+@mixin backgroundImage($filename, $repeat: no-repeat, $size: auto, $position: 0% 0%){
+	background-image: url("../images/"+$filename);
+	background-repeat: $repeat;
+	background-size: $size;
+	background-position: $position;
+}
+
+//H tag font sizes
+@mixin h-size($number){
+	@if ($number == 1){
+		font-weight: 900;
+		font-size: 32px;
+		
+	} @else if($number == 2){
+		font-weight: 900;
+		font-size: 27px;
+	
+	} @else if($number == 3){
+		font-weight: 500;
+		font-size: 11px;
+	
+	} @else if($number == 4){
+		font-weight: 700;
+		font-size: 16px;
+	
+	} @else if($number == 5){
+		font-weight: 500;
+		font-size: 16px;
+	
+	} @else if($number == 6){
+		font-weight: 900;
+		font-size: 16px;
+	
+	}
+}

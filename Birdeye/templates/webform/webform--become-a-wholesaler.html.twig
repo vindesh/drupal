@@ -1,0 +1,43 @@
+{# empty Twig template #}
+{#{ '<pre>'}} {{ dump(element.elements)}#}
+
+{% set form_elements = element.elements.contact_form %}
+
+<form{{ attributes }}>
+    {{ title_prefix }}
+    <div class="form-content">
+        <legend class="form-content">
+            <span>{{ element.elements["#title"] }}</span>
+        </legend>
+        <div class="fieldset-wrapper">
+            <div class="description">
+                {{ element.elements['#description']['#markup'] }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12"><h2>{{ element.elements["#title"] }}</h2></div>
+    <div class="col-sm-6">
+        <div class="form-ftr">
+            <div class="field-bx">{{ element.elements.1 }}</div>
+            <div class="field-bx">{{ element.elements.email }}</div>
+            <div class="field-bx">{{ element.elements.phone }}</div>
+            <div class="field-bx">{{ element.elements.company }}</div>
+            <div class="field-bx">
+                {{ element.elements.message }}
+            </div>            
+            <div class="field-btn">
+                {{ element.form_build_id }}
+                {{ element.form_token }}
+                {{ element.form_id }}
+                {{ element.elements.actions }}<i class="fa fa-chevron-right"></i>
+
+            </div>
+        </div>
+    </div>
+    {{ title_suffix }}
+</form>  
+
+
+
+

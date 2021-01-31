@@ -1,0 +1,123 @@
+@charset "UTF-8";
+/** Custom CSS write here **/
+
+/*
+font-family: 'Josefin Sans', sans-serif;
+*/
+body {font-family: 'Josefin Slab', serif; color:#2c292a;}
+h1, h2, h3, h4, h5, h6 {font-family: 'Josefin Sans', sans-serif;}
+img {max-width:100%;}
+.top-header li {font-size:11px; letter-spacing:0.25; font-weight:600; padding:0 8px; line-height:20px; text-transform:uppercase; vertical-align:top;}
+.top-header {background:#2c292a; position:relative; z-index:2; text-align:right; box-shadow:0 0 3px rgba(0,0,0,0.3); height:20px;}
+.top-header li a {color:#fff;}
+.top-header ul {margin:0;}
+.top-header li.spcl-btn a {background:#801324; box-shadow:0 0 3px rgba(0,0,0,0.3); font-size:13px; padding:8px 15px; display:block; line-height:normal; font-family: 'Josefin Sans', sans-serif; font-weight:600;}
+.navbar-brand {height:95px; width:300px; padding:10px 0;}
+.navbar-brand img {height:100%;}
+.header-right {float:right;}
+.navbar-collapse {float:left;}
+.navbar-default {padding-bottom:25px; background:#f3f3f4; border:none; margin:0;}
+.navbar-nav > li > a {padding:38px 15px; font-weight:700; text-transform:uppercase;}
+.search-header {float:left; position:relative; margin:29px 15px;}
+.search-header button {background:none; position:absolute; border:none; right:5px; top:10px;}
+.search-header input {background:#fff; border:none; padding:8px 10px;}
+.cart {float:left; padding:38px 0;}
+.cart a {color:#801324;}
+.item {position:relative;}
+.banner-content {position:absolute; bottom:20px; height:200px; margin-top:-100px; top:50%; left:50px; width:320px;}
+.banner {margin-top:-20px;}
+.banner-prod {box-shadow:0 0 5px rgba(0,0,0,0.4);}
+.banner-content h2 {margin:0 0 20px; font-weight:300; font-size:40px; color:#333; }
+.cmn-btn {min-width:200px; text-align:center; padding:11px 30px 8px; border-radius:3px; font-family: 'Josefin Sans', sans-serif; font-weight:600; background:#801324; color:#fff; line-height:normal; display:inline-block;}
+.cmn-btn:hover, .cmn-btn:focus {color:#fff; text-decoration:none; opacity:0.8;}
+.banner .owl-prev {font-size:0px; position:absolute; left:10px; top:50%; margin-top:-20px;}
+.banner .owl-prev:before {content: "\f137"; font-family:FontAwesome; color:#ccc; font-size:40px;}
+.banner .owl-next:before {content: "\f138"; font-family:FontAwesome; color:#ccc; font-size:40px;}
+.banner .owl-next {font-size:0; position:absolute; right:10px; top:50%; margin-top:-20px;}
+.grey-strip {width:600px; height:100%; position:fixed; z-index:1; background:#fafafb; left:50%; margin-left:-300px;}
+.web-page {position:relative; z-index:2;}
+.about-section {padding:100px 0;}
+.content-bx h2 {margin:0 0 20px; font-weight:300; font-size:40px; color:#333; }
+.content-bx p {color:#666; margin-bottom:40px; position:relative;}
+.about-section p:after {position:absolute; left:0; bottom:-20px; content:""; height:1px; width:100px; background:#ccc;}
+.content-bx {padding:50px 0 0;}
+.section-heading {margin-bottom:30px;}
+.section-heading .cmn-btn {float:right;}
+.section-heading h2 {float:left; text-transform:uppercase; margin:0 0 0; font-weight:300; font-size:40px; color:#333;}
+.our-products-outer {background:url(../images/wooden-strip.jpg) no-repeat center center / 100%; }
+.owl-products .item img {width:auto; display:inline-block; margin-bottom:10px;}
+.owl-products .item {text-align:center; position:relative;}
+.owl-products .item p {color:#333; font-weight:700;}
+.owl-products .item .zoom-icon a {background:rgba(0,0,0,0.8); color:#fff; font-size:50px; border-radius:50%; position:absolute; left:50%; width:80px; height:80px; opacity:0; line-height:80px; text-align:center; top:50%; margin-left:-40px; margin-right:-40px;}
+.owl-products .item:hover .zoom-icon a {opacity:1;}
+.owl-products .item .zoom-icon a i {line-height:80px;}
+.owl-products .owl-prev {font-size:0px; position:absolute; left:10px; top:50%; margin-top:-20px;}
+.owl-products .owl-prev:before {content: "\f053"; font-family:FontAwesome; color:#801324; font-size:40px;}
+.owl-products .owl-next:before {content: "\f054"; font-family:FontAwesome; color:#801324; font-size:40px;}
+.owl-products .owl-next {font-size:0; position:absolute; right:10px; top:50%; margin-top:-20px;}
+.coming-soon-bx {height:250px; padding:10px; text-align:center; width:100%; display:table; background:url(../images/coming-soon.jpg) no-repeat center / cover; color:#fff;}
+.interested-bx .inr-bg {background:rgba(128,19,36,0.8);}
+.coming-soon-bx .inr-bg {background:rgba(44,41,42,0.8);}
+.inr-bg {display:table-cell; vertical-align:middle;}
+.inr-bg p {font-size:25px; font-family: 'Josefin Sans', sans-serif; font-weight:300; padding:20px;}
+.interested-bx {height:250px; padding:10px; text-align:center; width:100%; display:table; background:url(../images/interested.jpg) center / cover; color:#fff;}
+.coming-soon-interested {background:url(../images/wooden-strip.jpg) no-repeat center center / 100%; padding:80px 0; }
+.blog-section {padding:80px 0;}
+.ftr-top-form {background:#2c292a; color:#fff; padding:50px 0;}
+.field-bx input {width:100%; padding:10px 10px; font-size:13px; color:#000; text-transform:uppercase;}
+.field-bx textarea {width:100%; padding:10px 10px; height:80px; font-size:13px; color:#000; text-transform:uppercase;}
+.field-bx {margin-bottom:20px;}
+.ftr-top-form h2 {margin:0 0 20px; font-weight:300; font-size:40px; color:#fff;}
+.field-btn button {float:right; background:none; border:none; font-weight:600; font-family: 'Josefin Sans', sans-serif; font-size:18px;}
+.field-btn {position:relative; margin-top:40px;}
+.field-btn:after {position:absolute; right:0; top:-20px; content:""; height:1px; width:100px; background:#464445;}
+.form-text {padding-left:30px; border-left:1px solid #464445; margin-top:50px; font-size:25px; font-family: 'Josefin Sans', sans-serif; font-weight:300;}
+.footer {background:#fff; padding:30px 0;}
+.ftr-links {float:left; width:20%;}
+.social-links {float:right; width:30%;}
+.ftr-logo {width:50%; float:left; text-align:center;}
+.ftr-links ul {padding:0 0 0 20px; margin-top:20px; border-left:2px solid #ccc; margin:0;}
+.ftr-links li {list-style:none; font-weight:700; margin-bottom:5px; font-weight:700;}
+.ftr-links li a {color:#333;}
+.social-links ul {padding:100px 0 0; margin:0;}
+.social-links li {display:inline-block; text-align:right; font-size:20px;  text-align:right; padding:0 20px; color:#000;}
+.face-ftr a { color:#3261a1;}
+.you-ftr a {color:#cc2129;}
+.twi-ftr a { color:#25aae1;}
+.insta-ftr a {color:#040707;}
+.enve-ftr a {color:#156d9d;}
+.ftr-bx {font-size:16px; font-weight:700; margin-top:20px; color:#666; text-align:center;}
+.ftr-copy {margin-top:20px; font-size:14px; font-weight:700; text-align:center;}
+.prod-category {padding:30px 0; background:#fff;}
+.breadcrumb_inr {padding:15px 0; background:#fff;}
+.breadcrumb_inr li {position:relative; display:inline-block; font-weight:700; padding-left:20px; list-style:none;}
+.breadcrumb_inr ul {padding:0; margin:0; text-align:right;}
+.breadcrumb_inr li:after {position:absolute; content:">"; left:5px; top:2px; font-size:10px;}
+.breadcrumb_inr li:first-child:after {content:"";}
+.breadcrumb_inr li a {color:#2c292a;}
+.prod-bx h2 {color:#666; font-weight:700; font-family: 'Josefin Slab', serif; text-align:center; font-size:16px; margin:10px 0 0;}
+.prod-img img {width:100%;}
+.prod-bx {margin-bottom:20px;}
+.inr-ftr .footer {background:none;}
+.prod-detail {padding:20px 0; background:#fff;}
+.prod-det-cont h3 {font-size:45px; font-weight:300; color:#333; text-align:center;}
+.btns-bx {text-align:center; padding:30px 0;}
+.btns-bx h4 {font-size:20px; margin:0 0 20px;}
+.btns-bx p {color:#666; font-weight:600; font-size:16px; margin-top:20px;}
+.prod-disc li {width:20%; list-style:none; vertical-align:bottom; display:inline-block;}
+.prod-disc ul {padding:0; margin:0; text-align:center;}
+.prod-suggestions:after {background:url(../images/wooden-strip.jpg) no-repeat center center / 100%; position:absolute; height:150px; width:100%; bottom:150px; content:"";}
+.prod-suggestions {padding:80px 0; position:relative;}
+.prod-disc {position:relative; z-index:99;}
+
+div.banner-content a {min-width:200px; text-align:center; padding:11px 30px 8px; border-radius:3px; font-family: 'Josefin Sans', sans-serif; font-weight:600; background:#801324; color:#fff; line-height:normal; display:inline-block;}
+div.banner-content a:hover, div.banner-content a:focus {color:#fff; text-decoration:none; opacity:0.8;}
+.path-frontpage h1.page-header { display: none; }
+.field-bx .form-text { margin-top: 0px; }
+span.cmn-btn {min-width:200px; text-align:center; padding:11px 30px 8px; border-radius:3px; font-family: 'Josefin Sans', sans-serif; font-weight:600; background:#801324; color:#fff; line-height:normal; display:inline-block;}
+span.cmn-btn:hover, span.cmn-btn:focus {color:#fff; text-decoration:none; opacity:0.8;}
+.owl-products p{ text-transform: uppercase; }
+.not-front .footer {background:none;}
+
+
+

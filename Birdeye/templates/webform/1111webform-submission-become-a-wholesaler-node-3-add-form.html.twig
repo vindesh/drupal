@@ -1,0 +1,67 @@
+{# empty Twig template #}
+
+
+{% set form_elements = element.elements.contact_form %}
+
+<form{{ attributes }}>
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  <div class="form-content">
+    <legend class="form-content">
+      <span>{{ form_elements["#title"] }}</span>
+    </legend>
+    <div class="fieldset-wrapper">
+      <div class="description">
+        {{ form_elements['#description']['#markup'] }}
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-left-bar">
+    {{ form_elements.name }}
+    {{ form_elements.email }}
+    {{ form_elements.phone }}
+    {{ form_elements.callback_request }}
+  </div>
+  <div id="edit-right-bar">
+    {{ form_elements.message }}
+    {{ form_elements.add_to_mailing_list }}
+    {{ element.elements.actions }}
+  </div>
+
+  {{ element.form_build_id }}
+  {{ element.form_token }}
+  {{ element.form_id }}
+
+</form>
+
+
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+<div class="ftr-top-form">
+	<div class="container">
+    	<div class="row">
+        	<div class="col-md-12"><h2>Become A wholeseller</h2></div>
+            <div class="col-sm-6">
+            	<div class="form-ftr">
+                	<div class="field-bx"><input type="text" placeholder="Name*" /></div>
+                    <div class="field-bx"><input type="text" placeholder="Email*" /></div>
+                    <div class="field-bx"><input type="text" placeholder="Phone*" /></div>
+                    <div class="field-bx"><input type="text" placeholder="Company*" /></div>
+                    <div class="field-bx">
+                    	<textarea placeholder="Message*"></textarea>
+                    </div>
+                    <div class="field-btn">
+                    	<button type="submit">Submit Info <i class="fa fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+            	<div class="form-text">
+                	<p>With 65 flavors to choose from and only using the freshest and most natural ingredients possible. Zero preservatives or colorings, just old fashioned, homestyle, hand scooped jams and jellies.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>dadasaasasasas

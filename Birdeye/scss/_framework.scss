@@ -1,0 +1,116 @@
+// Breakpoint
+@mixin breakpoint($breakpoint, $orientation: below, $scope: 0) {
+
+	@if (unitless($breakpoint)) {
+
+		@if $scope != 0 {
+
+			@if $orientation == below {
+				@media (max-width: nth($breakpoints, $breakpoint)) and(min-width: (nth($breakpoints, $breakpoint+$scope))+1) { @content; }
+			} @else {
+				&:before {
+					background-color: #f00;
+					color: #fff;
+					padding: vr(.25);
+					content: "You can only scope below a breakpoint, not above.";
+				}
+			}
+
+		} @else {
+
+			@if $breakpoint == 0 {
+				@media (min-width: (nth($breakpoints, 1))+1) { @content; }
+			} @else {
+				@if $orientation == above {
+					@media (min-width: (nth($breakpoints, $breakpoint))+1) { @content; }
+				} @else {
+					@media (max-width: nth($breakpoints, $breakpoint)) { @content; }
+				}
+			}
+		}
+
+	} @else {
+		@if $orientation == above {
+			@media (min-width: ($breakpoint)+1) { @content; }
+		} @else {
+			@media (max-width: ($breakpoint)) { @content; }
+		}
+	}
+}
+
+
+// Browser Prefixer
+@mixin prefixer($property, $value){
+	#{$property}: $value;
+	-moz-#{$property}: $value;
+	-ms-#{$property}: $value;	
+	-o-#{$property}: $value;	
+	-webkit-#{$property}: #{$value};	
+}
+
+
+// Prevent Text Selection
+@mixin prevent-text-selection() {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+
+// Clearfix
+@mixin clearfix() {
+	&:after {
+		display: block;
+		clear: both;
+		content: " ";
+		overflow: hidden;
+		height: 0;
+	}
+}
+
+
+// Grid Parent
+@mixin grid-parent($gutter: $grid-gutter, $type: inline, $fix-WhiteSpace: false) {
+	margin-left: (-$gutter);
+	margin-right: (-$gutter);
+
+	@if $type == float {
+		width: auto;
+		max-width: none;
+		@include clearfix();
+	}
+	@if $fix-WhiteSpace == true{
+		font-size: 0;
+	}
+	
+}
+
+// Grid Child
+@mixin grid-child($column-count, $gutter: $grid-gutter, $grid-box-sizing: true, $type: inline, $fix-WhiteSpace: false) {
+	padding-left: $gutter;
+	padding-right: $gutter;
+	max-width: 100%;
+	width: 100% / $column-count;
+
+	@if $type == inline {
+		vertical-align: top;
+		display: inline-block;
+	} @elseif $type == float {
+		float: left;
+	}
+
+	@if $grid-box-sizing == true {
+		@include prefixer(box-sizing, border-box);
+	}
+	@if $fix-WhiteSpace == true{
+		font-size: $base-font-size;
+	}
+}
+
+// Grid Span
+@mixin grid-count($column-count) {
+	width: 100% / $column-count;
+}

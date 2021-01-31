@@ -1,0 +1,47 @@
+{#
+/**
+ * @file
+ * Theme override to display a view of unformatted rows.
+ *
+ * Available variables:
+ * - title: The title of this group of rows. May be empty.
+ * - rows: A list of the view's row items.
+ *   - attributes: The row's HTML attributes.
+ *   - content: The row's content.
+ * - view: The view object.
+ * - default_row_class: A flag indicating whether default classes should be
+ *   used on rows.
+ *
+ * @see template_preprocess_views_view_unformatted()
+ */
+#}
+{% if title %}
+  <h3>{{ title }}</h3>
+{% endif %}
+
+
+{#{ rows.field_home_video_link.content.0.field_output  }}
+{{ rows.field_youtube_video.content.0.field_output }}
+{{ rows.content.title|field_value }}
+{{ rows.content.body|field_value }#}
+AAAAA
+{#{ kint(rows) }#}
+
+{{ rows.content['#view']['field']['field_youtube_video'].original_value }}
+{{ dump(rows.content['#view']) }}
+
+BBBB
+
+
+{% for row in rows %}
+  {%
+    set row_classes = [
+      default_row_class ? 'views-row',
+    ]
+  %}
+  <div{{ row.attributes.addClass(row_classes) }}>
+
+  
+    {{ row.content }}
+  </div>
+{% endfor %}

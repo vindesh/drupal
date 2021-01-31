@@ -1,0 +1,30 @@
+core: 8.x
+type: theme
+base theme: bootstrap
+
+name: 'Puffin'
+description: 'A Drupal 8 Boostrap sub-theme built by Birdeye.'
+package: 'Bootstrap'
+
+regions:
+  top_header: 'Top header'
+  websitelogo: 'Website logo'
+  navigation: 'Navigation'
+  navigation_collapsible: 'Navigation (Collapsible)'
+  header_right: 'Header right (Search & Cart)'
+  breadcrumb: Breadcrumb
+  header: 'Top Bar'  
+  highlighted: 'Highlighted'
+  help: 'Help'
+  content_top: 'Content top'
+  content: 'Content'
+  content_bottom: 'Content bottom'
+  sidebar_first: 'Primary'
+  sidebar_second: 'Secondary'
+  footer: 'Footer'
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+
+libraries:
+  - 'Birdeye/global-styling'
+  - 'Birdeye/bootstrap-scripts'

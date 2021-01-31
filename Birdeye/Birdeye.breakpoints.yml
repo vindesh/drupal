@@ -1,0 +1,6 @@
+Birdeye.wide:
+  label: wide
+  mediaQuery: '(max-width: 768px)'
+  weight: 2
+  multipliers:
+  - 1x

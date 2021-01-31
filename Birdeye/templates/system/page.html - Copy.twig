@@ -1,0 +1,112 @@
+
+<div class="grey-strip"></div>
+<div class="web-page">
+    <div class="header">
+        {% if page.top_header %}
+            <div class="top-header">
+                <div class="container">
+                    <div class="row">
+
+                        {{ page.top_header }}
+
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    {# .btn-navbar is used as the toggle for collapsed navbar content #}
+                    {% if page.navigation_collapsible %}
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">{{ 'Toggle navigation'|t }}</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    {% endif %}
+                    <a class="navbar-brand" href="#"><img src="themes/Birdeye/images/logo.png" alt="" /></a>
+                </div>
+
+
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                    <ul class="nav navbar-nav navbar-left">
+                        <li><a href="#">Our Story</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Wholesale</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+
+                <div class="header-right">
+                    <div class="search-header">
+                        <input type="text" placeholder="Search" />
+                        <button type="submit"><i class="fa fa-search"></i></button>
+                    </div>
+                    <div class="cart">
+                        <a href="#">Cart <i class="fa fa-shopping-cart"></i> <span>(0)</span></a>
+                    </div>
+                </div>
+
+            </div><!-- /.container-fluid -->
+        </nav>
+    </div>
+
+
+
+
+
+
+
+AAA
+    {# Main #}
+    {% block main %}
+        <div role="main" class="main-container {{ container }} js-quickedit-main-content">
+            <div class="row">
+
+                <div class="main-content {% if page.sidebar_second %}with-sidebar{% endif %}">
+                    <section{{ content_attributes.addClass(content_classes) }}>
+                        
+                        
+                        {# Content #}
+                        {% block content %}
+                            <a id="main-content"></a>
+                            {{ page.content }}
+                        {% endblock %}
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+BBBB
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

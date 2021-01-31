@@ -1,0 +1,205 @@
+
+<div class="grey-strip"></div>
+<div class="web-page">
+  <div class="header">
+    {% if page.top_header %}
+      <div class="top-header">
+        <div class="container">
+          <div class="row">
+
+            {{ page.top_header }}
+
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    <nav class="navbar navbar-default">
+      <div class="container">
+
+
+
+        {% set container = theme.settings.fluid_container ? 'container-fluid' : 'container' %}
+        {# Navbar #}
+        {% if page.navigation or page.navigation_collapsible %}
+          {% block navbar %}
+            {% set navbar_classes = [
+              'navbar',
+              theme.settings.navbar_inverse ? 'navbar-inverse' : 'navbar-default',
+              theme.settings.navbar_position ? 'navbar-' ~ theme.settings.navbar_position|clean_class : container,
+              ]
+            %}
+
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              {# .btn-navbar is used as the toggle for collapsed navbar content #}
+              {#% if page.navigation_collapsible %#}
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">{{ 'Toggle navigation'|t }}</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              {#% endif %#}
+              {% if page.websitelogo %}
+                {# Website logo #}
+                {% block websitelogo %}
+                  {{ page.websitelogo }}
+                {% endblock %}  
+              {% else %}
+                <a class="navbar-brand" href="/"><img src="themes/Birdeye/images/logo.png" alt="" /></a>
+                {% endif %}
+            </div>
+            {# Navigation (collapsible) #}
+            {% if page.navigation_collapsible %}
+              <div id="navbar-collapse" class="navbar-collapse collapse">
+                {{ page.navigation_collapsible }}
+              </div>
+            {% endif %}
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              {{ page.navigation }}
+            </div><!-- /.navbar-collapse -->                        
+
+          {% endblock %}
+        {% endif %}
+
+
+        {% if page.header_right %}       
+          {% block header_right %}
+            <div class="header_right">              
+              {{ page.header_right }}
+              <div class="cart">
+                <a href="#">{{ 'Cart'|t }} <i class="fa fa-shopping-cart"></i> <span>(0)</span></a>
+              </div>
+            </div>
+          {% endblock %}
+        {% endif %}
+      </div><!-- /.container-fluid -->
+    </nav>
+  </div><!-- /.header -->
+
+
+  {# Main #}
+  {% block main %}
+    <div role="main" class="main-container {{ container }} js-quickedit-main-content">
+
+
+      {# Header #}
+      {% if page.header %}
+        {% block header %}
+          <div class="col-sm-12" role="heading">
+            {{ page.header }}
+          </div>
+        {% endblock %}
+      {% endif %}
+
+      {# Sidebar First #}
+      {% if page.sidebar_first %}
+        {% block sidebar_first %}
+          <aside class="col-sm-3" role="complementary">
+            {{ page.sidebar_first }}
+          </aside>
+        {% endblock %}
+      {% endif %}
+
+      {# Content section start #}
+      {%
+        set content_classes = [
+          page.sidebar_first and page.sidebar_second ? 'col-sm-6',
+          page.sidebar_first and page.sidebar_second is empty ? 'col-sm-9',
+          page.sidebar_second and page.sidebar_first is empty ? 'col-sm-9',
+          page.sidebar_first is empty and page.sidebar_second is empty ? 'col-sm-12'
+        ]
+      %}
+
+      <div class="main-content {% if page.sidebar_second %}with-sidebar{% endif %}">
+        <section{{ content_attributes.addClass(content_classes) }}>
+
+          {# Highlighted #}
+          {% if page.highlighted %}
+            {% block highlighted %}
+              <div class="highlighted">{{ page.highlighted }}</div>
+            {% endblock %}
+          {% endif %}
+
+          {# Breadcrumbs #}
+          {% if breadcrumb %}
+            {% block breadcrumb %}
+              {{ breadcrumb }}
+            {% endblock %}
+          {% endif %}
+
+          {# Action Links #}
+          {% if action_links %}
+            {% block action_links %}
+              <ul class="action-links">{{ action_links }}</ul>
+            {% endblock %}
+          {% endif %}
+
+          {# Help #}
+          {% if page.help %}
+            {% block help %}
+              {{ page.help }}
+            {% endblock %}
+          {% endif %}
+
+          {# Content #}
+          {% block content_top %}                            
+            {{ page.content_top }}
+          {% endblock %}
+
+          {# Content #}
+          {% block content %}
+            <a id="main-content"></a>
+            {{ page.content }}
+          {% endblock %}
+
+          {# Content #}
+          {% block content_bottom %}   
+            <div class="ftr-top-form">
+              <div class="container">
+                <div class="row">
+                  {{ page.content_bottom }}
+                </div>
+              </div>
+            </div>
+          {% endblock %}
+        </section><!--End Of section-->
+
+        {# Sidebar Second #}
+        {% if page.sidebar_second %}
+          {% block sidebar_second %}
+            <aside class="col-sm-3" role="complementary">
+              {{ page.sidebar_second }}
+            </aside>
+          {% endblock %}
+        {% endif %}
+
+      </div>
+    </div>
+  {% endblock %}
+
+
+
+
+
+
+  <div class="footer">
+    <div class="container">
+      <div class="row">
+        {% if page.footer %}
+          {% block footer %}
+
+            {{ page.footer }}
+
+          {% endblock %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+<!--End Of Web-Page-->

@@ -1,0 +1,146 @@
+// Settings
+// Moved to _base.scss
+
+// Exponent Calculator
+@function exponent($base, $exponent) {
+
+	// reset value
+	$value: $base;
+
+	// positive intergers get multiplied
+	@if ($exponent > 1) {
+		@for $i from 2 through $exponent {
+			$value: $value * $base;
+		}
+	}
+
+	// negitive intergers get divided. A number divided by itself is 1
+	@if ($exponent < 1) {
+		@for $i from 0 through -$exponent {
+			$value: $value / $base;
+		}
+	}
+
+	// return the last value written
+	@return ($value);
+}
+
+// Ratios
+@function ratio($exponent, $ratio: $base-font-sizing-ratio) {
+	@return exponent($ratio, $exponent);
+}
+
+// Remove px unit from a value
+@function px-to-dec($n) {
+	@return if($n != 0, $n / 1px, 0);
+}
+
+// Remove em unit from a value
+@function em-to-dec($n) {
+	@return if($n != 0, $n / 1em, 0);
+}
+
+// Add px unit to a value
+@function dec-to-px($n) {
+	@return $n + 0px;
+}
+
+// Add em unit to a value
+@function dec-to-em($n) {
+	@return $n + 0em;
+}
+
+@function border-px-to-em($px, $font-size) {
+	@return dec-to-em(px-to-dec($px) / $font-size);
+}
+
+// Vertical Rhythm Multiplier
+@function vr($multiplier: 1) {
+	@return $base-line-height * $multiplier;
+}
+
+// Vertical Rhythm Calculator (Function Version)
+@function vrc($font-size, $multiplier: 1) {
+	$font-size-px: $font-size * px-to-dec($base-font-size);
+	$vr-px: px-to-dec($base-font-size) * em-to-dec($base-line-height);
+	@return dec-to-em($vr-px / $font-size-px)*$multiplier;
+}
+
+// Vertical Rhythm Calculator (Mixin Version)
+@mixin vrc(
+		$font-size: 1,
+		$margin: auto,
+		$line-height: 1,
+		$height: auto,
+		$width: auto,
+		$padding: auto
+	) {
+
+	$font-size-px: $font-size * px-to-dec($base-font-size); // px value of the desired font size
+	$vr-px: px-to-dec($base-font-size) * em-to-dec($base-line-height); // vertical rhythm in px
+	$vr-em: dec-to-em($vr-px / $font-size-px); // vertical rhythm in ems
+	
+	@if $font-size != auto {
+		font-size: dec-to-em($font-size);
+	}
+	
+	@if $line-height != auto {
+		line-height: $vr-em * $line-height;
+	}
+
+	@if $height != auto {
+		height: $vr-em * $height;
+	}
+	
+	@if $width != auto {
+		width: $vr-em * $width;
+	}
+
+	@if $margin != auto {
+		@if length($margin) == 2 {
+			margin:
+				(nth($margin, 1) * $vr-em)
+				(nth($margin, 2) * $vr-em);
+		} @else if length($margin) == 3 and nth($margin, 2) == 0 {
+			margin-top: (nth($margin, 1) * $vr-em); 
+			margin-bottom: (nth($margin, 3) * $vr-em);
+		} @else if length($margin) == 3 {
+			margin: 
+				(nth($margin, 1) * $vr-em) 
+				(nth($margin, 2) * $vr-em) 
+				(nth($margin, 3) * $vr-em);
+		} @else if length($margin) == 4 {
+			margin:
+				(nth($margin, 1) * $vr-em) 
+				(nth($margin, 2) * $vr-em) 
+				(nth($margin, 3) * $vr-em) 
+				(nth($margin, 4) * $vr-em);
+		} @else {
+			margin: $margin * $vr-em;
+		}
+	}
+  	
+	@if $padding != auto and $padding != 0 {
+		@if length($padding) == 2 {
+			padding: 
+				(nth($padding, 1) * $vr-em) 
+				(nth($padding, 2) * $vr-em);
+		} @else if length($padding) == 3 and nth($padding, 2) == 0 {
+			padding-top: (nth($padding, 1) * $vr-em); 
+			padding-bottom: (nth($padding, 3) * $vr-em);
+		} @else if length($padding) == 3 {
+			padding: 
+				(nth($padding, 1) * $vr-em) 
+				(nth($padding, 2) * $vr-em) 
+				(nth($padding, 3) * $vr-em);
+		} @else if length($padding) == 4 {    
+			padding:
+				(nth($padding, 1) * $vr-em) 
+				(nth($padding, 2) * $vr-em) 
+				(nth($padding, 3) * $vr-em) 
+				(nth($padding, 4) * $vr-em);
+		} @else {
+			padding: $vr-em * $padding;
+		}
+	}
+}

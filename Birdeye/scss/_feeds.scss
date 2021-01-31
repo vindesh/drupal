@@ -1,0 +1,183 @@
+@import "base";
+@import "cadence";
+@import "framework";
+@import "icons";
+
+// Base feed styles
+.feed {
+    
+	section > a {
+		display: block;
+		text-decoration: none;
+		color: $text-color;
+
+		h1 {
+			color: $link-color;
+		}
+	}
+
+    .text {
+		overflow: hidden;
+	}
+    
+    .text h1 {
+        @include vrc(1.33, 0, 1);
+    }
+
+	img {
+		max-width: 100%;
+		display: block;
+	}
+
+	.meta {
+		color: #888;
+	}
+
+    .more {
+		color: $link-color;
+		text-decoration: underline;
+	}
+
+	footer {
+		padding-top: vr();
+	}
+}
+
+// Grid Feed
+$feed-grid-gutter: 15px;
+.feed.grid {
+	margin: 0 (-($feed-grid-gutter)) vr();
+
+	header{
+		padding: 0 $feed-grid-gutter;
+	}
+
+	section {
+		display: inline-block;
+		vertical-align: top;
+		margin-bottom: vr();
+		padding: 0 $feed-grid-gutter;
+		width: 100%;
+
+		@include breakpoint(2, above) {
+			width: 33.33%;
+		}
+
+		@include breakpoint(2, below, 2) {
+			width: 50%;
+		}
+	}
+
+	.visual {
+		margin-bottom: vr(.5);
+	}
+
+	.meta {
+		margin-bottom: vr(.25);
+	}
+}
+
+// Rows Feed
+.feed.rows {
+	margin-bottom: vr();
+
+	section {
+		@include clearfix;
+		margin: vr(1.5) 0;
+	}
+
+	.visual {
+		float: left;
+		max-width: 30%;
+		margin-right: 1.5em;
+
+		@include breakpoint(3, below) {
+			margin-right: .9em;
+		}
+	}
+
+	.meta {
+		margin-bottom: vr(.25);
+	}
+}
+
+// Alt Feeds
+.feed.alt {
+	
+    section {
+		@include clearfix;
+		margin-bottom:vr()
+	}
+
+	.visual {
+		float: left;
+		margin-right: .9em;
+
+		img {
+			height: vr(2);
+		}
+	}
+}
+
+// Search Results Feed
+.feed.search_results {
+	
+    .collection {
+		color: #888;
+		@include vrc(.75, 0, 1);
+		font-weight: bold;
+	}
+
+	mark {
+		font-style: normal;
+		font-weight: normal;
+		background-color: rgba($link-color, 0.15);
+		padding: 0 .3em;
+	}
+}
+
+// Generic Detail Styles
+article.detail {
+	
+	> header {
+
+		.page-body & {
+			margin-bottom: vr();
+		}
+
+		.meta {
+			margin-top: vr(.5);
+			color: #888;
+		}
+	}
+
+	figure {
+		margin-bottom: vr();
+
+		img {
+			max-width: 100%;
+			display: block;
+		}
+	}
+
+	.downloads {
+		
+        ul {
+			list-style: none;
+			margin: 0 0 vr();
+		}
+
+		li {
+			&:before {
+				@include icon(download);
+				color: #888;
+				margin-right: .3em;
+			}
+		}
+	}
+
+	> footer {
+		margin-bottom: vr(1.5);
+		text-align: center;
+	}
+}

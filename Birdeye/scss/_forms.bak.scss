@@ -1,0 +1,412 @@
+// Messages
+div.message {
+
+	&.success {
+		background-color: #8bb93d;
+		color: #fff;
+		padding: vr(.25) vr(.5);
+		margin-bottom: vr();
+
+		&:before {
+			@include icon(check-circle);
+			margin-right: .3em;
+		}
+	}
+
+	&.info {
+		background-color: #3997D2;
+		color: #fff;
+		padding: vr(.25) vr(.5);
+		margin-bottom: vr();
+
+		div {
+			display: inline-block;
+		}
+
+		&:before {
+			@include icon(info-circle);
+			margin-right: .3em;
+		}
+	}
+
+	&.error {
+		background-color: $link-color;
+		color: #fff;
+		padding: vr(.25) vr(.5);
+		margin-bottom: vr();
+
+		&:before {
+			@include icon(exclamation-circle);
+			margin-right: .3em;
+		}
+	}
+	ol {
+		margin: 0 0 0 vr(1.5);
+	}
+}
+
+// Custom Forms
+.custom-form, 
+.module-form, 
+#giving-form {
+	$f-left: 33%;
+	$f-right: 62%;
+	$f-gutter: 2%;
+	$f-offset: .5%;
+
+	margin-bottom: vr();
+	clear: both;
+
+	%form-label {
+		display: block;
+		@include breakpoint(3, above) {
+			display: inline-block;
+			width: $f-left;
+			margin-right: $f-gutter;
+			text-align: right;
+		}
+	}
+
+	hr {
+		display: none;
+	}
+
+	> ul, 
+	ul.fields {
+		list-style: none;
+		margin: 0 0 vr();
+		border-top: 2px solid #e6e6e6;
+
+		> li {
+			padding: vr(.5) 0;
+			border-bottom: 2px solid #e6e6e6;
+
+			> label:first-of-type {
+				@extend %form-label;
+			}
+
+			&.checkbox > label:first-of-type {
+				@include breakpoint(3, above) {
+					display: block;
+					width: auto;
+					margin-right: 0;
+					text-align: left;
+				}
+			}
+
+			&.required {
+				> label
+				legend {
+					&:after {
+						content: "*";
+						color: red;
+					}
+				}
+			}
+
+			input[type="text"], 
+			input[type="password"], 
+			input[type="email"], 
+			textarea {
+				@include input;
+			}
+
+			input[type="password"] {
+				width: 8em;
+			}
+
+			.fields {
+				@include breakpoint(3, above) {
+				    display: inline-block;
+				}
+
+				.date-field, 
+				.time-field {
+					width: 120px;
+				}
+			}
+
+			textarea {
+				@include breakpoint(3, above) {
+					width: $f-right;
+				}
+				@include breakpoint(3, below) {
+					width: 100%;
+				}
+			}
+
+			select {
+				font-size: inherit;
+				font-family: inherit;
+				max-width: 100%;
+				@include prefixer(box-sizing, border-box);
+			}
+
+			&.error {
+				input[type="text"], 
+				input[type="password"], 
+				input[type="email"], 
+				textarea, 
+				select {
+					background-color: #fcd0bd;
+				}
+			}
+
+			.note,
+			.slide-captcha-help {
+				@include vrc(ratio(-1), 0, 1);
+				font-style: italic;
+				color: lighten($text-color, 15%);
+
+				@include breakpoint(3, above) {
+					margin-left: $f-left + $f-gutter + $f-offset;
+					display: block;
+				}
+			}
+
+			> fieldset {
+				position: relative;
+
+				> legend {
+					@extend %form-label;
+					@include breakpoint(3, above) {
+						float: left;
+						vertical-align: top;
+					}
+
+					.note {
+						display: block;
+					}
+				}
+
+				.note {
+					margin-left: 0;
+					display: inline-block;
+				}
+
+				> {
+					div, ul, ol {
+						margin: 0;
+						list-style: none;
+						@include breakpoint(3, above) {
+							margin-left: $f-left + $f-gutter + $f-offset;
+						}
+
+						button.add:before {
+							@include icon(plus);
+							font-size: .75em;
+							line-height: 1;
+							position: relative;
+							top: -1px;
+						}
+					}
+				}
+			}
+
+			&.files {
+				div.files-actions {
+					margin-top: vr(.125);
+				}
+				ul.files-list {
+					li {
+						padding: vr(.25) .9em;
+						background-color: #eee;
+						margin-bottom: 2px;
+						@include clearfix;
+
+						&:before {
+							@include icon(file);
+							margin-right: .3em;
+						}
+
+						a.del-file {
+							@include vrc(1,0,1,1,1);
+							overflow: hidden;
+							text-align: center;
+							text-decoration: none;
+							color: #aaa;
+							float: right;
+
+							&:hover {
+								color: $link-color;
+							}
+
+							&:before {
+								@include icon(times);
+								display: block;
+							}
+						}
+					}
+				}
+			}
+
+			&.submodule {
+				fieldset {
+					> div.actions {
+						margin-bottom: vr(.5);
+					}
+				}
+
+				div.form {
+					border-top: 1px solid #e6e6e6;
+					padding: vr(.5) 0;
+					> ul {
+						list-style: none;
+						margin: 0;
+						> li {
+							> label:first-of-type {
+								margin-right: .3em;
+							}
+						}
+					}
+				}
+			}
+
+			.slide-container {
+				display: inline-block;
+				width: $f-right;
+			}
+		}
+	}
+
+	.submodule {
+		label {
+			display: block;
+		}
+
+		.form li + li {
+			margin-top: vr(.5);
+		}
+	}
+
+	button {
+		@include button;
+		background-color: lighten($text-color, 15%);
+	}
+
+	.buttons {
+		margin-bottom: vr();
+		
+		button {
+			&.btn-submit, &#btn-save, &[type="submit"] {
+				background-color: $link-color;
+			}
+		}
+	}
+
+	section.popup {
+		position: fixed;
+		background-color: #fff;
+		z-index: 10000;
+		top: 50px;
+		@include prefixer(box-shadow, 0 5px 10px rgba(0,0,0,0.25));
+		padding: 0 vr() vr();
+		display: none;
+
+		> header {
+			background-color: $text-color;
+			color: #fff;
+			margin: 0 vr(-1) vr(.75);
+			padding: vr(.25) vr(.75);
+			
+			h1 {
+					
+			}
+
+			.close {
+				float: right;
+				@include vrc(1, 0 -.5 0 0, 1, 1, 1);
+				overflow: hidden;
+				text-align: center;
+				cursor: pointer;
+
+				&:before {
+					@include icon(remove);
+					display: block;
+				}
+			}
+		}
+	}
+}
+
+// Alt Forms
+#login-form, 
+#recover-form, 
+#evite-form,
+.tab.profile form {
+	ul {
+		list-style: none;
+		margin: 0 0 vr(.5);
+
+		li {
+			margin-bottom: vr(.5);
+
+			label {
+				display: block;
+				font-weight: bold;
+				@include vrc(ratio(-1));
+			}
+
+			input {
+				@include input;
+				@include prefixer(box-sizing, border-box);
+				width: 100%;
+
+				+ input {
+					margin-top: vr(.5);
+				}
+			}
+		}
+	}
+
+	div.buttons {
+		margin-bottom: vr();
+		button {
+			@include button;
+		}
+
+		a.recover,
+		a.cancel {
+			font-size: .69em;
+			color: lighten($text-color, 15%);
+			margin-left: .6em;
+		}
+	}
+
+	#btn-change-password {
+		@include vrc(ratio(-1));
+	}
+}
+
+
+// Slide captcha
+.slide-container {
+	padding-left: vr(.5);
+	margin-top: vr(.5);
+}
+.slide-status {
+	color: lighten($text-color, 15%);
+	display: inline-block;
+	@include vrc(ratio(-1), .25 0 .5);
+
+	&:before {
+		margin-right: .33em;
+		@include icon(lock);
+	}
+
+	&.slide-open:before {
+		@include icon(check);
+	}
+}
+
+// QQ Uploader
+#document {
+	.qq-upload-button {
+		@include button;
+		display: inline-block;
+		&:before {
+			@include icon(upload-alt);
+			margin-right: .3em;
+		}
+	}
+}

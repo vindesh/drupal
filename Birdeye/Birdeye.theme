@@ -1,0 +1,127 @@
+<?php
+
+/**
+ * @file
+ * Bootstrap sub-theme.
+ *
+ * Place your custom PHP code in this file.
+ */
+
+/**
+ * @file
+ * Functions to support theming in the Birdeye theme.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Template\Attribute;
+
+function Birdeye_preprocess_html(&$variables) {
+  // Add node id to the body class.
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if($node) {
+    $variables['attributes']['class'][] = 'node-' . $node->id();
+  }
+}
+
+
+
+function Birdeye_theme_suggestions_input_alter(array &$suggestions, array $variables, $hook) {
+
+   if (isset($variables['element']['#icon']) || isset($variables['element']['#icon-left']) || isset($variables['element']['#icon-right'])) {
+         $suggestions[] = 'input__submit_icon';
+         if (isset($variables['element']['#icon'])) {
+           //$suggestions[] = 'input__submit_icon_' . $variables['element']['#icon'];
+         }         
+    }
+}
+
+
+function Birdeye_preprocess_breadcrumb(&$variables) {
+  if ($variables['breadcrumb']) {
+    $request = \Drupal::request();
+    $route_match = \Drupal::routeMatch();
+    $page_title = \Drupal::service('title_resolver')->getTitle($request, $route_match->getRouteObject());
+    //print_r($variables['breadcrumb']);exit('test');
+    if (!empty($page_title)) {
+    $variables['breadcrumb'][1]  = ['text' => 'Home', 'url' => '/'];  
+      // $variables['breadcrumb'][] = [
+      //   'text' => $page_title,
+      //   'attributes' => new Attribute(['class' => ['active']])
+      // ];
+    }
+  }
+}
+
+// function Birdeye_preprocess_input(&$variables) {
+
+//   $glyphiconclass = $variables['icon']['#attributes']['class'][1];
+//   $glyphiconname = $variables['icon']['#attributes']['class'][2];
+
+//     if (($glyphiconclass == 'glyphicon') and ($glyphiconname == 'glyphicon-search')) {
+//        $variables['icon']['#attributes']['class'][1] = 'fa';
+//        $variables['icon']['#attributes']['class'][2] = 'fa-search';
+//     }
+
+//   }
+
+  /**
+ * Implements hook_form_alter()
+ */    
+function Birdeye_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+    // if ($form_id == 'search_block_form' || $form_id == 'search_form') {
+    //   // $form['#theme'] = ['custom_search_form_block'];
+    //   $form['#attributes']['class'][] = 'search-header';
+    // }
+}
+
+
+/*
+function Birdeye_theme_suggestions_input_alter(&$suggestions, array $variables) {
+  $element = $variables['element'];
+  if (isset($element['#attributes']['data-twig-suggestion'])) {
+    $suggestions[] = 'input__' . $element['#type'] . '__' . $element['#attributes']['data-twig-suggestion'];
+  }
+}*/
+
+
+
+function Birdeye_preprocess_views_view_fields(&$variables){
+	$view = $variables['view'];
+  //print_r($variables['fields']);exit;
+//print('AAAAA');
+	if ($view->storage->id() == 'homepage_video'){
+		//print_r($variables['fields']);exit;
+	}
+//exit('exit;');
+}
+
+function Birdeye_preprocess_webform(&$variables){
+    //print_r($variables);exit;
+}
+
+/*
+function Birdeye_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+    if($form_id == 'webform_submission_become_a_wholesaler_node_3_add_form') {
+        $form['#theme'] = 'webform_submission_become_a_wholesaler_node_3_add_form';
+    }
+}
+*/
+
+/**
+* Implements hook_theme().
+*/ 
+
+// function Birdeye_theme($existing, $type, $theme, $path) {
+//   $themes['custom_search_form_block'] = ['render element' => 'form'];
+
+//     return $themes;
+//     $info = [
+//         'webform_submission_become_a_wholesaler_node_3_add_form' => [
+//           'render element' => 'form',
+//           //'path' => drupal_get_path('theme', 'Birdeye') . '/templates/form',
+//         ],
+//       ];
+//     return $info;
+// }
+
+
