@@ -1,0 +1,144 @@
+<?php
+
+define('SIMPLEXLSX_ERROR_NO_HEADERS', 0);
+define('SIMPLEXLSX_ERROR_NO_DATA', 1);
+define('SIMPLEXLSX_ERROR_PATH_NOT_WRITABLE', 2);
+define('SIMPLEXLSX_ERROR_LIBRARY_NOT_FOUND', 3);
+define('SIMPLEXLSX_ERROR_FILE_NOT_WRITTEN', 4);
+define('SIMPLEXLSX_ERROR_FILE_NOT_READABLE', 5);
+define('SIMPLEXLSX_ERROR_PARSE', 6);
+define('SIMPLEXLSX_SUCCESS', 10);
+define('SIMPLEXLSX_DEFAULT_FILENAME', 'defense_dashboard.xlsx');
+
+
+/**
+ * implimentation of hook_field_attach_submit()
+ */
+function defense_dashboard_field_attach_submit($entity_type, $entity, $form, &$form_state) {
+  if( $entity->form_id == 'defense_dashboard_node_form'){
+    if(isset($entity->field_excel_upload[LANGUAGE_NONE][0]['fid'])){
+      $file = file_load($entity->field_excel_upload[LANGUAGE_NONE][0]['fid']);
+      $file = file_move($file, 'public://'.SIMPLEXLSX_DEFAULT_FILENAME, FILE_EXISTS_REPLACE);
+      $entity->field_excel_upload[LANGUAGE_NONE][0]['fid'] = $file->fid;
+      $path = drupal_realpath($file->uri);
+      $excel_result = import_product_xlsx($path);
+      if(isset($excel_result['success']) && $excel_result['success'] == 1 ){
+        $entity->field_excel_amount[LANGUAGE_NONE][0]['value'] = $excel_result['total_amount'];
+      }
+    }
+  }
+}
+
+/*------------------------Excel xlsx file import-------------------------------*/
+
+/**
+ * Read file "defense_dashboard.xlsx" and get array..
+ * return product array 
+*/
+/**
+ * Import an Excel file.
+ *
+ * Simple API function that will load an Excel file from $path and parse it
+ *
+ * @param string $path
+ *    The path to the Excel file. Must be readable.
+ *
+ * @return array|int
+ *    The parsed data as an array on success, SIMPLEXLSX_ERROR_LIBRARY_NOT_FOUND
+ *    or SIMPLEXLSX_ERROR_FILE_NOT_READABLE on error.
+ *
+ * @ingroup phpexcel_api
+ */
+function import_product_xlsx($path){
+  //require_once DRUPAL_ROOT . '/sites/all/libraries/simplexlsx/src/SimpleXLSX.php';
+  if (is_readable($path)) {
+    $library = libraries_load('simplexlsx');
+    if (!empty($library['loaded'])) {
+      //Do something
+      //$path = drupal_realpath('public://') . '/' . SIMPLEXLSX_DEFAULT_FILENAME;
+
+      if ( $xlsx = SimpleXLSX::parse($path, $is_data = false, $debug = false, $skip_empty_rows = true ) ) {
+          $data = array();
+          $total_amount = 0;
+          $xlsxsheet = $xlsx->sheetNames();
+
+          foreach ( $xlsx->rows() as $k => $r ) {
+            if($k === 0) continue;
+            $data[] = $r[9];
+            $total_amount += $r[9];
+          }
+
+          return array('success' => true, 'total_amount' => $total_amount, 'data' => $data );
+
+      } else {
+          echo SimpleXLSX::parseError();
+          watchdog('simplexlsx', 'Import Failed check import_product_xlsx in module file!!!');
+          return SIMPLEXLSX_ERROR_PARSE;
+      }
+    } else {
+      watchdog('simplexlsx', "Couldn't find the SimpleXLSX library. Excel import aborted.", array(), WATCHDOG_ERROR);
+      return SIMPLEXLSX_ERROR_LIBRARY_NOT_FOUND;
+    }
+  } else {
+    watchdog('simplexlsx', "The path '@path' is not readable. Excel import aborted.", array('@path' => $path));
+    return SIMPLEXLSX_ERROR_FILE_NOT_READABLE;
+  }
+
+}
+
+
+/**
+ * Implements hook_libraries_info().
+ */
+function defense_dashboard_libraries_info() {
+  return array(
+    'simplexlsx' => array(
+      'name' => 'simplexlsx',
+      'vendor url' => 'https://github.com/shuchkin/',
+      'download url' => 'https://github.com/shuchkin/simplexlsx',
+      'version callback' => 'defence_dashboard_get_library_version',
+      // libraries_get_version() takes a named argument array:
+      'version arguments' => array(
+        'file' => 'src/SimpleXLSX.php',
+        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
+        'lines' => 12,
+      ),
+      //'library path' => drupal_get_path('module', 'libraries') . '/simplexlsx/src',
+      //'version' => '0.8.23',
+      'path' => 'src',
+      'files' => array(
+        'php' => array(
+          'SimpleXLSX.php',
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Libraries API version callback.
+ */
+function defence_dashboard_get_library_version() {
+  $library = libraries_load('simplexlsx');
+  //print_r($library);exit('defence_dashboard_get_library_version');
+  $changelog_file = $library['library path'] . '/src/SimpleXLSX.php';
+    watchdog('library_version', ''.$changelog_file);
+  if (file_exists($changelog_file)) {
+    $changelog = file_get_contents($changelog_file);
+    $match;
+
+    if (preg_match('/\d{4}-\d{2}-\d{2}\s+\(v([0-9\.]+)/', $changelog, $match)) {
+      watchdog('library_version match', '1:'.$match[1]);
+      return $match[1];
+    }
+    elseif (preg_match('/@version\s+([0-9\.]+)/', $changelog, $match)) {
+       watchdog('library_version match', '2:'.$match[1]);
+      return $match[1];
+    }
+  }
+
+  return 'n/a';
+}
+
+
+

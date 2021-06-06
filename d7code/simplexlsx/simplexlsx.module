@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function simplexlsx_requirements($phase) {
+  if ($phase == 'runtime') {
+    //$library = libraries_load('simplexlsx');
+    $t = get_t();
+    //if (empty($library['loaded'])) {
+    if ($path = libraries_get_path('simplexlsx')) {
+      if (file_exists($path . '/src/SimpleXLSX.php')) {
+      return array(
+        'simplexlsx' => array(
+          'title' => $t("SimpleXLSX"),
+          //'value' => '>0.8.23',
+          'value' => '>=0.8.23',
+          'description' => $t("In order to use SimpleXLSX, you must first download the entire library (0.8.23) at !link and put it under sites/*/libraries/simplexlsx/ (so you should have sites/*/libraries/simplexlsx/src/SimpleXLSX.php). Make sure to include the changelog.txt file as well (sites/*/libraries/simplexlsx/changelog.txt), as Library API requires this file for loading the classes.", array('!link' => '<a href="https://github.com/shuchkin/simplexlsx">Github</a>')),
+          'severity' => REQUIREMENT_ERROR,
+        ),
+      );
+      }
+    }
+    else {
+      return array(
+        'simplexlsx' => array(
+          'title' => $t("SimpleXLSX"),
+          'value' => $t("SimpleXLSX @version", array('@version' => $library['version'])),
+          'severity' => REQUIREMENT_OK,
+        ),
+      );
+    }
+  }
+  return array();
+}
+
+
+/**
+ * Implements hook_libraries_info().
+ */
+function simplexlsx_libraries_info() {
+  return array(
+    'simplexlsx' => array(
+      'name' => 'simplexlsx',
+      'vendor url' => 'https://github.com/shuchkin/',
+      'download url' => 'https://github.com/shuchkin/simplexlsx',
+      //'version callback' => 'defence_dashboard_get_library_version',
+      // libraries_get_version() takes a named argument array:
+      'version arguments' => array(
+        'file' => 'src/SimpleXLSX.php',
+        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
+        'lines' => 12,
+      ),
+      //'version' => '0.8.23',
+      'path' => 'src',
+      'files' => array(
+        'php' => array(
+          'SimpleXLSX.php',
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Libraries API version callback.
+ */
+function simplexlsx_get_library_version() {
+  $library = libraries_load('simplexlsx');
+  //print_r($library);exit('defence_dashboard_get_library_version');
+  $changelog_file = $library['library path'] . '/SimpleXLSX.php';
+watchdog('library_version', ''.$changelog_file);
+  if (file_exists($changelog_file)) {
+    $changelog = file_get_contents($changelog_file);
+    $match;
+
+    if (preg_match('/\d{4}-\d{2}-\d{2}\s+\(v([0-9\.]+)/', $changelog, $match)) {
+      watchdog('library_version match', '1:'.$match[1]);
+      return $match[1];
+    }
+    elseif (preg_match('/@version\s+([0-9\.]+)/', $changelog, $match)) {
+       watchdog('library_version match', '2:'.$match[1]);
+      return $match[1];
+    }
+  }
+
+  return 'n/a';
+}
+

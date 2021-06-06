@@ -1,0 +1,464 @@
+<?php
+
+define('SIMPLEXLSX_ERROR_NO_HEADERS', 0);
+define('SIMPLEXLSX_ERROR_NO_DATA', 1);
+define('SIMPLEXLSX_ERROR_PATH_NOT_WRITABLE', 2);
+define('SIMPLEXLSX_ERROR_LIBRARY_NOT_FOUND', 3);
+define('SIMPLEXLSX_ERROR_FILE_NOT_WRITTEN', 4);
+define('SIMPLEXLSX_ERROR_FILE_NOT_READABLE', 5);
+define('SIMPLEXLSX_ERROR_PARSE', 6);
+define('SIMPLEXLSX_SUCCESS', 10);
+define('SIMPLEXLSX_DEFAULT_FILENAME', 'defense_dashboard.xlsx');
+
+
+function defense_dashboard_menu() {
+    $items = array();
+
+    //Make "Admin settings" appear on the admin Config page
+    $items['admin/structure/custom_xlsx_pro'] = array(
+      'title' => 'Custom XLSX import settings',
+      //'page callback' => 'custom_xlsx_pro_dashboard',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('defense_dashboard_file_upload_form'),
+      'access arguments' => array('administer site configuration') ,
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+    $items['admin/structure/custom_xlsx_pro/xlsx-upload'] = array(
+        'title' => 'XLSX upload stuff',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('defense_dashboard_file_upload_form'),
+        'access arguments' => array('administer site configuration') ,
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight'=> -1
+      );
+
+    $items['admin/structure/custom_xlsx_pro/xlsx-import'] = array(
+        'title' => 'XLSX import stuff',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('defense_dashboard_xlsxdata_import_form'),
+        'access arguments' => array('administer site configuration') ,
+        'type' => MENU_LOCAL_TASK,
+      );
+
+    return $items;
+}
+
+
+/**
+ * @form: xlsx data import form
+ *
+ */
+function defense_dashboard_file_upload_form($form, &$form_state) {
+    global $base_url;
+
+    $form['upload'] = array(
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => TRUE,
+      '#title' => t('File uploaded')
+    );
+
+    $node_types = node_type_get_names();
+    array_walk($node_types, 'check_plain');
+    $form['upload']['content_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Attach to content type'),
+      /*'#description' => '<p>' . t('If "Use standalone form" is selected, a source is imported by using a form under !import_form. If a content type is selected, a source is imported by creating a node of that content type.', array(
+        '!import_form' => l(url('import', array('absolute' => TRUE)), 'import', array('attributes' => array('target' => '_new'))),
+      )) . '</p>',*/
+      '#options' => array('' => t('Use standalone form')) + $node_types,
+      '#default_value' => 'defense_dashboard',
+      '#required' => TRUE,
+      '#attributes' => array('readonly' => 'readonly'),
+    );
+
+    $form['upload']['file'] = array(
+        '#type' => 'file',
+        '#title' => t('Import XLSX file '),
+        '#description' => t('Select the xlsx file to be imported, allowed extensions: xlsx'),
+      );                                       
+    $form['upload']['loglink'] = [
+      '#type'=> 'item',
+      '#markup'=> l(t('Check XLSX file..'), url('/sites/default/files/' . SIMPLEXLSX_DEFAULT_FILENAME)) ,
+    ];
+
+    $form['upload']['import_ct_markup'] = [
+      '#suffix' => '<div id="content_import_fields_change_wrapper"></div>',
+    ];
+    $form['upload']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Upload & Run Import',
+        '#submit' => array('defense_dashboard_file_upload_form_submit'),
+    );
+
+    return $form;
+
+}
+
+/**
+ * Implements form submit handler.
+ */
+function defense_dashboard_file_upload_form_submit($form, &$form_state) {
+    $file = $form_state['storage']['file'];
+    // We are done with the file, remove it from storage.
+    unset($form_state['storage']['file']);
+    // Make the storage of the file permanent
+    $file->status = FILE_STATUS_PERMANENT;
+    // Save file status.
+    file_save($file);
+    // Set a response to the user.
+    drupal_set_message(t('The form has been submitted and the file has been saved, filename: @filename.', array('@filename' => $file->filename)));
+    $path = drupal_realpath($file->uri);
+    //$path = drupal_realpath('public://') . '/' . SIMPLEXLSX_DEFAULT_FILENAME;
+    batch_xlsx_import_start( array('content_type' => $form_state['values']['content_type'], 'path' => $path) );
+}
+
+/**
+ * Implements form validate handler.
+ */
+function defense_dashboard_file_upload_form_validate($form, &$form_state) {
+
+    $file = file_save_upload('file', array(
+        //'file_validate_is_image' => array(), // Validates file is really an image.
+        'file_validate_extensions' => array('xlsx'), // Validate extensions.
+    ));
+    // If the file passed validation:
+    if ($file) {
+        // Move the file, into the Drupal file system
+        if ($file = file_move($file, 'public://'.SIMPLEXLSX_DEFAULT_FILENAME, FILE_EXISTS_REPLACE)) {
+            // Save the file for use in the submit handler.
+            $form_state['storage']['file'] = $file;
+        } else {
+            form_set_error('file', t('Failed to write the uploaded file to the site\'s file folder.'));
+        }
+    } else {
+        form_set_error('file', t('No file was uploaded.'));
+    }
+
+
+}
+
+/*------------------------Existing xlsx file import-------------------------------*/
+
+/**
+ * Implement form.
+ */
+function defense_dashboard_xlsxdata_import_form($form, &$form_state) {
+    global $base_url, $base_path;
+    $form['import'] = array(
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => TRUE,
+      '#title' => t('Data import')
+    );
+
+    $node_types = node_type_get_names();
+    array_walk($node_types, 'check_plain');
+    $xlsxUrl = url('sites/default/files/'.SIMPLEXLSX_DEFAULT_FILENAME, array('absolute' => TRUE));
+    $form['import']['content_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Attach to content type'),
+      '#description' => '<p>' . t('Last uploaded XLSX file : !import_form.', array(
+        '!import_form' => l($xlsxUrl, $xlsxUrl , array('attributes' => array('target' => '_new'))),
+      )) . '</p>',
+      '#options' => array('' => t('Use standalone form')) + $node_types,
+      '#default_value' => 'defense_dashboard',
+      '#required' => TRUE,
+    );
+
+    $form['import']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Import',
+    );
+
+    return $form;
+
+}
+
+/**
+ * Implements form submit handler.
+ */
+function defense_dashboard_xlsxdata_import_form_submit($form, &$form_state) {
+    if(!empty($form_state['values']['content_type'])){
+      $path = drupal_realpath('public://') . '/' . SIMPLEXLSX_DEFAULT_FILENAME;
+      batch_xlsx_import_start( array('content_type' => $form_state['values']['content_type'], 'path' => $path) );
+    }
+}
+
+/**
+ * Implements form validate handler.
+ */
+function defense_dashboard_xlsxdata_import_form_validate($form, &$form_state) {
+    if(empty($form_state['values']['content_type'])){
+      form_set_error('content_type', t('Select content type.'));
+    }
+}
+
+
+/**
+ * Batch start function
+ */
+function batch_xlsx_import_start($data) {
+  $item = import_product_xlsx($data['path']);
+  if(is_array($item)){
+    $batch = array(
+      'operations' => array(
+        array('_batch_xlsx_import', array($item, $data)),
+        //array('batch_example_run', array($options3, $options4)),
+        ),
+      'finished' => 'batch_xlsx_import_finished',
+      'title' => t('Processing XLSX Data Import Batch'),
+      'init_message' => t('XLSX Data Import Batch is starting.'),
+      'progress_message' => t('Processed @current out of @total.'),
+      'error_message' => t('XLSX Data Import Batch has encountered an error.'),
+      //'file' => drupal_get_path('module', 'batch_example') . '/batch_example.inc',
+    );
+    batch_set($batch);
+
+    // If this function was called from a form submit handler, stop here,
+    // FAPI will handle calling batch_process().
+
+    // If not called from a submit handler, add the following,
+    // noting the url the user should be sent to once the batch
+    // is finished.
+    // IMPORTANT:
+    // If you set a blank parameter, the batch_process() will cause an infinite loop
+
+    batch_process('admin/structure/custom_xlsx_pro/xlsx-upload');
+  }
+}
+
+/**
+ * Import from xlsx operation.
+ */
+function _batch_xlsx_import($item, $data, &$context) {
+
+    $context['results']['content_type'] = $data['content_type'];
+    // Get Count of products
+    if (empty($context['sandbox']['progress'])) {
+      $context['sandbox']['progress'] = 0;
+      $context['sandbox']['max'] = count($item);
+      watchdog('import', 'start import data!!!');
+    }
+    // Create Iteration variable
+    if (empty($context['sandbox']['iteration'])) {
+      $context['sandbox']['iteration'] = 0;
+    }
+    // Check for the end of cycle
+    if ($context['sandbox']['iteration'] < $context['sandbox']['max']) {
+      // Count of operation in one batch step
+      $limit = 5;
+      // Counts completed operations in one batch step
+      $counter = 0;
+      if ($context['sandbox']['progress'] != 0) {
+        $context['sandbox']['iteration'] = $context['sandbox']['iteration'] + $limit;
+      }
+
+      // Loop all Product items in xml
+      for ($i = $context['sandbox']['iteration']; $i < $context['sandbox']['max'] && $counter < $limit; $i++) {
+        // Skip first row of xlsx, this is heading row.
+        if($i===0)
+          continue;
+
+        $context['results']['added']['items'][] = $item[$i][0];//store title field;
+        $result = db_select('node', 'n')
+          ->fields('n')
+          ->condition('title', $item[$i][0], 'LIKE')
+          ->condition('status', 0, '>')
+          //->where('LOWER(n.title) = :title', array(':title' => $item[$i][0]) ),
+          ->execute()
+          ->fetchObject();
+
+          if(isset($result->nid) && $result->nid > 0){
+            $node = node_load($result->nid);
+            if(!empty($item[$i][3]))
+              $node->field_body_color[LANGUAGE_NONE][0]['value'] = $item[$i][3];
+            if(!empty($item[$i][4]))
+              $node->field_year_range[LANGUAGE_NONE][0]['value'] = $item[$i][4];
+            if(!empty($item[$i][5]))
+              $node->field_rs_text[LANGUAGE_NONE][0]['value'] = $item[$i][5];
+            if(!empty($item[$i][6]))
+              $node->field_target_range[LANGUAGE_NONE][0]['value'] = $item[$i][6];
+            if(!empty($item[$i][7]))
+            $node->field_qm_range[LANGUAGE_NONE][0]['value'] = $item[$i][7];
+            if(!empty($item[$i][8])){
+              $date = explode(' ',$item[$i][8]);
+              $node->field_date[LANGUAGE_NONE][0]['value'] = $date[0];
+            }
+            if(!empty($item[$i][9]))
+              $node->field_add_color[LANGUAGE_NONE][0]['value'] = $item[$i][9];
+            //node_save($node);
+            field_attach_update('node', $node);
+
+        //$sql = "INSERT INTO product_xslx_import (id, sku, artikel, price, data) VALUES (NULL, '".$item[$i][0]."', '".$item[$i][1]."', '".$item[$i][2]."', '". serialize($item[$i]) ."')";
+        $sql = $item[$i][0]."', '".$item[$i][1]."', '".$item[$i][2]."', '".$item[$i][3]."', '".$item[$i][4]."', '".$item[$i][5]."', '".$item[$i][6]."', '".$item[$i][7]."', '".$item[$i][8]."', '".$item[$i][9]."'<==========>";
+        //print $sql.'<==========>';
+        watchdog('simplexlsx import', 'import finished-' .$sql);
+        $context['results']['updated']['node'][] = 'Nid:'.$node->nid .' => Title:'. $item[$i][0];
+
+      }
+        /*
+            db_insert('product_xslx_import') // Table name no longer needs {}
+              ->fields(array(
+                'sku' => $item[$i][0],
+                'artikel' => $item[$i][2],
+                'price' => $price,
+                'producer' => $producer,
+                'herst' => $item[$i][1],
+                'data' => serialize($item[$i])
+              ))
+              ->execute();
+          */
+
+        // Update Progress
+        $context['sandbox']['progress']++;
+        $counter++;
+        // Messages
+        $context['message'] = t('Now processing  "%name". Item %progress of %count', array('%name' => $i, '%progress' => $context['sandbox']['progress'], '%count' => $context['sandbox']['max']));
+        $context['results']['processed'] = $context['sandbox']['progress'];
+
+
+      }//end of for loop
+    
+    }
+  //}//end of foreach
+
+  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+}
+
+
+/**
+ * Finish of batch. Messagess
+ */
+function batch_xlsx_import_finished($success, $results, $operations) {
+  //print_r($results);exit;
+  if ($success) {
+    drupal_set_message(t('@count items processed for @content_type content types.', array('@content_type'=>$results['content_type'], '@count' => isset($results['added']) ? count($results['added']['items']) : 0)));
+    drupal_set_message(t('@count node updated.', array('@count' => isset($results['updated']) ? count($results['updated']['node']) : 0)));
+    drupal_set_message(t('Updated node list: @list.', array('@list' => isset($results['updated']) ? implode(', ', $results['updated']['node']) : '')));
+  }
+  else {
+    $error_operation = reset($operations);
+    drupal_set_message(t('An error occurred while processing @operation with arguments : @args', array('@operation' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE))));
+  }
+  watchdog('import', 'import finished');
+}
+
+/**
+ * Read file "defense_dashboard.xlsx" and get array..
+ * return product array 
+*/
+/**
+ * Import an Excel file.
+ *
+ * Simple API function that will load an Excel file from $path and parse it
+ *
+ * @param string $path
+ *    The path to the Excel file. Must be readable.
+ *
+ * @return array|int
+ *    The parsed data as an array on success, SIMPLEXLSX_ERROR_LIBRARY_NOT_FOUND
+ *    or SIMPLEXLSX_ERROR_FILE_NOT_READABLE on error.
+ *
+ * @ingroup phpexcel_api
+ */
+function import_product_xlsx($path){
+  //require_once DRUPAL_ROOT . '/sites/all/libraries/simplexlsx/src/SimpleXLSX.php';
+  //$l = libraries_info('simplexlsx');
+  if (is_readable($path)) {
+    $library = libraries_load('simplexlsx');
+    if (!empty($library['loaded'])) {
+      //Do something
+      $path = drupal_realpath('public://') . '/' . SIMPLEXLSX_DEFAULT_FILENAME;
+
+      if ( $xlsx = SimpleXLSX::parse($path, $is_data = false, $debug = false, $skip_empty_rows = true ) ) {
+          $var = array();
+          $xlsxsheet = $xlsx->sheetNames();
+
+          $i=0;
+          foreach ( $xlsx->rows() as $k => $r ) {
+            foreach ($r as $key2 => $value) {
+              if( $key2 < 10) {
+                  $var[$i][$key2] = $value;
+              }
+              $i++;
+            }
+          }
+          //return $var;
+          return $xlsx->rows();
+
+      } else {
+          echo SimpleXLSX::parseError();
+          watchdog('simplexlsx', 'Import Failed check import_product_xlsx in module file!!!');
+          return SIMPLEXLSX_ERROR_PARSE;
+      }
+    } else {
+      watchdog('simplexlsx', "Couldn't find the SimpleXLSX library. Excel import aborted.", array(), WATCHDOG_ERROR);
+      return SIMPLEXLSX_ERROR_LIBRARY_NOT_FOUND;
+    }
+  } else {
+    watchdog('simplexlsx', "The path '@path' is not readable. Excel import aborted.", array('@path' => $path));
+    return SIMPLEXLSX_ERROR_FILE_NOT_READABLE;
+  }
+
+}
+
+
+/**
+ * Implements hook_libraries_info().
+ */
+function defense_dashboard_libraries_info() {
+  return array(
+    'simplexlsx' => array(
+      'name' => 'simplexlsx',
+      'vendor url' => 'https://github.com/shuchkin/',
+      'download url' => 'https://github.com/shuchkin/simplexlsx',
+      'version callback' => 'defence_dashboard_get_library_version',
+      // libraries_get_version() takes a named argument array:
+      'version arguments' => array(
+        'file' => 'src/SimpleXLSX.php',
+        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
+        'lines' => 12,
+      ),
+      //'library path' => drupal_get_path('module', 'libraries') . '/simplexlsx/src',
+      //'version' => '0.8.23',
+      'path' => 'src',
+      'files' => array(
+        'php' => array(
+          'SimpleXLSX.php',
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Libraries API version callback.
+ */
+function defence_dashboard_get_library_version() {
+  $library = libraries_load('simplexlsx');
+  //print_r($library);exit('defence_dashboard_get_library_version');
+  $changelog_file = $library['library path'] . '/src/SimpleXLSX.php';
+    watchdog('library_version', ''.$changelog_file);
+  if (file_exists($changelog_file)) {
+    $changelog = file_get_contents($changelog_file);
+    $match;
+
+    if (preg_match('/\d{4}-\d{2}-\d{2}\s+\(v([0-9\.]+)/', $changelog, $match)) {
+      watchdog('library_version match', '1:'.$match[1]);
+      return $match[1];
+    }
+    elseif (preg_match('/@version\s+([0-9\.]+)/', $changelog, $match)) {
+       watchdog('library_version match', '2:'.$match[1]);
+      return $match[1];
+    }
+  }
+
+  return 'n/a';
+}
+
+
+

@@ -1,0 +1,17 @@
+name = Defense Dashboard custom module
+description = Implement custom functionality by Defense Dashboard custom module.
+core = 7.x
+package = Custom
+version = VERSION
+
+;dependencies[] = views:views
+;files[] = tests/example.test
+;configure = admin/config/content/example
+
+dependencies[] = libraries
+configure = admin/structure/custom_xlsx_pro
+
+; Information added by dgqadefence.gov.in packaging script on 2021-05-29
+version = "7.0.0"
+project = "defence_dashboard"
+datestamp = 1622266169

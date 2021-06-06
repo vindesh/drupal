@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Module install logic.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function defence_dashboard_uninstall() {
+
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function defence_dashboard_requirements($phase) {
+  if ($phase == 'runtime') {
+    $library = libraries_load('simplexlsx');
+    $t = get_t();
+    if (empty($library['loaded'])) {
+    //if ($path = libraries_get_path('simplexlsx')) {
+      //if (file_exists($path . '/src/SimpleXLSX.php')) {
+      return array(
+        'simplexlsx' => array(
+          'title' => $t("SimpleXLSX"),
+          //'value' => '>0.8.23',
+          'value' => '>=0.8.23',
+          'description' => $t("In order to use SimpleXLSX, you must first download the entire library (0.8.23) at !link and put it under sites/*/libraries/simplexlsx/ (so you should have sites/*/libraries/simplexlsx/src/SimpleXLSX.php). Make sure to include the changelog.txt file as well (sites/*/libraries/simplexlsx/changelog.txt), as Library API requires this file for loading the classes.", array('!link' => '<a href="https://github.com/shuchkin/simplexlsx">Github</a>')),
+          'severity' => REQUIREMENT_ERROR,
+        ),
+      );
+    }
+    else {
+      return array(
+        'simplexlsx' => array(
+          'title' => $t("SimpleXLSX"),
+          'value' => $t("SimpleXLSX @version", array('@version' => $library['version'])),
+          'severity' => REQUIREMENT_OK,
+        ),
+      );
+    }
+  }
+  return array();
+}

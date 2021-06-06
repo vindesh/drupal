@@ -1,0 +1,12 @@
+name = SimpleXLSX module
+description = Implement SimpleXLSX Library.
+core = 7.x
+package = Custom
+version = VERSION
+dependencies[] = libraries
+
+
+; Information added by dgqadefence.gov.in packaging script on 2021-05-29
+version = "7.0.0"
+project = simplexlsx
+datestamp = 1622266169
