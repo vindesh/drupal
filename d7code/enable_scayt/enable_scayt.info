@@ -1,0 +1,11 @@
+name = Enable SCAYT
+description = Enables SCAYT (Spell Check As You Type) AND the Native Browser Spell Check when using the WYSIWYG with CKEditor
+core = 7.x
+files[] = enable_scayt.module
+
+
+
+; Information added by @vindesh packaging script on 2021-09-09
+version = "7.0.0"
+project = enable_scayt
+datestamp = 1622266169

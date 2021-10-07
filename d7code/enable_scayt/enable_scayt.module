@@ -1,0 +1,7 @@
+<?php
+
+function enable_scayt_wysiwyg_editor_settings_alter(&$settings, $context) {
+      if ($context['profile']->editor == 'ckeditor') {
+            $settings['customConfig'] = base_path() . drupal_get_path('module', 'enable_scayt') . '/js/enable_scayt_ckeditor.js';
+      }
+}
