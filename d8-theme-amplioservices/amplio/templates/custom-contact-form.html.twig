@@ -1,0 +1,32 @@
+
+
+<div action="" class="contact-form mt-4">
+
+    <label>{{ 'First name'|trans }}</label>
+	{{ form.field_first_name}}
+    <label>{{ 'Last name'|trans }}</label>
+    {{ form.field_last_name }} 
+    <label>{{ 'Company'|trans }}</label>
+    {{ form.field_company }} 
+    <label>{{ 'Email'|trans }}</label>
+    {{ form.mail }}
+    {{ form.subject }}
+    <label>{{ 'Message'|trans }}</label>
+    {{ form.message }}
+
+    <label>{{ 'Please check the box below if you do not want to be added to our mailing list'|trans }} </label>
+    {{ form.field_subscribe }}
+    <!--input type="checkbox"><span>{#{ 'Do not add me to your mailing list' |trans }#}</span--><br>
+    {{ form.actions.submit }}
+    {#{ form.actions.preview }#}
+
+{#
+Don't forget to add printing form special info at the end.
+Without this data form will not working propertly.
+#}
+{{ form.form_build_id }}
+{{ form.form_token }}
+{{ form.form_id }}
+{#{ form.actions }#} 
+</div>
+

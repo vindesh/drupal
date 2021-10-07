@@ -1,0 +1,28 @@
+core: 8.x
+type: theme
+
+name: 'Amplio'
+description: 'Theme for Amplio.'
+
+regions:
+  language_switch: Language switch
+  header: Header
+  primary_menu: 'Primary menu'
+  secondary_menu: 'Secondary menu'
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+  highlighted: Highlighted
+  featured_top: 'Featured top'
+  breadcrumb: Breadcrumb
+  content: Content
+  sidebar_first: 'Sidebar first'
+  sidebar_second: 'Sidebar second'
+  footer: 'Footer'
+  footer_first: 'Footer first'
+  footer_second: 'Footer second'
+  footer_third: 'Footer third'
+  copyright: 'Copyright'
+
+
+libraries:
+  - 'amplio/global-styling'

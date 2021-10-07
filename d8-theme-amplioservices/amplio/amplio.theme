@@ -1,0 +1,182 @@
+<?php
+
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_preprocess_HOOK() for node.html.twig.
+ */
+function amplio_preprocess_node(&$variables) {
+  // Remove the "Add new comment" link on teasers or when the comment form is
+  // displayed on the page.
+  if ($variables['teaser'] || !empty($variables['content']['comments']['comment_form'])) {
+    unset($variables['content']['links']['comment']['#links']['comment-add']);
+  }
+
+  //$aaa = serialize(print_r($variables['content']));
+  //drupal_set_message($aaa);
+  //kint($variables['date']);
+  //kint($variables);
+
+/** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['elements']['#node'];
+  //kint($variables['elements']['#node']);
+  //$img_value = $node->field_blog_image->getValue();
+  //kint($img_value);
+  //$variables['field_blog_image'] = $node->field_blog_image->getValue();
+  //$file = \Drupal\file\Entity\File::load(reset($img_value)['target_id']);
+  //kint($file->toArray());
+  //kint($variables['elements']['#node']);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function amplio_theme($existing, $type, $theme, $path) {
+  $info = [
+    'contact_message_feedback_form' => [
+      'template' => 'custom-contact-form',
+      'render element' => 'form',
+      //'path' => drupal_get_path('module', 'mymodulename'),
+    ],
+    // 'simplenews_subscriptions_block_b3665ed1-e56d-46b0-9393-620f0e8d5da6' => [
+    //   'template' => 'custom-simplenews-subscriptions-block-form',
+    //   'render element' => 'form',
+    // ],
+  ];
+  return $info;
+}
+
+function amplio_preprocess_simplenews_subscriptions_block_subscribe_email(&$variables) {
+    $variables['form']['mail']['#attributes']['class'] = array('form-control'); 
+
+  //kint($variables['form']);
+}
+
+
+function amplio_preprocess_contact_message_feedback_form(&$variables) {
+  $variables['example'] = 'This is added via preprocess';
+  //unset($variables['form']['name']['#title']);
+  unset($variables['form']['field_first_name']['widget'][0]['value']['#title']);
+  unset($variables['form']['field_last_name']['widget'][0]['value']['#title']);
+  unset($variables['form']['field_company']['widget'][0]['value']['#title']);
+  unset($variables['form']['mail']['#title']);
+  unset($variables['form']['message']['widget'][0]['value']['#title']);
+  //unset($variables['form']['subject']);
+  $variables['form']['name']['widget'][0]['value']['#value'] = t('ABC');
+
+  //print_r( $variables['form']['subject'] );exit;
+
+  //Subject: 
+  /*$variables['form']['subject']['widget'][0]['value']['#default_value'] = t('Contact form @Amplioservices');
+  $variables['form']['subject']['widget'][0]['value']['#value'] = t('Contact form @Amplioservices');
+  $variables['form']['subject']['widget'][0]['value']['#type'] = 'hidden';
+  unset($variables['form']['copy']);*/
+
+  $variables['form']['message']['widget'][0]['value']['#rows'] = '6';
+  $variables['form']['actions']['submit']['#value'] = t('Submit');
+  $variables['form']['message']['widget'][0]['value']['#cols'];
+
+  //$variables['form']['name']['#attributes']['class'] = array('form-control'); 
+  $variables['form']['field_first_name']['widget'][0]['value']['#attributes']['class'] = array('form-control'); 
+  $variables['form']['field_last_name']['widget'][0]['value']['#attributes']['class'] = array('form-control'); 
+  $variables['form']['field_company']['widget'][0]['value']['#attributes']['class'] = array('form-control'); 
+  $variables['form']['mail']['#attributes']['class'] = array('form-control'); 
+  $variables['form']['message']['widget'][0]['value']['#attributes']['class'] = array('form-control');
+  $variables['form']['actions']['submit']['#attributes']['class'][] = 'submit-btn'; 
+
+  $form['actions']['submit']['#submit'][] = t('amplio_contact_message_feedback_form_submit'); 
+}
+
+
+
+
+
+
+/**
+ * Submit callback for contact_message_contact_form.
+ *
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function amplio_contact_message_feedback_form_form_submit(&$form, FormStateInterface $form_state) {
+
+  // Set status message based on the seleted 'candidate_stream'
+  $custom_message = "Thank you for contacting us. Someone will be in touch shortly. Until then please continue to browse the site.";
+  // Update current messages.
+  $status_messages = drupal_get_messages('status');
+  drupal_set_message($custom_message);
+  $form_state->setRedirect('<current>');
+}
+
+
+function amplio_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  if($form_id == 'search_block_form') {
+    $form['#attributes']['class'][] = 'form-inline header-search mt-3';
+    $form['keys']['prefix'] = '<div class="form-group mb-2">';
+    $form['keys']['suffix'] = '</div>';
+    $form['keys']['#attributes']['class'][] = 'form-control';
+    $form['keys']['#attributes']['placeholder'] = t('Search...');
+    $form['actions']['submit']['#attributes']['class'][] = "ml-2 mb-2";    
+  }
+}
+
+function amplio_form_comment_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $form['#attributes']['class'][] = 'comment-form';
+  $form['#attributes']['class'][] = 'form-row';
+  $form['#attributes']['class'][] = 'mt-5';
+  $form['comment_body']['widget'][0]['#format'] = 'plain_text';
+  $form['comment_body']['#prefix'] = '<div class="col-12">';
+  $form['comment_body']['#suffix'] = '</div>';
+  $form['comment_body']['widget'][0]['#attributes']['class'][] = 'form-control';
+  
+  $form['field_first_name']['#prefix'] = '<div class="col-md-6">';
+  $form['field_first_name']['#suffix'] = '</div>';
+  $form['field_first_name']['widget'][0]['value']['#attributes']['class'][] = 'form-control';
+
+  $form['field_last_name']['#prefix'] = '<div class="col-md-6">';
+  $form['field_last_name']['#suffix'] = '</div>';
+  $form['field_last_name']['widget'][0]['value']['#attributes']['class'][] = 'form-control';
+  
+  $form['field_email']['#prefix'] = '<div class="col-12">';
+  $form['field_email']['#suffix'] = '</div>';
+  $form['field_email']['widget'][0]['value']['#attributes']['class'][] = 'form-control';
+
+  $form['actions']['submit']['#prefix'] = '<div class="col-12">';
+  $form['actions']['submit']['#suffix'] = '</div>';
+  $form['actions']['submit']['#attributes']['class'][] = 'submit-btn';
+  $form['actions']['submit']['#value'] = 'Submit comment';
+  $form['actions']['preview']['#access'] = FALSE;
+}
+
+function amplio_mailchimp_signup_subscribe_block_subscribe_to_our_mailing_list_form_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $form['#attributes']['class'][] = 'subscribe';
+  $form['mergevars[EMAIL]']['widget'][0]['#attributes']['class'][] = 'form-control';
+}
+
+
+// Implements HOOK_form_BASE_FORM_ID_alter
+function amplio_form_contact_message_feedback_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+    foreach (array_keys($form['actions']) as $action) {
+      if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+        $form['actions']['submit']['#submit'][] = 'custom_contact_message_feedback_form_submit';
+      }
+    }
+}
+
+function custom_contact_message_feedback_form_submit(array $form, FormStateInterface $form_state) { 
+  $mail = $form_state->getValue(array('mail'));
+  $subscribe = $form_state->getValue(array('field_subscribe'));
+  $subscribe = ($subscribe[0]['value']['subscribe'])?FALSE:TRUE;
+  if(!empty($mail) && $subscribe) { //field_subscribe[0][value][subscribe]
+    $mailchimp_url = 'https://amplioservices.us19.list-manage.com/subscribe/post?u=1715ffde452eaa120512c27d6&amp;id=9587a75af3&EMAIL=' . $mail;
+    file_get_contents($mailchimp_url, true);
+    //drupal_set_message('Success...' . $mailchimp_url . '--->>'. $subscribe);
+  }
+}
+
+
+
+
+
+

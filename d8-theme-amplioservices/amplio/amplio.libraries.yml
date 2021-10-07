@@ -1,0 +1,25 @@
+global-styling:
+  css:
+    base:
+      css/bootstrap.min.css: {}
+    font:
+      https://use.fontawesome.com/releases/v5.0.13/css/all.css: { type: external }
+    animate:
+    custom:
+      css/slick.css: {}
+      css/style.css: {}
+      css/custom.css: {}
+  js:
+    #js/jquery.min.js: {}
+    js/bootstrap.min.js: {}
+    js/jquery.bootstrap-dropdown-hover.min.js: {}
+    js/popper.min.js: {}
+    js/script.js: {}
+    js/slick.min.js: {}
+    js/custom.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal.ajax
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once    
