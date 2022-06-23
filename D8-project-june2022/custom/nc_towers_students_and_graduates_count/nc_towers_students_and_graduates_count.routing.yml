@@ -1,0 +1,47 @@
+nc_towers_students_and_graduates_count.school_type:
+  path: '/students-graduates-count/school-type'
+  defaults:
+    _controller: '\Drupal\nc_towers_students_and_graduates_count\Controller\StudentsGraduatesCountController::SchoolType'
+    _title: 'Search students by school type'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_students_and_graduates_count.school:
+  path: '/students-graduates-count/school'
+  defaults:
+    _controller: '\Drupal\nc_towers_students_and_graduates_count\Controller\StudentsGraduatesCountController::School'
+    _title: 'Search students by school'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_students_and_graduates_count.program_study:
+  path: '/students-graduates-count/program-study'
+  defaults:
+    _controller: '\Drupal\nc_towers_students_and_graduates_count\Controller\StudentsGraduatesCountController::ProgramStudy'
+    _title: 'Search students by school type'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_students_and_graduates_count.degree:
+  path: '/students-graduates-count/degree'
+  defaults:
+    _controller: '\Drupal\nc_towers_students_and_graduates_count\Controller\StudentsGraduatesCountController::Degree'
+    _title: 'Search students by degree'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_students_and_graduates_count.school_year:
+  path: '/students-graduates-count/school-year'
+  defaults:
+    _controller: '\Drupal\nc_towers_students_and_graduates_count\Controller\StudentsGraduatesCountController::SchoolYear'
+    _title: 'Search students by school year'
+  requirements:
+    _permission: 'access content'
+
+# nc_towers_students_and_graduates_count.gender:
+#   path: '/students-graduates-count/gender'
+#   defaults:
+#     _controller: '\Drupal\nc_towers_students_and_graduates_count\Controller\StudentsGraduatesCountController::gender'
+#     _title: 'Search students by gender'
+#   requirements:
+#     _permission: 'access content'

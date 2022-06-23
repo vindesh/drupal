@@ -1,0 +1,46 @@
+{#
+/**
+ * @file
+ * Theme override to display a single views grouping.
+ *
+ * Available variables:
+ * - view: The view object.
+ * - grouping: The grouping instruction.
+ * - grouping_level: A number indicating the hierarchical level of the grouping.
+ * - title: The group heading.
+ * - content: The content to be grouped.
+ * - rows: The rows returned from the view.
+ *
+ * @see template_preprocess_views_view_grouping()
+ */
+#}
+{% set groupName = title|convert_encoding('UTF-8', 'HTML-ENTITIES') %}
+{% set customClass = '' %}
+{% if grouping_level == 0 %}
+   {% set yearIndex = '' %}
+   {% if search_year == groupName %}
+     {% set customClass = 'yearItem-0' %}
+     {% set yearIndex = 0 %}
+   {% elseif (search_year+1) == groupName %}
+      {% set customClass = 'yearItem-1' %}
+      {% set yearIndex = 1 %}
+   {% elseif (search_year+2) == groupName %}
+      {% set customClass = 'yearItem-2' %}
+      {% set yearIndex = 2 %}
+   {% elseif (search_year+3) == groupName %}
+      {% set customClass = 'yearItem-3' %}
+      {% set yearIndex = 3 %}
+   {% elseif (search_year+4) == groupName %}
+      {% set customClass = 'yearItem-4' %}
+      {% set yearIndex = 4 %}
+   {% endif %}
+   <div class="view-grouping {{ customClass }}" data-yearclass="{{ customClass }}" data-yearindex="{{ yearIndex }}" data-year="{{ groupName }}">
+{% elseif grouping_level == 1 %}
+   {% set groupName = title|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES')|replace({"'" : "", " ": "-"}) %}
+   <div class="sector-item {{ groupName }}" data-sector="{{ groupName }}">
+{% else %}
+   <div class="{{ groupName }}">
+{% endif %}
+  {{ content }}
+
+</div>

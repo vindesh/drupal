@@ -1,0 +1,7 @@
+name: 'NC Towers: Main Outcomes'
+type: module
+description: 'NC Towers Main Outcomes'
+core: 8.x
+package: 'NC Towers'
+dependencies:
+  - drupal:nc_towers_students_and_graduates_count

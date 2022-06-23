@@ -1,0 +1,23 @@
+{% set empByType = title|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES') %}
+
+{% set customClass = '' %}
+{% set index = '' %}
+{% if search_param['school']~'/'~search_param['program_study']~'/'~search_param['degree'] == empByType %}
+	{% set customClass = 'enrollmentType-0' %}
+	{% set index = 0 %}
+{% elseif search_param['school1']~'/'~search_param['program_study1']~'/'~search_param['degree1'] == empByType %}
+	{% set customClass = 'enrollmentType-1' %}
+	{% set index = 1 %}
+{% elseif search_param['school2']~'/'~search_param['program_study2']~'/'~search_param['degree2'] == empByType %}
+	{% set customClass = 'enrollmentType-2' %}
+	{% set index = 2 %}
+{% elseif search_param['school3']~'/'~search_param['program_study3']~'/'~search_param['degree3'] == empByType %}
+	{% set customClass = 'enrollmentType-3' %}
+	{% set index = 3 %}
+{% elseif search_param['school4']~'/'~search_param['program_study4']~'/'~search_param['degree4'] == empByType %}
+	{% set customClass = 'enrollmentType-4' %}
+	{% set index = 4 %}
+{% endif %}
+<div class="view-grouping {{ customClass }}" data-empclass="{{ customClass }}" data-index="{{ index }}" data-year="{{ empByType }}">
+	{{ content }}
+</div>

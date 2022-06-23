@@ -1,0 +1,56 @@
+{% set groupName = title %}
+{% set customClass = '' %}
+{% set yearIndex = '' %}
+
+{% if grouping_level == 0 %}
+   {% set groupName = title|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES') %}
+   {% if search_param['param'] %}
+      {% set paramArr = search_param['param']|split('|') %}
+      {% set param1 = paramArr[1]~'/'~paramArr[2]~'/'~paramArr[3] %}
+      {% if param1 == groupName %}
+         {% set customClass = 'enrollmentType-0' %}
+         {% set yearIndex = 0 %}
+      {% endif %}
+   {% endif %}
+   {% if search_param['param1'] %}
+      {% set paramArr1 = search_param['param1']|split('|') %}
+      {% set param2 = paramArr1[1]~'/'~paramArr1[2]~'/'~paramArr1[3] %}
+      {% if param2 == groupName %}
+         {% set customClass = 'enrollmentType-1' %}
+         {% set yearIndex = 1 %}
+      {% endif %}
+   {% endif %}
+   {% if search_param['param2'] %}
+      {% set paramArr3 = search_param['param2']|split('|') %}
+      {% set param3 = paramArr3[1]~'/'~paramArr3[2]~'/'~paramArr3[3] %}
+      {% if param3 == groupName %}
+         {% set customClass = 'enrollmentType-2' %}
+         {% set yearIndex = 2 %}
+      {% endif %}
+   {% endif %}
+   {% if search_param['param3'] %}
+      {% set paramArr4 = search_param['param3']|split('|') %}
+      {% set param4 = paramArr4[1]~'/'~paramArr4[2]~'/'~paramArr4[3] %}
+      {% if param4 == groupName %}
+         {% set customClass = 'enrollmentType-3' %}
+         {% set yearIndex = 3 %}
+      {% endif %}
+   {% endif %}
+   {% if search_param['param4'] %}
+      {% set paramArr5 = search_param['param4']|split('|') %}
+      {% set param5 = paramArr5[1]~'/'~paramArr5[2]~'/'~paramArr5[3] %}
+      {% if param5 == groupName %}
+         {% set customClass = 'enrollmentType-4' %}
+         {% set yearIndex = 4 %}
+      {% endif %}
+   {% endif %}
+<div class="view-grouping {{ customClass }}" data-empclass="{{ customClass }}" data-index="{{ yearIndex }}" data-group="{{ groupName }}">
+{% elseif grouping_level == 1 %}
+   {% set groupName = title|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES')|replace({"'" : "", " ": "-"}) %}
+   <div class="sector-item {{ groupName }}" data-sector="{{ groupName }}">
+{% else %}
+   <div class="{{ groupName }}">
+{% endif %}
+
+  {{ content }}
+</div>

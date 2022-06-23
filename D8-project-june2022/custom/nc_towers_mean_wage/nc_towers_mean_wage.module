@@ -1,0 +1,195 @@
+<?php
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+/**
+ * @function hook_theme()
+ */
+function nc_towers_mean_wage_theme($existing, $type, $theme, $path) {
+  return [
+    'mean_wage_search' => [
+      'variables' => ['results' => NULL, 'query_param' => NULL],
+    ],
+    'mean_wage_multi_search' => [
+      'variables' => ['results' => NULL, 'query_param' => NULL],
+    ],
+  ];
+}
+/**
+ * @function hook_views_query_alter()
+ * @param  ViewExecutable
+ * @param  QueryPluginBase
+ * @return [type]
+ */
+function nc_towers_mean_wage_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  if (($view->id() == "mean_wages_after_graduation" && ($view->current_display == "attachment_1" || $view->current_display == "attachment_2"))) {
+    $current_path = \Drupal::request()->query->all();
+    $database = \Drupal::database();
+    $drillDownCombination = [['All','All'], ['All','Asian'], ['All','Black'], ['All',' White'], ['All','Other'], ['Male','All'], ['Female','All']];
+  }
+
+  if ($view->id() == "mean_wages_after_graduation" && ($view->current_display == "page_1")) {
+    foreach ($query->where[1]['conditions'] as $ckey => $cvalue) {
+      /*if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_school_year.name') {
+        $selectYear = intval($query->where[1]['conditions'][$ckey]['value']);
+        $yearArr = [];
+        for ($i = 0; $i < 5; $i++){
+          $yearArr[] = $selectYear + $i;
+        }
+        $query->where[1]['conditions'][$ckey]['operator'] = 'IN';
+        $query->where[1]['conditions'][$ckey]['value'] = $yearArr;
+      }*/
+      $selectYear = intval($query->where[1]['conditions'][$ckey]['value']);
+      $yearArr = [];
+      $sectorNids = [];
+      for ($i = 0; $i < 5; $i++){
+        $selectYearNameValue = $selectYear + $i;
+        if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_school_year.name') {
+          $yearArr[] = $selectYearNameValue;
+        }
+        /*if ($view->current_display == "attachment_1") {
+          $schoolTypeTid = $schoolTid = $programStudyTid = $degreeTid = $schoolYearTid = '';
+          if(isset($current_path['school_type'])){
+            $schoolTypeObj = getTermId($database, $current_path['school_type']);
+            if(!empty($schoolTypeObj)){
+              $schoolTypeTid = $schoolTypeObj->tid;
+            }
+            $schoolObj = getTermId($database, $current_path['school']);
+            if(!empty($schoolObj)){
+              $schoolTid = $schoolObj->tid;
+            }
+            $programStudyObj = getTermId($database, $current_path['program_study']);
+            if(!empty($programStudyObj)){
+              $programStudyTid = $programStudyObj->tid;
+            }
+            $degreeObj = getTermId($database, $current_path['degree']);
+            if(!empty($degreeObj)){
+              $degreeTid = $degreeObj->tid;
+            }
+            $schoolYearObj = getTermId($database, $selectYearNameValue);
+            if(!empty($schoolYearObj)){
+              $schoolYearTid = $schoolYearObj->tid;
+            }
+
+            foreach ($drillDownCombination as $dkey => $dvalue) {
+              $raceTid = $genderTid = '';
+              $genderObj = getTermId($database, $dvalue[0], 'gender');
+              if(!empty($genderObj)){
+                $genderTid = $genderObj->tid; 
+              }
+              $raceObj = getTermId($database, $dvalue[1], 'raceTid');
+              if(!empty($raceObj)){
+                $raceTid = $raceObj->tid; 
+              }                                  
+              
+              $sectorNidsArr = getSectorNids($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'employment_by_sector', 'employed_wages');
+              $sectorNids = array_merge($sectorNids, $sectorNidsArr);
+            }
+          }
+        }*/
+      }
+
+      if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_school_year.name') {
+        $query->where[1]['conditions'][$ckey]['operator'] = 'IN';
+        $query->where[1]['conditions'][$ckey]['value'] = $yearArr;
+      }
+
+      /*if(!empty($sectorNids) && $view->current_display == "attachment_1"){
+        $query->where[1]['conditions'][] = [
+          'field' => 'node_field_data.nid',
+          'operator' => 'IN',
+          'value'=> $sectorNids
+        ];
+      }*/
+    }
+  }
+
+  if ($view->id() == "mean_wages_after_graduation" && ($view->current_display == "page_2" || $view->current_display == "attachment_2")) {
+    for ($i=1; $i <= 5; $i++) {
+      $flag = FALSE;
+      /*if($view->current_display == "attachment_2"){
+        $multiSectorNids = [];
+        foreach ($drillDownCombination as $dkey => $dvalue) {
+          $schoolTypeTid = $schoolTid = $programStudyTid = $degreeTid = $schoolYearTid = $raceTid = $genderTid = '';
+          $genderObj = getTermId($database, $dvalue[0], 'gender');
+          if(!empty($genderObj)){
+            $genderTid = $genderObj->tid; 
+          }
+          $raceObj = getTermId($database, $dvalue[1], 'raceTid');
+          if(!empty($raceObj)){
+            $raceTid = $raceObj->tid; 
+          } 
+
+          if($i == 1) {
+            $param_number = '';
+          }else{
+            $param_number = $i;
+          }
+          if(isset($current_path['school_type'.$param_number])){
+            $schoolTypeObj = getTermId($database, $current_path['school_type'.$param_number]);
+            if(!empty($schoolTypeObj)){
+              $schoolTypeTid = $schoolTypeObj->tid;
+            }
+            $schoolObj = getTermId($database, $current_path['school'.$param_number]);
+            if(!empty($schoolObj)){
+              $schoolTid = $schoolObj->tid;
+            }
+            $programStudyObj = getTermId($database, $current_path['program_study'.$param_number]);
+            if(!empty($programStudyObj)){
+              $programStudyTid = $programStudyObj->tid;
+            }
+            $degreeObj = getTermId($database, $current_path['degree'.$param_number]);
+            if(!empty($degreeObj)){
+              $degreeTid = $degreeObj->tid;
+            }
+            $schoolYearObj = getTermId($database, $current_path['school_year'.$param_number]);
+            if(!empty($schoolYearObj)){
+              $schoolYearTid = $schoolYearObj->tid;
+            }
+
+            $multiSearchNids = getSectorNids($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'employment_by_sector');
+            $multiSectorNids = array_merge($multiSectorNids, $multiSearchNids);
+          }
+        }
+        if(!empty($multiSectorNids)){
+          $query->where[$i]['conditions'][] = [
+            'field' => 'node_field_data.nid',
+            'operator' => 'IN',
+            'value'=> $multiSectorNids
+          ];
+        }
+      }*/
+      foreach ($query->where[$i]['conditions'] as $ckey => $cvalue) {
+
+        if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_agency.name') {
+          $flag = TRUE;
+        }
+        if ( $i!=1 && $flag && $cvalue['field'] != 'node__field_after_year.field_after_year_value' ) {
+          $flag = FALSE;
+          if($view->current_display == "attachment_2"){
+            $nodeType = 'employment_by_sector';
+            $afterYearValue = 1;
+            $afterYearOperator = '=';
+          }
+          else {
+            $nodeType = 'main_outcomes';
+            $afterYearValue = 5;
+            $afterYearOperator = '<=';
+          }
+          $query->where[$i]['conditions'][$ckey] = [
+              'field' => 'node__field_after_year.field_after_year_value',
+              'operator' => $afterYearOperator,
+              'value'=>$afterYearValue];
+          $query->where[$i]['conditions'][] = [
+              'field' => 'node_field_data.type',
+              'operator' => '=',
+              'value'=> $nodeType];
+        }
+      }
+    }
+    //print_r($query->where);exit;
+    if( isset($_GET['mytest']) && $_GET['mytest']='yes'){
+      dpq($view->query->query());
+    }
+  }
+
+}

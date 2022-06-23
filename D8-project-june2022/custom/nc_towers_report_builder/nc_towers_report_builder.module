@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function nc_towers_report_builder_theme($existing, $type, $theme, $path) {
+  return [
+    'report_builder_search' => [
+      'variables' => ['results' => NULL],
+    ]
+  ];
+}
+

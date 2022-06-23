@@ -1,0 +1,62 @@
+<div class="school-search-type">
+	<h4>Search</h4>
+	<div class="school-search-type__item">
+		<input type="radio" name="searchType" id="multipleYears" value="1" checked>
+		<label for="multipleYears">I want to view data for one school/program for multiple years</label>
+	</div>
+
+	<div class="school-search-type__item">
+		<input type="radio" name="searchType" id="singleYear">
+		<label for="singleYear"> I want to compare data for multiple schools/programs for a single year</label>
+	</div>
+</div>
+
+<div class="search-program-form">
+	<div class="field-container max-width-250">
+		<label>School Year</label>
+		<select name="school_year" class="form-control" id="edit-school-year" required></select>
+	</div>
+</div>
+
+<div class="search-program-form">
+	<div class="students-graduates-search-indent field-container max-width-405">
+		<label>School Type</label>
+		<select name="school_type" class="form-control" id="edit-school-type" required>
+		</select>
+	</div>
+</div>
+
+<div class="search-program-form">
+
+	<div class="field-container">
+		<label>School</label>
+		<input type="text" name="school" id="edit-school" class="form-control" required aria-label="school search" value="" placeholder="Search by School" />
+	</div>
+
+	<div class="field-container">
+		<label>Program of Study</label>
+		<input type="text" name="program_study" id="edit-program-study" required class="form-control" aria-label="program study search" value="" placeholder="Search by Program Study" />
+	</div>
+
+	<div class="field-container">
+		<label>Degree</label>
+		<select name="degree" id="edit-degree" class="form-control" required></select>
+	</div>
+
+</div>
+
+<div class="search-program-form-action">
+	<button id="main_outcomes_search" class="button submit-btn btn-disabled" disabled>SEARCH</button>
+	<button id="main_outcomes_restart" class="button">START OVER</button>
+</div>
+
+<!-- tabs -->
+<div class="chart-tabs-container">
+	<ul>
+		<li class="isDisabled enrollment-graduates nc-tab-item"><a href="{{ path('view.students_graduates_search.page_1') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-1.png">Enrollment/<br>Graduates</a></li>
+		<li class="enrollment-outcomes isDisabled nc-tab-item"><a href="{{ path('view.enrollment_outcomes_search.page_1') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-2.png">Enrollment<br>Outcomes</a></li>
+		<li class="employment-outcomes isDisabled nc-tab-item"><a href="{{ path('view.employment_outcomes_search.page_1') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-3.png">Employment<br>Outcomes</a></li>
+		<li class="active wages isDisabled nc-tab-item"><a href="{{ path('view.mean_wages_search.page_1') }}"  class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-4.png">Wages</a></li>
+	</ul>
+</div>
+<!-- /tabs -->

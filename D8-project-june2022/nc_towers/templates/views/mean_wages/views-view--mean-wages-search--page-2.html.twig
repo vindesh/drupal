@@ -1,0 +1,218 @@
+{%
+  set classes = [
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title }}
+  {{ title_suffix }}
+
+  {% if header %}
+      {{ header }}
+  {% endif %}
+<div class="explore-occupation-exposed-filters_1">
+
+  {#{ exposed }#}
+  {{ drupal_block('mean_wage_multi_search') }}
+</div>
+
+<div class="explore-occupation-column-selector" id="table-formatter">
+</div>
+
+<div class="table-grid explore-occupation-grid" id="outcomesGraphData" style="display: none;">
+  {% if rows -%}
+    {{ rows }}
+  {% elseif empty -%}
+    {{ empty }}
+  {% endif %}
+</div>
+  {{ pager }}
+  {{ more }}
+  <div class="graph-container meanWagesAfterGraduationFilters" style="display: none">
+    <div class="graph-container__title">{{'Mean Wages After Graduation'|trans}}</div>
+    <div class="graph-container__sorting-container">
+      <div class="graph-container__sorting">
+        {{'Show data by'|trans}}
+        <div class="graph-container__filters">
+          <label>{{'Gender'|trans}} <input type="checkbox" name="gender" class="toggleDrilldown" id="0"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> {{'All'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Male"> {{'Male'|trans}}</label></li>
+              <li><label id="femaleData"><input type="checkbox" id="Female"> {{'Female'|trans}}</label></li>
+            </ul>
+          </div>
+        </div>
+        <div class="graph-container__filters">
+          <label>{{'Race'|trans}} <input type="checkbox" name="race" class="toggleDrilldown" id="0"></label>
+          <div class="graph-container__filters-dropdown">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> {{'All'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Asian" checked> {{'Asian'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Black" checked> {{'Black'|trans}}</label></li>
+              <li><label><input type="checkbox" id="White" checked> {{'White'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Other" checked> {{'Other'|trans}}</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="graph-container__icons">
+        <img class="graph-view-action" src="/themes/custom/nc_towers/images/chart-view.jpg">
+        <img class="table-view-action" src="/themes/custom/nc_towers/images/table-view.jpg">
+      </div>
+    </div>
+    <div class="graph-container__toggle">
+      <div id="studentsEnrolledGraphMultiSearch" class="graph-view-container"></div>
+      <div class="table-view-container" style="display: none">
+        {{ attachment_before }}
+
+        <div class="search-data-export-button" style="float:right;"></div>
+        {% if muliple_term_params %}
+          <table id="search-data-export" class="search-data-export views-table">
+          <thead>
+            <tr>
+              <th colspan=11 align="center">{{'Mean Wages'|trans}}</th>
+            </tr>
+            <tr>
+              <th>{{'Year'|trans}}</th>
+              <th>{{'School'|trans}}</th>
+              <th>{{'Program'|trans}}</th>
+              <th>{{'Degree'|trans}}</th>
+              {% for key, value2 in muliple_term_params[0].wagesData %}
+              <th class="views-field views-field-field-after-year">
+                {% if value2.field_after_year_value == 1  %}
+                     {{'After @afteryear Year'|trans({'@afteryear': value2.field_after_year_value}) }}
+                {% else %}
+                   {{'After @afteryear Years'|trans({'@afteryear': value2.field_after_year_value}) }}
+                {% endif %}
+              </th>
+              {% endfor %}
+              {% if muliple_term_params[0].wagesData|length < 5 %}
+                  {% for i in (muliple_term_params[0].wagesData|length+1)..5 %}
+                      <th>
+                        {{'After'|trans}} {{ i }}  {{(i==1)?'Year'|trans:'Years'|trans}}
+                      </th>
+                  {% endfor %}
+               {% endif %}
+              <th>{{'Gender'|trans}}</th>
+              <th>{{'Race'|trans}}</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for key1, param in muliple_term_params %}
+              {% if param.wagesData %}
+            <tr>
+              <td>{{ param.school_year }}</td>
+              <td>{{ param.school }}</td>
+              <td>{{ param.program_study }}</td>
+              <td>{{ param.degree }}</td>
+              {% for key, value2 in param.wagesData %}
+                <td class="views-field">
+                  {% if value2.field_mean_wage_value  %}
+                    {% if value2.field_mean_wage_value == -1 %}
+                      {{'Data Suppressed'|trans}}
+                    {% else %}
+                      ${{ value2.field_mean_wage_value|number_format }}
+                    {% endif %}
+                  {% else %}
+                    0
+                  {% endif %}
+                </td>
+              {% endfor %}
+              {% if param.wagesData|length < 5 %}
+                  {% for i in (param.wagesData|length+1)..5 %}
+                      <td></td>
+                  {% endfor %}
+              {% endif %}
+              <td>{{'All'|trans}}</td>
+              <td>{{'All'|trans}}</td>
+            </tr>
+           {% endif %}
+          {% endfor %}
+          </tbody>
+          </table>
+        {% endif %}
+      </div>
+    </div>
+    {{ attachment_after }}
+    {% if term_params %}
+      <div class="table-view-container1" style="display: none;">
+        <table id="search-data-export" class="search-data-export wagesDataTable views-table">
+          <thead>
+            <tr>
+              <th colspan="25" align="center">{{'Mean Wages'|trans}}</th>
+            </tr>
+            <tr>
+              <th>{{'Year'|trans}}</th>
+              <th>{{'School'|trans}}</th>
+              <th>{{'Program'|trans}}</th>
+              <th>{{'Degree'|trans}}</th>
+              {% set categoryList = [] %}
+              {% set emptyArray = [] %}
+              {% for key1, param in term_params %}
+              {% for key, value2 in param.multiEmploymentWagesData %}                
+                {% if value2[param.sub_key].field_employment_sector_target_id not in categoryList and (value2[param.sub_key].name|trim is not empty) %}
+                  <th class="views-field views-field-field-after-year">
+                    {{ value2[param.sub_key].name }}
+                  </th>
+                  {% set categoryList = categoryList|merge([value2[param.sub_key].field_employment_sector_target_id]) %}
+                  {% set emptyArray = emptyArray|merge(['']) %}
+
+                {% endif %}
+              {% endfor %}
+              {% endfor %} 
+              <th>{{'After Year'|trans}}</th>
+              <th>{{'Gender'|trans}}</th>
+              <th>{{'Race'|trans}}</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for key1, param in term_params %}
+            {% if param.multiEmploymentWagesData %}
+              <tr class="yearItem-{{key1}}" data-val="yearItem-{{key1}}" >
+                <td>{{ param.school_year }}</td>
+                 <td>{{ param.school }}</td>
+                 <td>{{ param.program_study }}</td>
+                 <td>{{ param.degree }}</td>
+                   {% set output = emptyArray %}
+                   {% for index, row in param.multiEmploymentWagesData %}
+                      {% set empSector = row[param.sub_key].field_employment_sector_target_id  %}
+                      {% set sectorIndex = 0 %}
+                      {% for key, sectorID in categoryList %}
+                        {% if empSector == sectorID %}
+                          {% set sectorIndex = loop.index %}
+                        {% endif %}
+                      {% endfor %}
+                      {% set wages = '' %}
+                      {% if row[param.sub_key].field_mean_wage_value %}
+                        {% if row[param.sub_key].field_mean_wage_value == -1 %}
+                          {% set wages = 'Data Suppressed'|trans %}
+                        {% else %}
+                          {% set wages = '$'~row[param.sub_key].field_mean_wage_value|number_format %}
+                        {% endif %}
+                      {% endif %}
+                      {% set output = {(sectorIndex-1): wages} + output %}  
+                   {% endfor %}
+                  {% for key, wage in output|ksort %}
+                    <td>{{wage}}</td>
+                  {% endfor %}
+                <td>1</td>
+                <td>{{'All'|trans}}</td>
+                <td>{{'All'|trans}}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if footer %}
+    <footer>
+      {{ footer }}
+    </footer>
+  {% endif %}
+  {{ feed_icons }}
+</div>

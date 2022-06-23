@@ -1,0 +1,47 @@
+mean_wage_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/mean_wage_search.js: {}
+    js/employment_wages_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once
+
+mean_wage_multi_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/mean_wage_multi_search.js: {}
+    js/multiple_employment_wages_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once
+
+mean_wages:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/mean_wages.js: {}
+    js/employment_wages.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once
+
+multiple_mean_wages:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/multiple_mean_wages.js: {}
+    js/multiple_employment_wages.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once

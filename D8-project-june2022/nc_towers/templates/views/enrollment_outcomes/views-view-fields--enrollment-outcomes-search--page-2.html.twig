@@ -1,0 +1,40 @@
+{% set title = view.field.title.value(view.result[row.index])|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES') %}
+{% set customClass = '' %}
+{% if search_param['param'] == title %}
+   {% set customClass =  'multiSearch-0' %}
+{% endif %}
+{% if search_param['param1'] == title %}
+   {% set customClass =  'multiSearch-1' %}
+{% endif %}
+{% if search_param['param2'] == title %}
+   {% set customClass =  'multiSearch-2' %}
+{% endif %}
+{% if search_param['param3'] == title %}
+   {% set customClass =  'multiSearch-3' %}
+{% endif %}
+{% if search_param['param4'] == title %}
+   {% set customClass =  'multiSearch-4' %}
+{% endif %}
+
+{% for field in fields -%}
+  {{ field.separator }}
+  {%- if field.wrapper_element -%}
+    <{{ field.wrapper_element }}{{ field.wrapper_attributes }}>
+  {%- endif %}
+  {%- if field.label -%}
+    {%- if field.label_element -%}
+      <{{ field.label_element }}{{ field.label_attributes }}>{{ field.label }}{{ field.label_suffix }}</{{ field.label_element }}>
+    {%- else -%}
+      {{ field.label }}{{ field.label_suffix }}
+    {%- endif %}
+  {%- endif %}
+  {%- if field.element_type -%}
+    <{{ field.element_type }} {% if loop.last %} {{ field.element_attributes.addClass(customClass) }} {%- endif %}>{{ field.content }}</{{ field.element_type }}>
+
+  {%- else -%}
+    {{ field.content }}
+  {%- endif %}
+  {%- if field.wrapper_element -%}
+    </{{ field.wrapper_element }}>
+  {%- endif %}
+{%- endfor %}

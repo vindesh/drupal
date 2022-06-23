@@ -1,0 +1,17 @@
+nc_towers_report_builder.builder_form:
+  path: '/report'
+  defaults:
+    _form: '\Drupal\nc_towers_report_builder\Form\ReportBuilderForm'
+    _title: 'Report Builder'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'
+
+nc_towers_report_builder.download:
+  path: '/download'
+  defaults:
+    _controller: '\Drupal\nc_towers_report_builder\Controller\ReportBuilderController::download'
+    _title: 'download'
+  requirements:
+    _permission: 'access content'

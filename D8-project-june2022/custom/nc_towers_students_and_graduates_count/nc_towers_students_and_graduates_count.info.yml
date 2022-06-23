@@ -1,0 +1,5 @@
+name: 'NC Towers: Students and Graduates Count'
+type: module
+description: 'NC Towers Students and Graduates Count'
+core: 8.x
+package: 'NC Towers'

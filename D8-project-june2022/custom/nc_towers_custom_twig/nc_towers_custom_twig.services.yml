@@ -1,0 +1,5 @@
+services:
+  nc_towers_custom_twig.twig.CustomTwigExtension:
+    class: Drupal\nc_towers_custom_twig\Twig\Extension\CustomTwigExtension
+    tags:
+      - { name: twig.extension }

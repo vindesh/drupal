@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * Theme override to display a single views grouping.
+ *
+ * Available variables:
+ * - view: The view object.
+ * - grouping: The grouping instruction.
+ * - grouping_level: A number indicating the hierarchical level of the grouping.
+ * - title: The group heading.
+ * - content: The content to be grouped.
+ * - rows: The rows returned from the view.
+ *
+ * @see template_preprocess_views_view_grouping()
+ */
+#}
+{% set empBySector = title|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES') %}
+
+{% set customClass = '' %}
+{% set index = '' %}
+{% if search_param['school']~'/'~search_param['program_study']~'/'~search_param['degree'] == empBySector %}
+  {% set customClass = 'employmentSector-0' %}
+  {% set index = 0 %}
+{% elseif search_param['school1']~'/'~search_param['program_study1']~'/'~search_param['degree1'] == empBySector %}
+   {% set customClass = 'employmentSector-1' %}
+   {% set index = 1 %}
+{% elseif search_param['school2']~'/'~search_param['program_study2']~'/'~search_param['degree2'] == empBySector %}
+   {% set customClass = 'employmentSector-2' %}
+   {% set index = 2 %}
+{% elseif search_param['school3']~'/'~search_param['program_study3']~'/'~search_param['degree3'] == empBySector %}
+   {% set customClass = 'employmentSector-3' %}
+   {% set index = 3 %}
+{% elseif search_param['school4']~'/'~search_param['program_study4']~'/'~search_param['degree4'] == empBySector %}
+   {% set customClass = 'employmentSector-4' %}
+   {% set index = 4 %}
+{% endif %}
+<div class="view-grouping {{ customClass }}" data-empclass="{{ customClass }}" data-index="{{ index }}" data-year="{{ empBySector }}">
+  {#<div class="view-grouping-header">{{ title }}</div>
+  <div class="view-grouping-content">{{ content }}</div>#}
+  {{ content }}
+</div>

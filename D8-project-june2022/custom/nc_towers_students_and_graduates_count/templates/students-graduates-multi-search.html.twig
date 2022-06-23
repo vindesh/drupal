@@ -1,0 +1,152 @@
+{# Multi Search Template #}
+<div class="school-search-type">
+	<h4>Search</h4>
+	<div class="school-search-type__item">
+		<input type="radio" name="searchType" id="multipleYears" >
+		<label for="multipleYears">I want to view data for one school/program for multiple years</label>
+	</div>
+
+	<div class="school-search-type__item">
+		<input type="radio" name="searchType" id="singleYear" checked>
+		<label for="singleYear"> I want to compare data for multiple schools/programs for a single year</label>
+	</div>
+</div>
+
+<div class="search-program-form">
+	<div class="field-container max-width-250">
+		<label>School Year</label>
+		<select name="school_year" id="edit-school-year-multi"></select>
+	</div>
+</div>
+
+<div class="search-program-form">
+	<div class="students-graduates-search-indent field-container max-width-405">
+		<label>School Type</label>
+		<select name="school_type" id="edit-school-type-multi">
+		</select>
+	</div>
+</div>
+
+
+<div class="search-program-form offset-right-38 filter-group filter1" data-index="1">
+		<div class="field-container">
+		<label>School</label>
+		<input class="form-control" type="text" name="school[]" id="edit-school-0" aria-label="school search" value="" placeholder="Search by School" />
+	</div>
+
+	<div class="field-container">
+		<label>Program of Study</label>
+		<input class="form-control" type="text" name="program_study[]" id="edit-program-study-0" aria-label="program study search" value="" placeholder="Search by Program Study" />
+	</div>
+
+	<div class="field-container">
+		<label>Degree</label>
+		<select class="form-control" name="degree[]" id="edit-degree-0"></select>
+	</div>
+</div>
+
+<div class="search-program-form multisearch-form filter-group filter2" data-index="2">
+	<div class="field-container">
+		<label>School</label>
+		<input class="form-control" type="text" name="school[]" id="edit-school-1" aria-label="school search" value="" placeholder="Search by School" />
+	</div>
+
+	<div class="field-container">
+		<label>Program of Study</label>
+		<input class="form-control" type="text" name="program_study[]" id="edit-program-study-1" aria-label="program study search" value="" placeholder="Search by Program Study" />
+	</div>
+
+	<div class="field-container">
+		<label>Degree</label>
+		<select class="form-control" name="degree[]" id="edit-degree-1"></select>
+	</div>
+	<div class="remove-search-fields" data-row="0">
+		<button>remove</button>
+	</div>
+</div>
+
+<div class="search-program-form multisearch-form filter-group filter3" data-index="3">
+
+
+	<div class="field-container">
+		<label>School</label>
+		<input class="form-control" type="text" name="school[]" id="edit-school-2" aria-label="school search" value="" placeholder="Search by School" />
+	</div>
+
+	<div class="field-container">
+		<label>Program of Study</label>
+		<input class="form-control" type="text" name="program_study[]" id="edit-program-study-2" aria-label="program study search" value="" placeholder="Search by Program Study" />
+	</div>
+
+	<div class="field-container">
+		<label>Degree</label>
+		<select class="form-control" name="degree[]" id="edit-degree-2"></select>
+	</div>
+	<div class="remove-search-fields" data-row="1">
+		<button>remove</button>
+	</div>
+</div>
+
+<div class="search-program-form multisearch-form filter-group filter4" data-index="4">
+
+	<div class="field-container">
+		<label>School</label>
+		<input class="form-control" type="text" name="school[]" id="edit-school-3" aria-label="school search" value="" placeholder="Search by School" />
+	</div>
+
+	<div class="field-container">
+		<label>Program of Study</label>
+		<input class="form-control" type="text" name="program_study[]" id="edit-program-study-3" aria-label="program study search" value="" placeholder="Search by Program Study" />
+	</div>
+
+	<div class="field-container">
+		<label>Degree</label>
+		<select class="form-control" name="degree[]" id="edit-degree-3"></select>
+	</div>
+	<div class="remove-search-fields" data-row="2">
+		<button>remove</button>
+	</div>
+</div>
+
+<div class="search-program-form multisearch-form filter-group filter5" data-index="5">
+
+	<div class="field-container">
+		<label>School</label>
+		<input class="form-control" type="text" name="school[]" id="edit-school-4" aria-label="school search" value="" placeholder="Search by School" />
+	</div>
+
+	<div class="field-container">
+		<label>Program of Study</label>
+		<input class="form-control" type="text" name="program_study[]" id="edit-program-study-4" aria-label="program study search" value="" placeholder="Search by Program Study" />
+	</div>
+
+	<div class="field-container">
+		<label>Degree</label>
+		<select class="form-control" name="degree[]" id="edit-degree-4"></select>
+	</div>
+	<div class="remove-search-fields" data-row="3">
+		<button>remove</button>
+	</div>
+</div>
+
+<div class="search-program-form">
+	<button class="search-program-add-search">
+		+ Add School/Program
+	</button>
+</div>
+
+<div class="search-program-form-action">
+	<div id="multi_students_graduates_search" class="button">SEARCH</div>
+	<div id="students_graduates_restart" class="button">START OVER</div>
+</div>
+
+
+<!-- tabs -->
+<div class="chart-tabs-container">
+	<ul>
+		<li class="active isDisabled enrollment-graduates nc-tab-item"><a href="{{ path('view.students_graduates_search.page_2') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-1.png">Enrollment/<br>Graduates</a></li>
+		<li class="enrollment-outcomes isDisabled nc-tab-item"><a href="{{ path('view.enrollment_outcomes_search.page_2') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-2.png">Enrollment<br>Outcomes</a></li>
+		<li class="employment-outcomes isDisabled nc-tab-item"><a href="{{ path('view.employment_outcomes_search.page_2') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-3.png">Employment<br>Outcomes</a></li>
+		<li class="wages isDisabled nc-tab-item"><a href="{{ path('view.mean_wages_search.page_2') }}" class="nc-tab-link"><img src="/themes/custom/nc_towers/images/thumb-4.png">Wages</a></li>
+	</ul>
+</div>

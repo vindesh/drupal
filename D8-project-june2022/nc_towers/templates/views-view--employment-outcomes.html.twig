@@ -1,0 +1,247 @@
+{%
+  set classes = [
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title }}
+  {{ title_suffix }}
+
+  {% if header %}
+      {{ header }}
+  {% endif %}
+<div class="explore-occupation-exposed-filters_1">
+
+  {#{ exposed }#}
+  {{ drupal_block('main_outcomes_search') }}
+</div>
+
+<div class="explore-occupation-column-selector" id="table-formatter">
+</div>
+
+<div class="table-grid explore-occupation-grid" id="outcomesGraphData" style="display: none;">
+  {% if rows -%}
+    {{ rows }}
+  {% elseif empty -%}
+    {{ empty }}
+  {% endif %}
+</div>
+  {{ pager }}
+  {{ more }}
+  <div class="graph-container" style="display: none">
+    <div class="graph-container__title">Employment Rate After Graduation</div>
+    <div class="graph-container__sorting-container employment-rate-filters">
+      <div class="graph-container__sorting">
+        Show data by
+        <div class="graph-container__filters">
+          <label>Gender <input type="checkbox" name="gender" class="toggleDrilldown" id="0"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> All</label></li>
+              <li><label><input type="checkbox" id="Male"> Male</label></li>
+              <li><label id="femaleData"><input type="checkbox" id="Female"> Female</label></li>
+            </ul>
+          </div>
+        </div>
+        <div class="graph-container__filters">
+          <label>Race <input type="checkbox" name="race" class="toggleDrilldown" id="0"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> All</label></li>
+              <li><label><input type="checkbox" id="Asian" checked> Asian</label></li>
+              <li><label><input type="checkbox" id="Black" checked> Black</label></li>
+              <li><label><input type="checkbox" id="White" checked> White</label></li>
+              <li><label><input type="checkbox" id="Other" checked> Other</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="graph-container__icons">
+        <img class="graph-view-action" src="/themes/custom/nc_towers/images/chart-view.jpg">
+        <img class="table-view-action" src="/themes/custom/nc_towers/images/table-view.jpg">
+      </div>
+    </div>
+    <div class="graph-container__toggle">
+      <div id="outcomesEnrolledGraph" class="graph-view-container"></div>
+      <div class="table-view-container" style="display: none">
+        {{ attachment_before }}
+        <div class="search-data-export-button" style="float:right;"></div>
+        {% if term_params %}
+          <table id="search-data-export" class="search-data-export views-table">
+          <thead>
+            <tr>
+              <th colspan=8 align="center">{{'Students Employed/Graduates (%)'|trans}}</th>
+            </tr>
+            <tr>
+              <th>{{'Year'|trans}}</th>
+              {% for key, value2 in term_params[0].multiEmployedData %}
+                  <th class="views-field views-field-field-after-year">
+                  {% if value2.field_after_year_value == 1  %}
+                    {% trans %}After {{ value2.field_after_year_value }} Year{% endtrans %}
+                  {% else %}
+                    {% trans %}After {{ value2.field_after_year_value }} Years{% endtrans %}
+                  {% endif %}
+                  </th>
+              {% endfor %}
+              {% if term_params[0].multiEmployedData|length < 5 %}
+                  {% for i in (term_params[0].multiEmployedData|length+1)..5 %}
+                      <th>
+                        {{'After'|trans}} {{ i }}  {{(i==1)?'Year'|trans:'Years'|trans}}
+                      </th>
+                  {% endfor %}
+              {% endif %}
+              <th>{{'Gender'|trans}}</th>
+              <th>{{'Race'|trans}}</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for key1, param in term_params %}
+          {% if param.multiEmployedData %}
+            <tr>
+              <td>{{ param.year }}</td>
+              {% for key, value2 in param.multiEmployedData %}
+                 <td class="views-field">
+                    {% if value2.field_employed_value and value2.field_graduate_value %}
+                      {% if value2.field_employed_value == -1 or value2.field_graduate_value == -1 %}
+                        {{'Data Suppressed'|trans}}
+                      {% else %}
+                        {% set outcome_percentage = (value2.field_employed_value/value2.field_graduate_value)*100 %}
+                        {{ outcome_percentage|round(2, 'floor') }}%
+                      {% endif %}
+                    {% else %}
+                      0
+                    {% endif %}
+                 </td>
+              {% endfor %}
+              {% if param.multiEmployedData|length < 5 %}
+                  {% for i in (param.multiEmployedData|length+1)..5 %}
+                      <td></td>
+                  {% endfor %}
+              {% endif %}
+              <td>{{'All'|trans}}</td>
+              <td>{{'All'|trans}}</td>
+            </tr>
+          {% endif %}
+          {% endfor %}
+          </tbody>
+          </table>
+        {% endif %}
+        {#}
+        {% if term_params %}
+          <table class="views-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Students Employed/Graduates (%)</th>
+                <th>Gender</th>
+                <th>Race</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for key1, param in term_params %}
+                {% if param.multiEmployedData %}
+                 <tr>
+                    <td>{{ param.year }}</td>
+                    <td>
+                      <table class="cols-5">
+                         <thead>
+                            <tr>
+                              {% for key, value2 in param.multiEmployedData %}
+                               <th class="views-field views-field-field-after-year">After {{ value2.field_after_year_value }} Year</th>
+                               {% endfor %}
+                            </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                              {% for key, value2 in param.multiEmployedData %}
+                               <td class="views-field">
+                                  {% if value2.field_employed_value and value2.field_graduate_value %}
+                                    {% if value2.field_employed_value == -1 or value2.field_graduate_value == -1 %}
+                                      {{'Data Suppressed'|trans}}
+                                    {% else %}
+                                      {% set outcome_percentage = (value2.field_employed_value/value2.field_graduate_value)*100 %}
+                                      {{ outcome_percentage|round(2, 'floor') }}%
+                                    {% endif %}
+                                  {% else %}
+                                    0
+                                  {% endif %}
+                               </td>
+                               {% endfor %}
+                            </tr>
+                         </tbody>
+                      </table>
+                    </td>
+                    <td>All</td>
+                    <td>All</td>
+                 </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+        {#}
+      </div>
+    </div>
+
+    {{ attachment_after }}
+    {% if term_params %}
+      <div class="table-view-container1" style="display: none">
+        <table id="search-data-export" class="search-data-export views-table">
+          <thead>
+            <tr>
+              <th colspan="9" align="center">{{'Employment'|trans}}</th>
+            </tr>
+            <tr>
+              <th>{{'Year'|trans}}</th>
+              {% for key, value2 in term_params[0].multiEmploymentSectorData %}
+                <th class="views-field views-field-field-after-year">
+                  {{ value2.name }}
+                </th>
+              {% endfor %}
+              <th>{{'After Year'|trans}}</th>
+              <th>{{'Gender'|trans}}</th>
+              <th>{{'Race'|trans}}</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for key1, param in term_params %}
+            {% if param.multiEmploymentSectorData %}
+              <tr>
+                <td>{{ param.year }}</td>
+                
+                {% for key, value2 in param.multiEmploymentSectorData %}
+                <td class="views-field">
+                  {% if value2.field_employed_value %}
+                    {% if value2.field_employed_value == -1 %}
+                      {{'Data Suppressed'|trans}}
+                    {% else %}
+                      {{ value2.field_employed_value|number_format }}
+                    {% endif %}
+                  {% else %}
+                    0
+                  {% endif %}
+                </td>
+                {% endfor %}
+                <td>1</td>
+                <td>{{'All'|trans}}</td>
+                <td>{{'All'|trans}}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+
+
+  {% if footer %}
+    <footer>
+      {{ footer }}
+    </footer>
+  {% endif %}
+
+  {{ feed_icons }}
+</div>

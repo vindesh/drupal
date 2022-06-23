@@ -1,0 +1,42 @@
+student_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/students_graduates_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once
+student_multi_search:
+  js:  
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true } 
+    js/students_graduates_multi_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once
+
+### New Student search by tittle ### 
+students_graduates_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/students_graduates_search_title.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once
+multiple_students_graduates_search:
+  js:  
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true } 
+    js/multiple_students_graduates_search_title.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.autocomplete
+    - core/jquery.once    

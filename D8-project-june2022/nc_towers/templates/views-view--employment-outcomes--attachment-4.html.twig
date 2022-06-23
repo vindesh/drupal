@@ -1,0 +1,124 @@
+{%
+  set classes = [
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title }}
+  {{ title_suffix }}
+
+  {% if header %}
+    {{ header }}
+  {% endif %}
+  {#{ exposed }#}
+  <div class="table-grid explore-occupation-grid" id="employmentSectorGraphData" style="display: none  ;">
+    {% if rows -%}
+      {{ rows }}
+    {% elseif empty -%}
+      {{ empty }}
+    {% endif %}
+  </div>
+  <div class="graph-container" style="display: none">
+    <div class="graph-container__title">{{'Top Employment Industries After Graduation'|trans}}</div>
+    <div class="graph-container__sorting-container">
+      <div class="graph-container__sorting empBySector">
+        {{'Show data by'|trans}}
+        <div class="graph-container__filters">
+          <label>{{'Gender'|trans}} <input type="checkbox" name="gender" class="toggleDrilldown" id="1"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> {{'All'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Male"> {{'Male'|trans}}</label></li>
+              <li><label id="femaleData"><input type="checkbox" id="Female"> {{'Female'|trans}}</label></li>
+            </ul>
+          </div>
+        </div>
+        <div class="graph-container__filters">
+          <label>{{'Race'|trans}} <input type="checkbox" name="race" class="toggleDrilldown" id="1"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> {{'All'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Asian" checked> {{'Asian'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Black" checked> {{'Black'|trans}}</label></li>
+              <li><label><input type="checkbox" id="White" checked> {{'White'|trans}}</label></li>
+              <li><label><input type="checkbox" id="Other" checked> {{'Other'|trans}}</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="graph-container__icons">
+        <img class="graph-view-action" src="/themes/custom/nc_towers/images/chart-view.jpg">
+        <img class="table-view-action" src="/themes/custom/nc_towers/images/table-view.jpg">
+      </div>
+    </div>
+    <div class="graph-container__toggle">
+      <div id="employmentSectorGraph" class="graph-view-container"></div>
+      <div class="table-view-container" style="display: none">
+        {{ attachment_before }}
+        {% if term_params %}
+          <table class="views-table">
+            <thead>
+              <tr>
+                <th>{{'Year'|trans}}</th>
+                <th>{{'Students Enrolled/Graduates (%)'|trans}}</th>
+                <th>{{'Gender'|trans}}</th>
+                <th>{{'Race'|trans}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for key1, param in term_params %}
+                {% if param.multiEnrolledData %}
+                 <tr>
+                    <td>{{ param.year }}</td>
+                    <td>
+                      <table class="cols-5">
+                         <thead>
+                            <tr>
+                              {% for key, value2 in param.multiEnrolledData %}
+                               <th class="views-field views-field-field-after-year">After {{ value2.field_after_year_value }} Year</th>
+                               {% endfor %}
+                            </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                              {% for key, value2 in param.multiEnrolledData %}
+                               <td class="views-field">
+                                  {% if value2.field_enrolled_or_employed_value and value2.field_graduate_value %}
+                                    {% if value2.field_enrolled_or_employed_value == -1 or value2.field_graduate_value == -1 %}
+                                      {{'Suppressed'|trans}}
+                                    {% else %}
+                                      {% set outcome_percentage = (value2.field_enrolled_or_employed_value/value2.field_graduate_value)*100 %}
+                                      {{ outcome_percentage|round(2, 'floor') }}%
+                                    {% endif %}
+                                  {% else %}
+                                    0
+                                  {% endif %}
+                                  <span class="d-none nid">{{ value2.nid }}</span>
+                               </td>
+                               {% endfor %}
+                            </tr>
+                         </tbody>
+                      </table>
+                    </td>
+                    <td>{{'All'|trans}}</td>
+                    <td>{{'All'|trans}}</td>
+                 </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {{ pager }}
+  {{ more }}
+  {% if footer %}
+    <footer>
+      {{ footer }}
+    </footer>
+  {% endif %}
+
+  {{ feed_icons }}
+</div>

@@ -1,0 +1,810 @@
+<?php
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\taxonomy;
+/**
+ * Implements hook_theme().
+ */
+function nc_towers_students_and_graduates_count_theme($existing, $type, $theme, $path) {
+  return [
+    'students_graduates_search' => [
+      'variables' => ['results' => NULL],
+    ],
+    'students_graduates_multi_search' => [
+      'variables' => [ 'results' => NULL ],
+    ],
+  ];
+}
+/**
+ * Implements hook_form_views_exposed_form_alter().
+ */
+function nc_towers_students_and_graduates_count_form_views_exposed_form_alter(&$form, FormStateInterface $form_state,   $form_id) {
+  $view_ids = ['employment_outcomes_search', 'students_graduates_search', 'enrollment_outcomes_search', 'mean_wages_search'];
+  $view = $form_state->getStorage('view');
+  if ($form_id == 'views_exposed_form' && in_array($view['view']->id(), $view_ids)) {
+        $form['param']['#maxlength'] = NULL;
+      if(isset($form['param1']))
+        $form['param1']['#maxlength'] = NULL;
+      if(isset($form['param2']))
+        $form['param2']['#maxlength'] = NULL;
+      if(isset($form['param3']))
+        $form['param3']['#maxlength'] = NULL;
+      if(isset($form['param4']))
+        $form['param4']['#maxlength'] = NULL;
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function nc_towers_students_and_graduates_count_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  if (($view->id() == "employment_outcomes" && ($view->current_display == "attachment_1" || $view->current_display == "attachment_4")) || 
+  ($view->id() == "students_graduates_search" && ($view->current_display == "page_2" || $view->current_display == "attachment_3" || $view->current_display == "attachment_4")) ) {
+    $current_path = \Drupal::request()->query->all();
+    $database = \Drupal::database();
+    $drillDownCombination = [['All','All'], ['All','Asian'], ['All','Black'], ['All',' White'], ['All','Other'], ['Male','All'], ['Female','All']];
+  }
+  if (($view->id() == "students_graduates_counts" && ($view->current_display == "page_1" || $view->current_display == "attachment_1" || $view->current_display == "attachment_2")) ||
+    ($view->id() == "main_enrollment_outcomes" && ($view->current_display == "page_1" || $view->current_display == "attachment_3")) ||
+    ($view->id() == "employment_outcomes" && ($view->current_display == "page_1" || $view->current_display == "attachment_3")) ||
+    ($view->id() == "mean_wages_search" && ($view->current_display == "page_1" || $view->current_display == "attachment_1")) ||
+    ($view->id() == "enrollment_outcomes_search" && ($view->current_display == "page_1" || $view->current_display == "attachment_1")) ||
+    ($view->id() == "employment_outcomes_search" && ($view->current_display == "page_1" || $view->current_display == "attachment_1")) ||
+    ($view->id() == "students_graduates_search" && ($view->current_display == "page_1" || $view->current_display == "attachment_1" || $view->current_display == "attachment_2"))
+     ) {
+    foreach ($query->where[1]['conditions'] as $ckey => $cvalue) {
+      $selectYear = intval($query->where[1]['conditions'][$ckey]['value']);
+
+      if($view->id() == "mean_wages_search" || $view->id() == "employment_outcomes_search" || $view->id() == "enrollment_outcomes_search" || $view->id() == "students_graduates_search" ){
+        if ($cvalue['field'] == 'node_field_data.title') {
+          $titles = [];
+          $params = explode('|',$cvalue['value']);
+          $currentYear = array_pop($params);
+          if(is_numeric($currentYear)){
+            $new_param = implode('|', $params);
+            for ($i = 0; $i < 5; $i++) {
+              $selectYearNameValue = $currentYear + $i;
+              $titles[] = $new_param.'|'.$selectYearNameValue;
+            }
+            $query->where[1]['conditions'][$ckey]['operator'] = 'IN';
+            $query->where[1]['conditions'][$ckey]['value'] = $titles;
+          }
+        }
+      } else{
+        if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_school_year.name') {
+          $yearArr = [];
+          for ($i = 0; $i < 5; $i++){
+            $selectYearNameValue = $selectYear + $i;
+            $yearArr[] = $selectYearNameValue;
+          }
+          $query->where[1]['conditions'][$ckey]['operator'] = 'IN';
+          $query->where[1]['conditions'][$ckey]['value'] = $yearArr;
+        }
+      }
+    }
+  }
+  if (($view->id() == "employment_outcomes" && $view->current_display == "page_2" || $view->current_display == "attachment_4") ||
+    ($view->id() == "main_enrollment_outcomes" && ($view->current_display == "page_2" || $view->current_display == "attachment_4") ) ||
+    ($view->id() == "students_graduates_counts" && ($view->current_display == "page_2" || $view->current_display == "attachment_3" || $view->current_display == "attachment_4")) ||
+    ($view->id() == "mean_wages_search" && ($view->current_display == "page_2" || $view->current_display == "attachment_2")) ||
+    ($view->id() == "enrollment_outcomes_search" && ($view->current_display == "page_2" ||
+    $view->current_display == "attachment_2")) ||
+    ($view->id() == "employment_outcomes_search" && ($view->current_display == "page_2" ||
+    $view->current_display == "attachment_2")) ||
+    ($view->id() == "students_graduates_search" && ($view->current_display == "page_2" ||
+    $view->current_display == "attachment_3" || $view->current_display == "attachment_4"))
+  ) {
+    for ($i=1; $i <= 5; $i++) {
+      $flag = FALSE;
+      foreach ($query->where[$i]['conditions'] as $ckey => $cvalue) {
+
+        if($view->id() == "students_graduates_counts"){
+          if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_agency.name') {
+            $flag = TRUE;
+          }
+          //condition for content type - expose field
+          if ($i!=1 && $flag && ($view->current_display == "page_2" || $view->current_display == "attachment_3" || $view->current_display == "attachment_4" )) {
+            $flag = FALSE;
+            //Content type = students_graduates_counts
+            $query->where[$i]['conditions'][] = [
+              'field' => 'node_field_data.type',
+              'operator' => '=',
+              'value'=>'students_graduates_counts'];
+            //Gender=all
+            $query->where[$i]['conditions'][] = [
+              'field' => 'taxonomy_term_field_data_node__field_gender.name',
+              'operator' => '=',
+              'value'=>'all'];
+            //Race=all
+            $query->where[$i]['conditions'][] = [
+              'field' => 'taxonomy_term_field_data_node__field_race.name',
+              'operator' => '=',
+              'value'=>'all'];
+          }
+        }elseif($view->id() == "employment_outcomes" || $view->id() == "main_enrollment_outcomes"){
+          if ($cvalue['field'] == 'taxonomy_term_field_data_node__field_agency.name') {
+            $flag = TRUE;
+          }
+          if($view->current_display == "page_2" || $view->current_display == "attachment_4"){
+            if ($i != 1 && $flag) {
+              $flag = FALSE;
+              if($view->id() == "main_enrollment_outcomes" && $view->current_display == "attachment_4"){
+                $query->where[$i]['conditions'][] = [
+                  'field' => 'node_field_data.type',
+                  'operator' => '=',
+                  'value'=>'enrollment_by_type'];
+              }else{
+                $query->where[$i]['conditions'][] = [
+                  'field' => 'node_field_data.type',
+                  'operator' => '=',
+                  'value'=>'employment_by_sector'];
+              }
+              //Command after year in both views.
+              $query->where[$i]['conditions'][] = [
+                'field' => 'node__field_after_year.field_after_year_value',
+                'operator' => '=',
+                'value'=> '1'
+              ];
+            }
+          }
+        }elseif($view->id() == "mean_wages_search" || $view->id() ==  "enrollment_outcomes_search" || $view->id() == "employment_outcomes_search"){
+          if ($cvalue['field'] == 'node_field_data.title') {
+            $flag = TRUE;
+          }
+          if($view->current_display == "page_2" || $view->current_display == "attachment_2"){
+            if ($i != 1 && $flag) {
+              $flag = FALSE;
+              if($view->current_display == "attachment_2"){
+                
+                if($view->id() ==  "enrollment_outcomes_search")
+                  $bundle = 'enrollment_by_type';
+                if($view->id() ==  "mean_wages_search" || $view->id() ==  "employment_outcomes_search")
+                  $bundle = 'employment_by_sector';
+              }else{
+                $bundle = 'main_outcomes';
+              }
+              $afterYearOperator = '<=';
+              $afterYearValue = 5;
+              $query->where[$i]['conditions'][] = [
+                'field' => 'node__field_after_year.field_after_year_value',
+                'operator' => $afterYearOperator,
+                'value'=> $afterYearValue
+              ];
+              $query->where[$i]['conditions'][] = [
+                'field' => 'node_field_data.type',
+                'operator' => '=',
+                'value'=>$bundle
+              ];
+            }
+          }
+          
+        }elseif($view->id() == "students_graduates_search"){
+          if ($cvalue['field'] == 'node_field_data.title') {
+            $flag = TRUE;
+          }
+          //condition for content type - expose field
+          if ($i!=1 && $flag && ($view->current_display == "page_2" || $view->current_display == "attachment_3" || $view->current_display == "attachment_4" )) {
+            $flag = FALSE;
+            //Content type = students_graduates_counts
+            $query->where[$i]['conditions'][] = [
+              'field' => 'node_field_data.type',
+              'operator' => '=',
+              'value'=>'students_graduates_counts'];
+            /*
+            if($view->current_display != "page_2"){
+              $raceTid = getTermId($database, 'All', 'race')->tid; //All case
+              $genderTid = getTermId($database, 'All', 'gender')->tid; //All case
+              //Gender=all
+              $query->where[$i]['conditions'][] = [
+                'field' => 'node__field_gender.field_gender_target_id',
+                'operator' => '=',
+                'value'=> $genderTid ];
+              //Race=all
+              $query->where[$i]['conditions'][] = [
+                'field' => 'node__field_race.field_race_target_id',
+                'operator' => '=',
+                'value'=> $raceTid ];
+            }
+            */
+          }
+        }//end if
+      }
+    }
+  }
+}
+
+/**
+ * Implements template_preprocess_views_view_fields().
+ */
+function nc_towers_students_and_graduates_count_preprocess_views_view_fields(&$variables) {
+  $current_path = \Drupal::request()->query->all();
+  $view = $variables['view'];
+  if( (($view->id() == "mean_wages_search") && ($view->current_display == "page_1")) ||
+    (($view->id() == "enrollment_outcomes_search") && 
+      ($view->current_display == "page_1" || $view->current_display == "attachment_1")) ||
+    (($view->id() == "employment_outcomes_search") &&
+        ($view->current_display == "page_1" || $view->current_display == "attachment_1")) || 
+    (($view->id() == "students_graduates_search") && ($view->current_display == "attachment_1" || $view->current_display == "attachment_2"))
+  ){
+    $params = explode('|',$current_path['param']);
+    $currentYear = array_pop($params);
+    $new_param = implode('|', $params);
+    $variables['search_param'] = $new_param;
+    $variables['search_year'] = $currentYear;
+  }else{
+    $variables['search_param'] = $current_path;
+  }
+
+}
+
+/**
+ * Implements template_preprocess_views_view_grouping().
+ */
+function nc_towers_students_and_graduates_count_preprocess_views_view_grouping(&$variables) {
+  $current_path = \Drupal::request()->query->all();
+  $view = $variables['view'];
+  if( (($view->id() == "mean_wages_search") && ($view->current_display == "attachment_1") || ($view->id() == "enrollment_outcomes_search") && ($view->current_display == "attachment_1") || ($view->id() == "employment_outcomes_search") && ($view->current_display == "attachment_1")) ){
+    $params = explode('|',$current_path['param']);
+
+    $currentYear = array_pop($params);
+    $new_param = implode('|', $params);
+    $variables['search_param'] = $new_param;
+    $variables['search_year'] = $currentYear;
+  }else{
+    $variables['search_param'] = $current_path;
+  }
+}
+
+/**
+ * Implements template_preprocess_views_view().
+ */
+function nc_towers_students_and_graduates_count_preprocess_views_view(&$variables) {
+  $view = $variables['view'];
+  $current_path = \Drupal::request()->query->all();
+  if(($view->id() == "employment_outcomes" || $view->id() == "main_enrollment_outcomes" || $view->id() == "mean_wages_after_graduation" || $view->id() == "mean_wages_search" || $view->id() == "enrollment_outcomes_search" || $view->id() == "employment_outcomes_search") && !empty($current_path)){
+    $database = \Drupal::database();
+    $raceTid = getTermId($database, 'All', 'race')->tid; //All case
+    $genderTid = getTermId($database, 'All', 'gender')->tid; //All case
+    for ($i = 0; $i < 5; $i++){
+      $schoolType = $school = $programStudy = $degree = $schoolYear = $selectYearName = $schoolYear1 = '';
+      if($i == 0) {
+        $key = '';
+      }else{
+        $key = $i;
+      }
+      $param_number = $key;
+      if(isset($current_path['school_type'.$param_number])){
+        $schoolType = $current_path['school_type'.$param_number];
+        $school = $current_path['school'.$param_number];
+        $programStudy = $current_path['program_study'.$param_number];
+        $degree = $current_path['degree'.$param_number];
+        $schoolYear = $current_path['school_year'.$param_number];
+
+        $schoolTypeTid = getTermId($database, $schoolType)->tid;
+        $schoolTid = getTermId($database, $school)->tid;
+        $programStudyTid = getTermId($database, $programStudy)->tid;
+        $degreeTid = getTermId($database, $degree)->tid;
+        $schoolYearTid = getTermId($database, $schoolYear)->tid;
+
+        if($view->current_display == 'page_2'){
+          $variables['muliple_term_params'][$i]['school_type'] = $schoolType;
+          $variables['muliple_term_params'][$i]['school'] = $school;
+          $variables['muliple_term_params'][$i]['program_study'] = $programStudy;
+          $variables['muliple_term_params'][$i]['degree'] = $degree;
+          $variables['muliple_term_params'][$i]['school_year'] = $schoolYear;
+          $variables['muliple_term_params'][$i]['total_terms'] = $schoolYearTid.",".$schoolTypeTid.",".$schoolTid.",".$programStudyTid.",".$degreeTid.",".$genderTid.",".$raceTid;
+          if($view->id() == "employment_outcomes" &&  $view->current_display == 'page_2'){
+          $variables['muliple_term_params'][$i]['employedData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'main_outcomes', 'employed');
+          }elseif($view->id() == "main_enrollment_outcomes" &&  $view->current_display == 'page_2'){
+            $variables['muliple_term_params'][$i]['enrolledData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'main_outcomes', 'enrolled');
+          }elseif($view->id() == "mean_wages_after_graduation" &&  $view->current_display == 'page_2'){
+            $variables['muliple_term_params'][$i]['wagesData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'main_outcomes', 'wages');
+          }
+        }
+      }
+
+      if(isset($current_path['param'.$param_number])){
+        $params = explode('|',$current_path['param'.$param_number]);
+        $selectYear1 = array_pop($params);
+        $selectYearNameValue = $selectYear1 + $i;
+        $new_param = implode('|', $params);
+
+        $schoolType = $params[0];
+        $school = $params[1];
+        $programStudy = $params[2];
+        $degree = $params[3];
+
+        $schoolTypeTid = getTermId($database, $schoolType)->tid;
+        $schoolTid = getTermId($database, $school)->tid;
+        $programStudyTid = getTermId($database, $programStudy)->tid;
+        $degreeTid = getTermId($database, $degree)->tid;
+        $schoolYearTid = getTermId($database, $selectYear1)->tid;
+
+        if($view->id() == "mean_wages_search" && $view->current_display == 'page_2'){
+          $variables['muliple_term_params'][$i]['school_type'] = $schoolType;
+          $variables['muliple_term_params'][$i]['school'] = $school;
+          $variables['muliple_term_params'][$i]['program_study'] = $programStudy;
+          $variables['muliple_term_params'][$i]['degree'] = $degree;
+          $variables['muliple_term_params'][$i]['school_year'] = $selectYear1;
+          $variables['muliple_term_params'][$i]['total_terms'] = $schoolYearTid.",".$schoolTypeTid.",".$schoolTid.",".$programStudyTid.",".$degreeTid.",".$genderTid.",".$raceTid;
+
+          $variables['muliple_term_params'][$i]['wagesData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'main_outcomes', 'wages');
+            $variables['term_params'][$i]['sub_key'] = $genderTid."-".$raceTid;
+
+            $variables['term_params'][$i]['school_type'] = $schoolType;
+            $variables['term_params'][$i]['school'] = $school;
+            $variables['term_params'][$i]['program_study'] = $programStudy;
+            $variables['term_params'][$i]['degree'] = $degree;
+            $variables['term_params'][$i]['school_year'] = $selectYear1;
+            $variables['term_params'][$i]['multiEmploymentWagesData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolTypeTid, $genderTid, $raceTid, 'employment_by_sector', 'employment_wages');
+        }elseif( ($view->id() == "enrollment_outcomes_search" || $view->id() == "employment_outcomes_search") && ($view->current_display == 'page_2') ){
+            $variables['muliple_term_params'][$i]['school_type'] = $schoolType;
+            $variables['muliple_term_params'][$i]['school'] = $school;
+            $variables['muliple_term_params'][$i]['program_study'] = $programStudy;
+            $variables['muliple_term_params'][$i]['degree'] = $degree;
+            $variables['muliple_term_params'][$i]['school_year'] = $selectYear1;
+            $variables['muliple_term_params'][$i]['total_terms'] = $schoolYearTid.",".$schoolTypeTid.",".$schoolTid.",".$programStudyTid.",".$degreeTid.",".$genderTid.",".$raceTid;
+
+            $variables['term_params'][$i]['sub_key'] = $genderTid."-".$raceTid;
+            $variables['term_params'][$i]['school_type'] = $schoolType;
+            $variables['term_params'][$i]['school'] = $school;
+            $variables['term_params'][$i]['program_study'] = $programStudy;
+            $variables['term_params'][$i]['degree'] = $degree;
+            $variables['term_params'][$i]['school_year'] = $selectYear1;
+            /*
+            Variable created for "enrollment_outcomes_search" views
+             */
+            if($view->id() == "enrollment_outcomes_search"){
+              $variables['muliple_term_params'][$i]['enrolledData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'main_outcomes', 'enrolled');
+              $variables['term_params'][$i]['multiEnrolledData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolTypeTid, $genderTid, $raceTid, 'enrollment_by_type', 'entrollment_type');
+              $variables['term_gender'] = getTaxonomyTermList('gender');
+              $variables['term_race'] = getTaxonomyTermList('race');
+            }
+            /*
+            Variable created for "employment_outcomes_search" views: attachment-2
+             */
+            if($view->id() == "employment_outcomes_search"){
+              $variables['muliple_term_params'][$i]['employedData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'main_outcomes', 'employed');
+
+              // $variables['term_params'][$i]['multiEmployedData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'employment_by_sector', 'employment_sector');
+              //Updated code for 9B table
+              $variables['term_params'][$i]['multiEmploymentSectorData'] = getWagesTable($database, $new_param.'|'.$selectYear1, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid, $genderTid, $raceTid, 'employment_by_sector', 'employment_sector');
+            }
+        }
+      }
+
+      if($view->current_display == 'page_1'){
+        if(isset($current_path['school_year'])){
+          $schoolYear1 = $current_path['school_year'];
+          $selectYearNameValue = $schoolYear1 + $i;
+          $schoolYearTid1 = getTermId($database, $selectYearNameValue)->tid;
+          $variables['term_params'][$i]['year'] = $selectYearNameValue;
+          if($view->id() == "employment_outcomes" &&  $view->current_display == 'page_1'){
+            $variables['term_params'][$i]['multiEmployedData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'main_outcomes', 'employed');
+            if($i == 0){
+              $variables['term_params'][$i]['multiEmploymentSectorData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'employment_by_sector', 'employment_sector');
+            }
+          }elseif($view->id() == "main_enrollment_outcomes" &&  $view->current_display == 'page_1'){
+            $variables['term_params'][$i]['multiEnrolledData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'main_outcomes', 'enrolled');
+            if($i == 0){
+              $variables['term_params'][$i]['multiEntrollmentTypeData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'enrollment_by_type', 'entrollment_type');
+            }
+          }elseif($view->id() == "mean_wages_after_graduation" &&  $view->current_display == 'page_1'){
+            $variables['term_params'][$i]['multiWagesData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'main_outcomes', 'wages');
+
+            if($i == 0){
+              $variables['term_params'][$i]['sub_key'] = $genderTid."-".$raceTid;
+              $variables['term_params'][$i]['multiEmploymentWagesData'] = getOutcomesTable($database, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'employment_by_sector', 'employment_wages');
+            }
+          }
+        }elseif(isset($current_path['param'])){
+          $params = explode('|',$current_path['param']);
+          $schoolType = $params[0];
+          $school = $params[1];
+          $programStudy = $params[2];
+          $degree = $params[3];
+
+          $schoolTypeTid = getTermId($database, $schoolType)->tid;
+          $schoolTid = getTermId($database, $school)->tid;
+          $programStudyTid = getTermId($database, $programStudy)->tid;
+          $degreeTid = getTermId($database, $degree)->tid;
+          
+          $selectYear1 = array_pop($params);
+          $selectYearNameValue = $selectYear1 + $i;
+          $schoolYearTid1 = getTermId($database, $selectYearNameValue)->tid;
+          $new_param = implode('|', $params);
+          if($view->id() == "mean_wages_search" &&  $view->current_display == 'page_1'){
+              $variables['term_params'][$i]['year'] = $selectYearNameValue;
+              $variables['term_params'][$i]['multiWagesData'] = getWagesTable($database, $new_param.'|'.$selectYearNameValue, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'main_outcomes', 'wages');
+
+              $variables['term_params'][$i]['sub_key'] = $genderTid."-".$raceTid;
+              $variables['term_params'][$i]['multiEmploymentWagesData'] = getWagesTable($database, $new_param.'|'.$selectYearNameValue, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'employment_by_sector', 'employment_wages');
+          }
+          if($view->id() == "enrollment_outcomes_search" &&  $view->current_display == 'page_1'){
+              $variables['term_params'][$i]['year'] = $selectYearNameValue;
+              $variables['term_params'][$i]['multiEnrolledData'] = getWagesTable($database, $new_param.'|'.$selectYearNameValue, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'main_outcomes', 'enrolled');
+              $variables['term_params'][$i]['sub_key'] = $genderTid."-".$raceTid;
+              $variables['term_params'][$i]['multiEntrollmentTypeData'] = getWagesTable($database, $new_param.'|'.$selectYearNameValue, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'enrollment_by_type', 'entrollment_type');
+              $variables['term_gender'] = getTaxonomyTermList('gender');
+              $variables['term_race'] = getTaxonomyTermList('race');
+          }
+          if($view->id() == "employment_outcomes_search" &&  $view->current_display == 'page_1'){
+              $variables['term_params'][$i]['year'] = $selectYearNameValue;
+              $variables['term_params'][$i]['multiEmployedData'] = getWagesTable($database, $new_param.'|'.$selectYearNameValue, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'main_outcomes', 'employed');
+
+              $variables['term_params'][$i]['sub_key'] = $genderTid."-".$raceTid;
+              $variables['term_params'][$i]['multiEmploymentSectorData'] = getWagesTable($database, $new_param.'|'.$selectYearNameValue, $schoolTypeTid, $schoolTid, $programStudyTid, $degreeTid, $schoolYearTid1, $genderTid, $raceTid, 'employment_by_sector', 'employed');
+          }
+        }//end of elseif 
+        
+      }
+    }
+  }
+}
+
+function getTermId($database, $name, $vid = '') {
+  $query = $database->select('taxonomy_term_field_data', 'td')
+  ->fields('td',['vid','name', 'tid']);
+  $query->condition('td.name', $name);
+  if(!empty($vid)){
+    $query->condition('td.vid', $vid);
+  }
+  return $query->distinct()->execute()->fetchObject();
+}
+
+function getOutcomesTable($database, $aid, $cid, $pid, $crid, $syid, $gid, $rid, $nodetype, $fieldName = 'employed'){
+  $query = $database->select('node_field_data', 'nd');
+  $query->join('node__field_agency', 'na', 'nd.nid = na.entity_id');
+  $query->join('node__field_campus', 'nc', 'nd.nid = nc.entity_id');
+  $query->join('node__field_program', 'np', 'nd.nid = np.entity_id');
+  $query->join('node__field_credential', 'ncr', 'nd.nid = ncr.entity_id');
+  $query->join('node__field_school_year', 'nsy', 'nd.nid = nsy.entity_id');
+  $query->join('node__field_gender', 'ng', 'nd.nid = ng.entity_id');
+  $query->join('node__field_race', 'nr', 'nd.nid = nr.entity_id');
+  $query->join('node__field_after_year', 'nay', 'nd.nid = nay.entity_id');
+  $query->join('node__field_graduate', 'ngr', 'nd.nid = ngr.entity_id');
+  if($fieldName == 'employed'){
+    $query->join('node__field_employed', 'ne', 'nd.nid = ne.entity_id');
+  }elseif($fieldName == 'enrolled'){
+    $query->join('node__field_enrolled_or_employed', 'ne', 'nd.nid = ne.entity_id');
+  }elseif($fieldName == 'wages'){
+    $query->join('node__field_mean_wage', 'ne', 'nd.nid = ne.entity_id');
+  }elseif($fieldName == 'entrollment_type'){
+    $query->join('node__field_enrollment', 'ne', 'nd.nid = ne.entity_id');
+    $query->join('node__field_enrollment_type', 'net', 'nd.nid = net.entity_id');
+    $query->join('taxonomy_term_field_data', 'td', 'net.field_enrollment_type_target_id = td.tid');
+  }elseif($fieldName == 'employment_sector'){
+    $query->join('node__field_employed', 'ne', 'nd.nid = ne.entity_id');
+    $query->join('node__field_employment_sector', 'net', 'nd.nid = net.entity_id');
+    $query->join('taxonomy_term_field_data', 'td', 'net.field_employment_sector_target_id = td.tid');
+  }elseif($fieldName == 'employment_wages'){
+    $query->join('node__field_mean_wage', 'ne', 'nd.nid = ne.entity_id');
+    $query->join('node__field_employment_sector', 'net', 'nd.nid = net.entity_id');
+    $query->join('taxonomy_term_field_data', 'td', 'net.field_employment_sector_target_id = td.tid');
+  }
+  if($fieldName == 'entrollment_type' || $fieldName == 'employment_sector' || $fieldName == 'employment_wages'){
+    $query->condition('nay.field_after_year_value',1);
+  }else{
+    $query->condition('nay.field_after_year_value', 5, '<=');
+  }
+  $query->condition('nd.type',$nodetype);
+  $query->condition('na.field_agency_target_id',$aid);
+  $query->condition('nc.field_campus_target_id',$cid);
+  $query->condition('np.field_program_target_id',$pid);
+  $query->condition('ncr.field_credential_target_id',$crid);
+  $query->condition('nsy.field_school_year_target_id',$syid);
+  if($fieldName != 'employment_wages'){
+    $query->condition('ng.field_gender_target_id',$gid);
+    $query->condition('nr.field_race_target_id',$rid);
+  }
+  $query->fields('ng', ['field_gender_target_id']);
+  $query->fields('nr', ['field_race_target_id']);
+  $query->fields('nc', ['field_campus_target_id']);
+  $query->fields('np', ['field_program_target_id']);
+  $query->fields('ncr', ['field_credential_target_id']);
+  $query->fields('nay', ['field_after_year_value']);
+  if($fieldName == 'employed'){
+    $query->fields('ne', ['field_employed_value']);
+  }elseif($fieldName == 'enrolled'){
+    $query->fields('ne', ['field_enrolled_or_employed_value']);
+  }elseif($fieldName == 'wages'){
+    $query->fields('ne', ['field_mean_wage_value']);
+  }elseif($fieldName == 'entrollment_type'){
+    $query->fields('ne', ['field_enrollment_value']);
+    $query->fields('net', ['field_enrollment_type_target_id']);
+    $query->fields('td', ['name']);
+  }elseif($fieldName == 'employment_sector'){
+    $query->fields('ne', ['field_employed_value']);
+    $query->fields('net', ['field_employment_sector_target_id']);
+    $query->fields('td', ['name']);
+  }elseif($fieldName == 'employment_wages'){
+    $query->fields('ne', ['field_mean_wage_value']);
+    $query->fields('net', ['field_employment_sector_target_id']);
+    $query->fields('td', ['name']);
+  }
+  $query->fields('ngr', ['field_graduate_value']);
+  $query->fields('nd', ['nid']);
+  if($fieldName == 'entrollment_type'){
+    $query->range(0, 4);
+    $query->orderBy('field_enrollment_value', 'DESC');
+  }elseif($fieldName == 'employment_sector'){
+    $query->range(0, 5);
+    $query->orderBy('field_employed_value', 'DESC');
+  }elseif($fieldName == 'employment_wages'){
+    //$query->range(0, 5);
+    $query->orderBy('field_mean_wage_value', 'DESC');
+  }else{
+    $query->range(0, 5);
+    $query->orderBy('field_after_year_value', 'ASC');
+  }
+  $employedData = $query->execute()->fetchAll();
+  if($fieldName == 'employment_wages'){
+    $wagesData = [];
+    if(!empty($employedData)){
+      $groupedParams = $cid.'-'.$pid.'-'.$crid;
+      foreach ($employedData as $key => $employed) {
+        $groupedTerms = $employed->field_campus_target_id.'-'.$employed->field_program_target_id.'-'.$employed->field_credential_target_id;
+        $sectorId = $employed->field_employment_sector_target_id;
+        if($groupedParams == $groupedTerms){
+          $rg_tid = $employed->field_gender_target_id.'-'.$employed->field_race_target_id;
+          $wagesData[$groupedTerms.'-'.$sectorId][$rg_tid] = $employed;
+        }
+      }
+    }
+    if(count($wagesData) > 5){
+      array_pop($wagesData);
+    }
+    return $wagesData;
+  }
+  return $employedData;
+}
+
+function getWagesTable($database, $nodeTitle, $aid, $cid, $pid, $crid, $syid, $gid, $rid, $nodetype, $fieldName = 'employed'){
+  $query = $database->select('node_field_data', 'nd');
+  $query->join('node__field_agency', 'na', 'nd.nid = na.entity_id');
+  $query->join('node__field_campus', 'nc', 'nd.nid = nc.entity_id');
+  $query->join('node__field_program', 'np', 'nd.nid = np.entity_id');
+  $query->join('node__field_credential', 'ncr', 'nd.nid = ncr.entity_id');
+  $query->join('node__field_school_year', 'nsy', 'nd.nid = nsy.entity_id');
+  $query->join('node__field_gender', 'ng', 'nd.nid = ng.entity_id');
+  $query->join('node__field_race', 'nr', 'nd.nid = nr.entity_id');
+  $query->join('node__field_after_year', 'nay', 'nd.nid = nay.entity_id');
+  $query->join('node__field_graduate', 'ngr', 'nd.nid = ngr.entity_id');
+  if($fieldName == 'employed'){
+    $query->join('node__field_employed', 'ne', 'nd.nid = ne.entity_id');
+  }elseif($fieldName == 'enrolled'){
+    $query->join('node__field_enrolled_or_employed', 'ne', 'nd.nid = ne.entity_id');
+  }elseif($fieldName == 'wages'){
+    $query->join('node__field_mean_wage', 'ne', 'nd.nid = ne.entity_id');
+  }elseif($fieldName == 'entrollment_type'){
+    $query->join('node__field_enrollment', 'ne', 'nd.nid = ne.entity_id');
+    $query->join('node__field_enrollment_type', 'net', 'nd.nid = net.entity_id');
+    $query->join('taxonomy_term_field_data', 'td', 'net.field_enrollment_type_target_id = td.tid');
+  }elseif($fieldName == 'employment_sector'){
+    $query->join('node__field_employed', 'ne', 'nd.nid = ne.entity_id');
+    $query->join('node__field_employment_sector', 'net', 'nd.nid = net.entity_id');
+    $query->join('taxonomy_term_field_data', 'td', 'net.field_employment_sector_target_id = td.tid');
+  }elseif($fieldName == 'employment_wages'){
+    $query->join('node__field_mean_wage', 'ne', 'nd.nid = ne.entity_id');
+    $query->join('node__field_employment_sector', 'net', 'nd.nid = net.entity_id');
+    $query->join('taxonomy_term_field_data', 'td', 'net.field_employment_sector_target_id = td.tid');
+  }
+  //if($fieldName == 'entrollment_type' || $fieldName == 'employment_sector' || $fieldName == 'employment_wages'){
+  if($fieldName == 'employment_sector' || $fieldName == 'employment_wages'){  
+    $query->condition('nay.field_after_year_value',1);
+  }else{
+    $query->condition('nay.field_after_year_value', 5, '<=');
+  }
+  $query->condition('nd.type',$nodetype);
+  // $query->condition('na.field_agency_target_id',$aid);
+  // $query->condition('nc.field_campus_target_id',$cid);
+  // $query->condition('np.field_program_target_id',$pid);
+  // $query->condition('ncr.field_credential_target_id',$crid);
+  // $query->condition('nsy.field_school_year_target_id',$syid);
+  $query->condition('nd.title',$nodeTitle);
+  if($fieldName != 'employment_wages' && $fieldName != 'entrollment_type' && $fieldName != 'enrolled'){
+      $query->condition('ng.field_gender_target_id',$gid);
+      $query->condition('nr.field_race_target_id',$rid);
+  }
+  $query->fields('ng', ['field_gender_target_id']);
+  $query->fields('nr', ['field_race_target_id']);
+  $query->fields('nc', ['field_campus_target_id']);
+  $query->fields('np', ['field_program_target_id']);
+  $query->fields('ncr', ['field_credential_target_id']);
+  $query->fields('nay', ['field_after_year_value']);
+  if($fieldName == 'employed'){
+    $query->fields('ne', ['field_employed_value']);
+  }elseif($fieldName == 'enrolled'){
+    $query->fields('ne', ['field_enrolled_or_employed_value']);
+  }elseif($fieldName == 'wages'){
+    $query->fields('ne', ['field_mean_wage_value']);
+  }elseif($fieldName == 'entrollment_type'){
+    $query->fields('ne', ['field_enrollment_value']);
+    $query->fields('net', ['field_enrollment_type_target_id']);
+    $query->fields('td', ['name']);
+  }elseif($fieldName == 'employment_sector'){
+    $query->fields('ne', ['field_employed_value']);
+    $query->fields('net', ['field_employment_sector_target_id']);
+    $query->fields('td', ['name']);
+  }elseif($fieldName == 'employment_wages'){
+    $query->fields('ne', ['field_mean_wage_value']);
+    $query->fields('net', ['field_employment_sector_target_id']);
+    $query->fields('td', ['name']);
+  }
+  $query->fields('ngr', ['field_graduate_value']);
+  $query->fields('nd', ['nid']);
+  if($fieldName == 'entrollment_type'){
+    //$query->range(0, 4);
+    $query->orderBy('field_enrollment_value', 'DESC');
+  }elseif($fieldName == 'employment_sector'){
+    $query->range(0, 5);
+    $query->orderBy('field_employed_value', 'DESC');
+  }elseif($fieldName == 'employment_wages'){
+    //$query->range(0, 5);
+    $query->orderBy('field_mean_wage_value', 'DESC');
+  }else{
+    //$query->range(0, 5);
+    $query->orderBy('field_after_year_value', 'ASC');
+  }
+  $employedData = $query->execute()->fetchAll(); 
+  //if($fieldName == 'enrolled'){
+  //if($fieldName == 'employment_wages' || $fieldName == 'entrollment_type' || $fieldName == 'employment_sector' ){
+    if($fieldName == 'employment_wages' || $fieldName == 'employment_sector' ){  
+    $wagesData = [];
+    if(!empty($employedData)){
+      $groupedParams = $cid.'-'.$pid.'-'.$crid;
+      foreach ($employedData as $key => $employed) {
+        $groupedTerms = $employed->field_campus_target_id.'-'.$employed->field_program_target_id.'-'.$employed->field_credential_target_id;
+        if($fieldName == 'employment_wages')
+          $sectorId = $employed->field_employment_sector_target_id;
+        elseif($fieldName == 'entrollment_type')
+          $sectorId = $employed->field_enrollment_type_target_id;
+        elseif($fieldName == 'employment_sector')
+           $sectorId = $employed->field_employment_sector_target_id;
+
+        if($groupedParams == $groupedTerms){
+          //if($groupedParams == $groupedTerms && count($wagesData) <5){
+          $rg_tid = $employed->field_gender_target_id.'-'.$employed->field_race_target_id;
+          $wagesData[$groupedTerms.'-'.$sectorId][$rg_tid] = $employed;
+        }
+        // else{
+        //   break;
+        // }
+      }
+    }
+    //Remove array element if more than 5.
+    // if(count($wagesData) > 5){
+    //   array_pop($wagesData);
+    // }
+    
+
+    return $wagesData;
+  }
+  
+  if($fieldName == 'enrolled' || $fieldName == 'entrollment_type')
+    $employedData = enrollmentDataGrpupBy($employedData, $fieldName);
+  
+  return $employedData;
+}
+
+function enrollmentDataGrpupBy($data, $fieldName){
+  $tableData = [];
+  if($fieldName == 'entrollment_type' && count($data) > 0){
+    $category = [];
+    $result = [];
+    foreach ($data as $key => $row) {
+      $id = $row->field_after_year_value.'-'. $row->field_gender_target_id.'-'.$row->field_race_target_id; 
+      if(!in_array($row->name, $category))
+        $category[] = $row->name;
+
+      if($row->field_after_year_value == 1){
+        $result[0][$id][] = $row;
+      }
+      if($row->field_after_year_value == 2){
+        $result[1][$id][] = $row;
+      }
+      if($row->field_after_year_value == 3){
+        $result[2][$id][] = $row;
+      }
+      if($row->field_after_year_value == 4){
+        $result[3][$id][] = $row;
+      }
+      if($row->field_after_year_value == 5){
+        $result[4][$id][] = $row;
+      }
+    }
+    $tableData = ['data' => $result, 'category' => $category];
+  }  
+  if($fieldName == 'enrolled' && count($data) > 0){
+    $rows = $data;
+    foreach ($data as $key => $row) {
+      if($row->field_after_year_value == 1){
+        $tableData[0][] = $row;
+      }
+      if($row->field_after_year_value == 2){
+        $tableData[1][] = $row;
+      }
+      if($row->field_after_year_value == 3){
+        $tableData[2][] = $row;
+      }
+      if($row->field_after_year_value == 4){
+        $tableData[3][] = $row;
+      }
+      if($row->field_after_year_value == 5){
+        $tableData[4][] = $row;
+      }        
+    }
+    $maxLength = 0;
+    foreach($tableData as $key => $value){
+      if($maxLength < count($value))
+        $maxLength = count($value);
+    }
+    $result = [];
+    for ($i = 0; $i < $maxLength; $i++) {
+      for ($j = 0; $j < 5; $j++) {
+        if(isset($tableData[$j][$i]) && count($tableData[$j][$i])>0 )
+          $result[$i][] = $tableData[$j][$i]; 
+        else
+          $result[$i][] = NULL;   
+      }
+    }
+    $tableData = $result;
+    
+  }
+  return $tableData;
+}
+
+/**
+ * Getting term name list of Vocabulary.
+ * @param: $vid
+ */
+function getTaxonomyTermList($vid){
+  $container = \Drupal::getContainer();
+  $terms = $container->get('entity.manager')->getStorage('taxonomy_term')->loadTree($vid);
+  $term_data = [];
+  foreach ($terms as $term) {
+    if(!empty($term->tid))
+      $term_data[$term->tid] = (String) $term->name ;
+  }
+  return $term_data;
+}
+
+function getSectorNids($database, $aid, $cid, $pid, $crid, $syid, $gid, $rid, $bundle, $fieldName = 'employed_sector'){
+    $query = $database->select('node_field_data', 'nd');
+    $query->join('node__field_agency', 'na', 'nd.nid = na.entity_id');
+    $query->join('node__field_campus', 'nc', 'nd.nid = nc.entity_id');
+    $query->join('node__field_program', 'np', 'nd.nid = np.entity_id');
+    $query->join('node__field_credential', 'ncr', 'nd.nid = ncr.entity_id');
+    $query->join('node__field_school_year', 'nsy', 'nd.nid = nsy.entity_id');
+    $query->join('node__field_gender', 'ng', 'nd.nid = ng.entity_id');
+    $query->join('node__field_race', 'nr', 'nd.nid = nr.entity_id');
+    if($fieldName == 'employed_sector'){
+      $query->join('node__field_employed', 'ne', 'nd.nid = ne.entity_id');
+    }elseif($fieldName == 'employed_wages'){
+      $query->join('node__field_mean_wage', 'ne', 'nd.nid = ne.entity_id');
+    }
+    $query->condition('nd.type',$bundle);
+    $query->condition('na.field_agency_target_id',$aid);
+    $query->condition('nc.field_campus_target_id',$cid);
+    $query->condition('np.field_program_target_id',$pid);
+    $query->condition('ncr.field_credential_target_id',$crid);
+    $query->condition('nsy.field_school_year_target_id',$syid);
+    $query->condition('ng.field_gender_target_id',$gid);
+    $query->condition('nr.field_race_target_id',$rid);
+    $query->fields('nc', ['field_campus_target_id']);
+    if($fieldName == 'employed_sector'){
+      $query->fields('ne', ['field_employed_value']);
+    }elseif($fieldName == 'employed_wages'){
+      $query->fields('ne', ['field_mean_wage_value']);
+    }
+    $query->fields('nd', ['nid']);
+    $query->range(0, 5);
+    if($fieldName == 'employed_sector'){
+      $query->orderBy('field_employed_value', 'DESC');
+    }elseif($fieldName == 'employed_wages'){
+      $query->orderBy('field_mean_wage_value', 'DESC');
+    }
+    $employedData = $query->execute()->fetchCol(2);
+    return $employedData;
+}

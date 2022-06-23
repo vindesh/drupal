@@ -1,0 +1,40 @@
+nc_towers_main_outcomes.school_type:
+  path: '/api-main-outcomes/school-type'
+  defaults:
+    _controller: '\Drupal\nc_towers_main_outcomes\Controller\MainOutcomesController::SchoolType'
+    _title: 'Search outcomes by school type'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_main_outcomes.school:
+  path: '/api-main-outcomes/school'
+  defaults:
+    _controller: '\Drupal\nc_towers_main_outcomes\Controller\MainOutcomesController::School'
+    _title: 'Search outcomes by school'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_main_outcomes.program_study:
+  path: '/api-main-outcomes/program-study'
+  defaults:
+    _controller: '\Drupal\nc_towers_main_outcomes\Controller\MainOutcomesController::ProgramStudy'
+    _title: 'Search outcomes by school type'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_main_outcomes.degree:
+  path: '/api-main-outcomes/degree'
+  defaults:
+    _controller: '\Drupal\nc_towers_main_outcomes\Controller\MainOutcomesController::Degree'
+    _title: 'Search outcomes by degree'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_main_outcomes.school_year:
+  path: '/api-main-outcomes/school-year'
+  defaults:
+    _controller: '\Drupal\nc_towers_main_outcomes\Controller\MainOutcomesController::SchoolYear'
+    _title: 'Search outcomes by school year'
+  requirements:
+    _permission: 'access content'
+

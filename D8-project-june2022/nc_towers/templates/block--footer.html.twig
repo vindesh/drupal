@@ -1,0 +1,65 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display a block.
+ *
+ * Available variables:
+ * - plugin_id: The ID of the block implementation.
+ * - label: The configured label of the block if visible.
+ * - configuration: A list of the block's configuration values.
+ *   - label: The configured label for the block.
+ *   - label_display: The display settings for the label.
+ *   - provider: The module or other provider that provided this block plugin.
+ *   - Block plugin specific settings will also be stored here.
+ * - content: The content of this block.
+ * - attributes: array of HTML attributes populated by modules, intended to
+ *   be added to the main container tag of this template.
+ *   - id: A valid HTML ID and guaranteed unique.
+ * - title_attributes: Same as attributes, except applied to the main title
+ *   tag that appears in the template.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the main title tag that appears in the template.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the main title tag that appears in the template.
+ *
+ * @see template_preprocess_block()
+ *
+ * @ingroup themeable
+ */
+#}
+
+
+{% set currentYear = 'now'|date('Y') %}
+
+<div{{ attributes }}>
+  {{ title_prefix }}
+  {% if label %}
+    <h2{{ title_attributes }}>{{ label }}</h2>
+  {% endif %}
+  {{ title_suffix }}
+  {% block content %}
+    {{ content }}
+    {% if currentYear == 2020 %}
+    <div class= "copyright">Copyright © {{ 'now'|date('Y') }}. All rights reserved.</div>
+    {% else %}
+    <div class= "copyright">Copyright © 2020 - {{ 'now'|date('Y') }}. All rights reserved.</div>
+    {% endif %}
+
+    <!-- <div class= "copyright">Copyright © {{ 'now'|date('Y') }} - {{ 'now'|date('y') + 1 }}. All rights reserved.</div> -->
+
+  {{ drupal_entity('block_content','62') }}   
+  {% endblock %}
+
+</div>
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function(event) {
+    fadeout();
+  });
+  function fadeout() {
+    var fade= document.getElementById("fullscreen_loader");
+    setTimeout(function() {
+      fade.style.display = "none";
+    }, 500);
+  }
+</script>
+<link rel="stylesheet" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css">

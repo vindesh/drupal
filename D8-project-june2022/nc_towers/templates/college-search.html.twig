@@ -1,0 +1,110 @@
+<div class="head-program-search page-head">
+{{ drupal_entity('block_content','32') }}
+</div>
+<div class="college-search-main">
+
+	<div class="college-main-block college-search-wrapper">
+		<div class="program-search-container college-left-side">
+			<div class="college-filter-search">
+				<div class="collegefilter-search-indent">
+					<input type="text" name="college_search" id="college-search-edit" aria-label="college search" value="" placeholder="Search by Program/Degree" />
+					<button type="submit" value="Submit" class="title-submit-value">
+						<svg width="15" height="15" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M16.4395 13.3984L20.334 17.293C20.6973 17.6602 20.6973 18.2539 20.3301 18.6211L19.2246 19.7266C18.8613 20.0938 18.2676 20.0938 17.9004 19.7266L14.0059 15.832C13.8301 15.6562 13.7324 15.418 13.7324 15.168V14.5312C12.3535 15.6094 10.6191 16.25 8.73242 16.25C4.24414 16.25 0.607422 12.6133 0.607422 8.125C0.607422 3.63672 4.24414 0 8.73242 0C13.2207 0 16.8574 3.63672 16.8574 8.125C16.8574 10.0117 16.2168 11.7461 15.1387 13.125H15.7754C16.0254 13.125 16.2637 13.2227 16.4395 13.3984ZM3.73242 8.125C3.73242 10.8906 5.9707 13.125 8.73242 13.125C11.498 13.125 13.7324 10.8867 13.7324 8.125C13.7324 5.35938 11.4941 3.125 8.73242 3.125C5.9668 3.125 3.73242 5.36328 3.73242 8.125Z" fill="#384D93"/>
+						</svg><span class="sr-only">Title Submit Button</span>
+					</button>
+				</div>
+			</div>
+			<div id="result-count">{{ collegeCount }} Colleges/Universities found </div>
+			<input type="hidden" id="totalresult" value="{{ collegeCount }}">
+			<div class="heart-save-button save-program">
+				<div class="heart-icon save_program_link" title="Click to save">X</div>
+			</div>
+		</div>
+
+		<div class="programs-filters-container college-right-side">
+			<div class="college-filter-top">
+				<div class="college-filter-radio">
+					{% for key, type in schoolType %}
+					<span class="check_container checkbox-wrapper-default">
+						<input type="checkbox"  id="check{{ type.tid }}" name="college_filter" class="education-filter" value="{{ type.tid }}" checked>
+						<label for="check{{ type.tid }}" class="checkbox-label">{{ type.name }}</label>
+						<span class="category-count" data-color="{{ type.description__value }}" style="background:{{ type.description__value }}">{{ categories[type.tid] }}</span>
+						</span>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+<div class="college-main-block">
+	  <div class="college-left-side">
+			<ul class="college-list" id="theList">
+				{% for key, college in colleges %}
+					{% if college.name != 'ALL' %}
+					<li class="{{ college.tid }} college-items" id="{{ college.tid }}" data-school-type="{{ college.school_type }}" data-color="{{ colors[college.field_school_type_target_id] }}" data-type="{{ college.field_school_type_target_id }}" data-lat="{{ college.lat }}" data-lon="{{ college.lon }}" data-school-id="{{ college.field_school_type_target_id }}" data-name="{{ college.name }}"><span class="circle" style="background-color:{{ colors[college.field_school_type_target_id] }}"></span>{{ college.name }}</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+	  </div>
+	  <div class="college-right-side">
+
+		<div id="collegeMap">.</div>
+		<div id='collegeDetails' class='text-align-center'>Click on a College or University to view more information.</div>
+			<div class="model_popup">
+				<div class="model_head">
+					<span class="college_name">
+						Cape Fear Community College
+					</span>
+					<span class="college_foundation_logo">
+						<a  title="CFNC Logo" target="_blank"><img src="/themes/custom/nc_towers/images/logo/CFNC_words_onwhite.png" alt="CFNC logo" typeof="foaf:Image" width="80px" height=""></a>
+					</span>
+				</div>
+				<div class="model_body">
+					<ul class="model_list">
+						{#
+						<li class="list_item"><span class="list_label">In-state tuition</span><span class="list_value in_state_tuition">$5,000</span></li>
+						#}
+						<li class="list_item"><span class="list_label">City</span><span class="list_value city">Cape Fear</span></li>
+						{#
+						<li class="list_item"><span class="list_label">Out-of-state tuition</span><span class="list_value out_state_tuition">$15,000</span></li>
+						<li class="list_item"><span class="list_label">Online Ed</span><span class="list_value online_ed">Yes</span></li>
+						<li class="list_item"><span class="list_label">Enrollment</span><span class="list_value enrollment">4,600</span></li>
+						<li class="list_item"><span class="list_label">Entrance difficulty</span><span class="list_value entrance_difficulty">Competative</span></li>
+						<li class="list_item"><span class="list_label">Student/faculty ratio</span><span class="list_value faculty">15/1</span></li>
+						#}
+						<li class="list_item"><span class="list_label">School URL</span><span class="list_value website"></span></li>
+						<li class="list_item"><span class="list_label">Type (two-year, four-year, public, private)</span><span class="list_value type">2 year</span></li>
+						<li class="list_item"><span class="list_label">CFNC College Profile</span><span class="list_value cfnc_url"></span></li>
+						{#
+						<li class="list_item"><span class="list_label">Graduate programs (yes, no)</span><span class="list_value graduate_program">Yes</span></li>
+						<li class="list_item"><span class="list_label">Setting (urban, rural, etc.)</span><span class="list_value setting">Urban</span></li>
+						#}
+					</ul>
+					<div class="heart-save-button training_education_link">
+						<div class="heart-icon save_training_education_link" >X</div>
+					</div>			
+				</div>
+				{#
+				<div class="model_Secondary_head">
+					<span>Programs offered</span>
+					<span>Degree Type</span>
+				</div>
+				<div class="model_Secondary_body">
+					<ul class="model_list" id="program_list">
+						<li class="list_item"><span class="list_label">In-state tuition</span><span class="list_value">$5,000</span></li>
+					</ul>
+				</div>
+				#}
+			</div>
+
+
+
+
+	  </div>
+	</div>
+</div>
+<div id="json_data" style="display:none;">{{ jsonResult }}</div>
+<div id="json_result" style="display:none;">{{ jsonResult }}</div>
+<div id="json_result_cip" style="display:none;">{{ jsonsocResult }}</div>

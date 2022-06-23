@@ -1,0 +1,40 @@
+nc_towers_mean_wage.school_type:
+  path: '/api-mean-wage/school-type'
+  defaults:
+    _controller: '\Drupal\nc_towers_mean_wage\Controller\MeanWageController::SchoolType'
+    _title: 'Search mean wages by school type'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_mean_wage.school:
+  path: '/api-mean-wage/school'
+  defaults:
+    _controller: '\Drupal\nc_towers_mean_wage\Controller\MeanWageController::School'
+    _title: 'Search mean wages by school'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_mean_wage.program_study:
+  path: '/api-mean-wage/program-study'
+  defaults:
+    _controller: '\Drupal\nc_towers_mean_wage\Controller\MeanWageController::ProgramStudy'
+    _title: 'Search mean wages by school type'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_mean_wage.degree:
+  path: '/api-mean-wage/degree'
+  defaults:
+    _controller: '\Drupal\nc_towers_mean_wage\Controller\MeanWageController::Degree'
+    _title: 'Search mean wages by degree'
+  requirements:
+    _permission: 'access content'
+
+nc_towers_mean_wage.school_year:
+  path: '/api-mean-wage/school-year'
+  defaults:
+    _controller: '\Drupal\nc_towers_mean_wage\Controller\MeanWageController::SchoolYear'
+    _title: 'Search mean wages by school year'
+  requirements:
+    _permission: 'access content'
+

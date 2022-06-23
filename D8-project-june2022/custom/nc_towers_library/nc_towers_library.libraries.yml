@@ -1,0 +1,6 @@
+nc_towers_quicktab_redirect:
+  js:
+    js/quicktab_redirect.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings

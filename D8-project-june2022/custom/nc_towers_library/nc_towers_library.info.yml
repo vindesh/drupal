@@ -1,0 +1,5 @@
+name: 'NC Towers: Library'
+type: module
+description: 'Attach Libraries to any page'
+core: 8.x
+package: 'NC Towers'

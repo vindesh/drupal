@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Contains nc_towers_library.module.
+ */
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function nc_towers_library_page_attachments_alter(&$page){
+
+  $path = $current_path = \Drupal::service('path.current')->getPath();
+  $result = \Drupal::service('path.alias_manager')->getAliasByPath($current_path);
+
+  # enable highmaps js to following urls
+  if ('/students-graduates-counts' == $result ||
+    '/multiple-students-graduates-counts' == $result ||
+    '/enrollment-outcomes' == $result ||
+    '/multiple-enrollment-outcomes' == $result ||
+    '/employment-outcomes' == $result ||
+    '/multiple-employment-outcomes' == $result ||
+    '/mean-wages' == $result ||
+    '/programs-wages' == $result ||
+    '/mean-wages-search' == $result ||
+    '/multiple-mean-wages-search' == $result ||
+    '/enrollment-outcomes-search' == $result ||
+    '/multiple-enrollment-outcomes-search' == $result || 
+    '/employment-outcomes-search' == $result ||
+    '/multiple-employment-outcomes-search' == $result || 
+    '/students-graduates-search' == $result ||
+    '/multiple-students-graduates-search' == $result
+  ) {
+    $page['#attached']['library'][] = 'nc_towers/nc_towers_highmap_js';
+  }
+
+  $page['#attached']['library'][] = 'nc_towers_library/nc_towers_quicktab_redirect';
+  
+  if ('/students-graduates-counts' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_students_and_graduates_count/student_search';
+  }elseif ('/multiple-students-graduates-counts' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_students_and_graduates_count/student_multi_search';
+  }elseif ('/enrollment-outcomes' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/main_outcomes_search';
+  }elseif ('/multiple-enrollment-outcomes' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/multiple_main_outcomes_search';
+  }elseif ('/employment-outcomes' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/employment_outcomes_search';
+  }elseif ('/multiple-employment-outcomes' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/multiple_employment_outcomes_search';
+  }elseif ('/mean-wages' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_mean_wage/mean_wage_search';
+  }elseif ('/programs-wages' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_mean_wage/mean_wage_multi_search';
+  }elseif ('/mean-wages-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_mean_wage/mean_wages';
+  }elseif ('/multiple-mean-wages-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_mean_wage/multiple_mean_wages';
+  }elseif ('/enrollment-outcomes-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/enrollment_outcomes_search';
+  }elseif ('/multiple-enrollment-outcomes-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/multiple_enrollment_outcomes_search';
+  }elseif ('/employment-outcomes-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/employment_outcomes_search_by_title';
+  }elseif ('/multiple-employment-outcomes-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_main_outcomes/multiple_employment_outcomes_search_by_title';
+  }elseif ('/students-graduates-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_students_and_graduates_count/students_graduates_search';
+  }elseif ('/multiple-students-graduates-search' == $result) {
+    $page['#attached']['library'][] = 'nc_towers_students_and_graduates_count/multiple_students_graduates_search';
+  }
+}

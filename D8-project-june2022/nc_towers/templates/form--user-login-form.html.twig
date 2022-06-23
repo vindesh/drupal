@@ -1,0 +1,25 @@
+<script src="//www.google.com/recaptcha/api.js?render=v26LcLPVoaAAAAAOdplzzeB_E3aRfLAF59QWD_JYu3" async defer></script>
+<div class="login-form login-form__wrapper">
+	<form{{ attributes }}>
+		<div class="login-form__top">
+			<div id="error_messages"></div>
+			{{ element.messages }}
+			{{ element.name }} {# username element #}
+			{{ element.pass }} {# password element #}
+			{{ element.form_build_id }} {# required #}
+			{{ element.form_id }} {# required #}
+
+			<!-- google recaptcha element -->
+			<div id="render_google_recaptcha"></div>
+
+			<div class="login-form__submit" id="login_btn_container">
+				<!-- {{ element.actions.submit }} -->
+				<div class="disabled"><span class="btn button">Submit</span></div>
+			</div>
+			
+
+		</div>
+	</form>
+	
+</div>
+

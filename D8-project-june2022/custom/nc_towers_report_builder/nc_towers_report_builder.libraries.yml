@@ -1,0 +1,10 @@
+report_form:
+  css:
+    theme:
+      css/report_builder_form.css: {}
+  js:
+    js/report_builder_form.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

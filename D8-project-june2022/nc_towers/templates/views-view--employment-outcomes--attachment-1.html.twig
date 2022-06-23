@@ -1,0 +1,115 @@
+{#
+/**
+ * @file
+ * Default theme implementation for main view template.
+ *
+ * Available variables:
+ * - attributes: Remaining HTML attributes for the element.
+ * - css_name: A css-safe version of the view name.
+ * - css_class: The user-specified classes names, if any.
+ * - header: The optional header.
+ * - footer: The optional footer.
+ * - rows: The results of the view query, if any.
+ * - empty: The content to display if there are no rows.
+ * - pager: The optional pager next/prev links to display.
+ * - exposed: Exposed widget form/info to display.
+ * - feed_icons: Optional feed icons to display.
+ * - more: An optional link to the next page of results.
+ * - title: Title of the view, only used when displaying in the admin preview.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the view title.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the view title.
+ * - attachment_before: An optional attachment view to be displayed before the
+ *   view content.
+ * - attachment_after: An optional attachment view to be displayed after the
+ *   view content.
+ * - dom_id: Unique id for every view being printed to give unique class for
+ *   Javascript.
+ *
+ * @see template_preprocess_views_view()
+ *
+ * @ingroup themeable
+ */
+#}
+{%
+  set classes = [
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title }}
+  {{ title_suffix }}
+
+  {% if header %}
+    {{ header }}
+  {% endif %}
+  {#{ exposed }#}
+  <div class="table-grid explore-occupation-grid" id="employmentSectorGraphData" style="display: none;">
+    {% if rows -%}
+      {{ rows }}
+    {% elseif empty -%}
+      {{ empty }}
+    {% endif %}
+  </div>
+  <div class="graph-container" style="display: none">
+    <div class="graph-container__title">Top Employment Industries After Graduation
+      
+      {# <select id="employmentSectorAfterYearFilter">
+        <option data-id="1">After 1</option>
+        <option data-id="2">After 2</option>
+        <option data-id="3">After 3</option>
+        <option data-id="4">After 4</option>
+        <option data-id="5">After 5</option>
+      </select> #}
+      </div>
+    <div class="graph-container__sorting-container">
+      <div class="graph-container__sorting 2ndchart employment-sector-filter">
+        Show data by
+        <div class="graph-container__filters">
+          <label>Gender <input type="checkbox" name="gender" class="toggleDrilldown" id="1"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> All</label></li>
+              <li><label><input type="checkbox" id="Male"> Male</label></li>
+              <li><label id="femaleData"><input type="checkbox" id="Female"> Female</label></li>
+            </ul>
+          </div>
+        </div>
+        <div class="graph-container__filters">
+          <label>Race <input type="checkbox" name="race" class="toggleDrilldown" id="1"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> All</label></li>
+              <li><label><input type="checkbox" id="Asian" checked> Asian</label></li>
+              <li><label><input type="checkbox" id="Black" checked> Black</label></li>
+              <li><label><input type="checkbox" id="White" checked> White</label></li>
+              <li><label><input type="checkbox" id="Other" checked> Other</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="graph-container__icons">
+        <img class="graph-view-action1" src="/themes/custom/nc_towers/images/chart-view.jpg">
+        <img class="table-view-action1" src="/themes/custom/nc_towers/images/table-view.jpg">
+      </div>
+    </div>
+    <div class="graph-container__toggle employmentSector">
+      <div id="employmentSectorGraph1" class="graph-view-container1"></div>
+      {# <div id="employmentSectorGraph2" class="graph-view-container"></div>
+      <div id="employmentSectorGraph3" class="graph-view-container"></div>
+      <div id="employmentSectorGraph4" class="graph-view-container"></div>
+      <div id="employmentSectorGraph5" class="graph-view-container"></div> #}
+    </div>
+  </div>
+  {{ pager }}
+  {{ more }}
+  {% if footer %}
+    <footer>
+      {{ footer }}
+    </footer>
+  {% endif %}
+
+  {{ feed_icons }}
+</div>

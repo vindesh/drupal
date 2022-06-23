@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Contains nc_towers_custom_twig.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function nc_towers_custom_twig_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the nc_towers_custom_twig module.
+    case 'help.page.nc_towers_custom_twig':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Custom Twig filter and function') . '</p>';
+      $output .= '<p>' . t('Use custom filter ksort like default filter of sort.') . '</p>';
+      $output .= '<p>' . t('Example: {{ array|ksort}} - it will work like PHP ksort function') . '</p>';
+      return $output;
+
+    default:
+  }
+}

@@ -1,0 +1,24 @@
+.report-builder-form .popup-btn-wrap {
+  position: relative;
+  display: inline-block;
+}
+.report-builder-form span.toggle-popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  display: block;
+  cursor: pointer;
+}
+.sorting-order-wrap {
+  display: none;
+}
+.pager-wrap{
+  display: flex;
+  gap: 60px;
+}
+.download-wrap {
+  display: flex;
+  justify-content: end;
+}

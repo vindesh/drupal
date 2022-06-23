@@ -1,0 +1,42 @@
+
+{%
+  set classes = [
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title }}
+  {{ title_suffix }}
+
+  {% if header %}
+      {{ header }}
+  {% endif %}
+<div class="explore-occupation-exposed-filters_1">
+
+  {#{ exposed }#}
+</div>
+
+<div class="explore-occupation-column-selector" id="table-formatter">
+</div>
+  {{ attachment_before }}
+<div id="student-enrolled-table" class="table-grid student-enrolled-table">
+  {% if rows -%}
+    {{ rows }}
+  {% elseif empty -%}
+    {{ empty }}
+  {% endif %}
+</div>
+  {{ pager }}
+
+  {{ attachment_after }}
+  {{ more }}
+
+  {% if footer %}
+    <footer>
+      {{ footer }}
+    </footer>
+  {% endif %}
+
+  {{ feed_icons }}
+</div>

@@ -1,0 +1,13 @@
+<?php
+
+function nc_towers_main_outcomes_theme($existing, $type, $theme, $path) {
+  return [
+    'main_outcomes_search' => [
+      'variables' => ['results' => NULL],
+    ],
+    'multiple_main_outcomes_search' => [
+      'variables' => ['results' => NULL],
+    ]
+  ];
+}
+

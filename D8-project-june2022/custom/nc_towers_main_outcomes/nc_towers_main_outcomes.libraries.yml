@@ -1,0 +1,96 @@
+main_outcomes_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/main_outcomes_search.js: {}
+    js/entrollment_type_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete
+
+multiple_main_outcomes_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true } 
+    js/multiple_main_outcomes_search.js: {}
+    js/multiple_entrollment_type_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete
+
+employment_outcomes_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/employment_outcomes_search.js: {}
+    js/employment_sector_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete
+
+multiple_employment_outcomes_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true } 
+    js/multiple_employment_outcomes_search.js: {}
+    js/multiple_employment_sector_search.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete
+
+###NEW enrollment_outcomes_search Search implement by Title###
+enrollment_outcomes_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/enrollment_outcomes_search.js: {}
+    js/enrollment_outcomes_search_type.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete   
+
+multiple_enrollment_outcomes_search:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true } 
+    js/multiple_enrollment_outcomes_search.js: {}
+    js/multiple_enrollment_outcomes_search_type.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete    
+# Tab-3: Employment Ooutcomes Search
+employment_outcomes_search_by_title:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true }
+    js/employment_outcomes_search_by_title.js: {}
+    js/employment_outcomes_search_sector_by_title.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete 
+
+multiple_employment_outcomes_search_by_title:
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js: { type: external, minified: true } 
+    js/multiple_employment_outcomes_search_by_title.js: {}
+    js/multiple_employment_outcomes_search_sector_by_title.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.once
+    - core/jquery.ui.autocomplete

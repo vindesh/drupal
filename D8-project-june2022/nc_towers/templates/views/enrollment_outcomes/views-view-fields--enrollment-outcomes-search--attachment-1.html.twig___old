@@ -1,0 +1,41 @@
+
+{% set currentTitle = view.field.title.value(view.result[row.index])|striptags|trim|convert_encoding('UTF-8', 'HTML-ENTITIES') %}
+{% set customClass = '' %}
+{% if search_param~'|'~search_year == currentTitle %}
+   {% set customClass = 'yearItem-0' %}
+{% endif %}
+{% if search_param~'|'~(search_year+1) == currentTitle %}
+   {% set customClass = 'yearItem-1' %}
+{% endif %}
+{% if search_param~'|'~(search_year+2) == currentTitle %}
+   {% set customClass = 'yearItem-2' %}
+{% endif %}
+{% if search_param~'|'~(search_year+3) == currentTitle %}
+   {% set customClass = 'yearItem-3' %}
+{% endif %}
+{% if search_param~'|'~(search_year+4) == currentTitle %}
+   {% set customClass = 'yearItem-4' %}
+{% endif %}  
+<div class="{{ customClass }}">
+  {% for field in fields -%} 
+    {{ field.separator }}
+    {%- if field.wrapper_element -%}
+      <{{ field.wrapper_element }}{{ field.wrapper_attributes }}>
+    {%- endif %}
+    {%- if field.label -%}
+      {%- if field.label_element -%}
+        <{{ field.label_element }}{{ field.label_attributes }}>{{ field.label }}{{ field.label_suffix }}</{{ field.label_element }}>
+      {%- else -%}
+        {{ field.label }}{{ field.label_suffix }}
+      {%- endif %}
+    {%- endif %}
+    {%- if field.element_type -%}
+      <{{ field.element_type }} {#{ field.element_attributes }#} {% if loop.last %} {{ field.element_attributes }} {%- endif %}>{{ field.content }}</{{ field.element_type }}>
+    {%- else -%}
+      {{ field.content }}
+    {%- endif %}
+    {%- if field.wrapper_element -%}
+      </{{ field.wrapper_element }}>
+    {%- endif %}
+  {%- endfor %}
+</div>

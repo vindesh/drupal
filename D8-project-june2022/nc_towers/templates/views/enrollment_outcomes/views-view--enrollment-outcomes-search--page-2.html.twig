@@ -1,0 +1,246 @@
+{%
+  set classes = [
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title }}
+  {{ title_suffix }}
+
+  {% if header %}
+      {{ header }}
+  {% endif %}
+<div class="explore-occupation-exposed-filters_1">
+
+  {#{ exposed }#}
+  {{ drupal_block('multiple_main_outcomes_search') }}
+</div>
+
+<div class="explore-occupation-column-selector" id="table-formatter">
+</div>
+
+<div class="table-grid explore-occupation-grid" id="outcomesGraphData" style="display: none;">
+  {% if rows -%}
+    {{ rows }}
+  {% elseif empty -%}
+    {{ empty }}
+  {% endif %}
+</div>
+  {{ pager }}
+  {{ more }}
+  <div class="graph-container" style="display: none">
+    <div class="graph-container__title">Enrollment Rate After Graduation</div>
+    <div class="graph-container__sorting-container enrolledOutcomes">
+      <div class="graph-container__sorting enrollchart">
+        Show data by
+        <div class="graph-container__filters">
+          <label>Gender <input type="checkbox" name="gender" class="toggleDrilldown" id="0"></label>
+          <div class="graph-container__filters-dropdown" style="display: none;">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> All</label></li>
+              <li><label><input type="checkbox" id="Male"> Male</label></li>
+              <li><label id="femaleData"><input type="checkbox" id="Female"> Female</label></li>
+            </ul>
+          </div>
+        </div>
+        <div class="graph-container__filters">
+          <label>Race <input type="checkbox" name="race" class="toggleDrilldown" id="0"></label>
+          <div class="graph-container__filters-dropdown">
+            <ul>
+              <li><label><input type="checkbox" id="All" checked> All</label></li>
+              <li><label><input type="checkbox" id="Asian" checked> Asian</label></li>
+              <li><label><input type="checkbox" id="Black" checked> Black</label></li>
+              <li><label><input type="checkbox" id="White" checked> White</label></li>
+              <li><label><input type="checkbox" id="Other" checked> Other</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="graph-container__icons">
+        <img class="graph-view-action" src="/themes/custom/nc_towers/images/chart-view.jpg">
+        <img class="table-view-action" src="/themes/custom/nc_towers/images/table-view.jpg">
+      </div>
+    </div>
+    <div class="graph-container__toggle">
+      <div id="studentsEnrolledGraphMultiSearch" class="graph-view-container"></div>
+      <div class="table-view-container" style="display: none">
+        {{ attachment_before }} 
+        {% if muliple_term_params %}
+          <div id="filterTableDataExportButton" class="search-data-export-button" style="float:right;"></div>
+          <table id="filterTableData" class="search-data-export views-table">
+          <thead>
+            <tr>
+              <th colspan=11 align="center">{{'STUDENTS ENROLLED/GRADUATES (%)'|trans}}</th>
+            </tr>
+            <tr>
+              <th>{{'Year'|trans}}</th>
+              <th>{{'School'|trans}}</th>
+              <th>{{'Program'|trans}}</th>
+              <th>{{'Degree'|trans}}</th>
+              <th>{{'Gender'|trans}}</th>
+              <th>{{'Race'|trans}}</th>
+              {% for key, value2 in muliple_term_params[0].enrolledData[0] %}
+              <th class="views-field views-field-field-after-year">
+                {% if value2.field_after_year_value == 1  %}
+                  {{'After @afteryear Year'|trans({'@afteryear': value2.field_after_year_value}) }}
+                {% else %}
+                  {{'After @afteryear Years'|trans({'@afteryear': value2.field_after_year_value}) }}
+                {% endif %}
+              </th>
+              {% endfor %}
+              {% if muliple_term_params[0].enrolledData[0]|length < 5 %}
+                  {% for i in (muliple_term_params[0].enrolledData[0]|length+1)..5 %}
+                      <th>
+                        {{'After'|trans}} {{ i }}  {{(i==1)?'Year'|trans:'Years'|trans}}
+                      </th>
+                  {% endfor %}
+              {% endif %}
+              
+            </tr>
+          </thead>
+          <tbody>
+          {% for key, value in muliple_term_params %} 
+            {% if value.enrolledData|length > 0 %}
+            {% for key1, rows in value.enrolledData %}
+            <tr>
+              <td>{{ value.school_year }}</td>
+              <td>{{ value.school }}</td>
+              <td>{{ value.program_study }}</td>
+              <td>{{ value.degree }}</td>
+              {% set flag = true %}
+              
+              {% for key, row in rows %}  
+                {% if flag %}
+                  <td>{{ term_gender[row.field_gender_target_id] }}</td>
+                  <td>{{ term_race[row.field_race_target_id] }}</td>
+                  {% set flag = false %}
+                {% endif %}
+                <td class="views-field">
+                  {% if row.field_enrolled_or_employed_value and row.field_graduate_value %}
+                    {% if row.field_enrolled_or_employed_value == -1 or row.field_graduate_value == -1 %}
+                      {{'Data Suppressed'|trans}}
+                    {% else %}
+                      {% set outcome_percentage = (row.field_enrolled_or_employed_value/row.field_graduate_value)*100 %}
+                      {{ outcome_percentage|round(2, 'floor') }}%
+                    {% endif %}
+                  {% else %}
+                    0
+                  {% endif %}
+                </td>
+              {% endfor %}
+
+              {% if rows|length < 5 %}
+                {% for i in (rows|length+1)..5 %}
+                  <td></td>
+                {% endfor %}
+              {% endif %}
+
+            </tr>
+           {% endfor %} 
+           {% endif %}
+          {% endfor %}
+          </tbody>
+          </table>
+        {% endif %}
+        
+      </div>
+    </div>
+  </div>
+  
+  {{ attachment_after }}
+  {% if term_params %}
+      <div class="table-view-container1" style="display: none;">
+        <div id="enrollmentTypeTableExportButton" class="search-data-export-button" style="float:right;"></div>
+        <table id="enrollmentTypeTable" class="search-data-export views-table">
+          <thead>
+            <tr>
+              <th colspan="11" align="center">{{'Students Enrolled/Graduates (%)'|trans}}</th>
+            </tr>
+            <tr>
+              <th>{{'Year'|trans}}</th>
+              <th>{{'School'|trans}}</th>
+              <th>{{'Program'|trans}}</th>
+              <th>{{'Degree'|trans}}</th>
+              <th>{{'Gender'|trans}}</th>
+              <th>{{'Race'|trans}}</th>
+              <th>{{'After Year'|trans}}</th>
+              {% set counter = 1 %}
+              {% set maxLength = 0 %}
+              {% set ikey = 0 %}
+              {% for k, row in term_params %}
+                {% if row.multiEnrolledData|length > 0 and maxLength < row.multiEnrolledData|length  %}
+                  {% set maxLength = row.multiEnrolledData|length %}
+                  {% set ikey = k %}
+                {% endif %}
+              {% endfor %}
+
+              {% for key, categoryName in term_params[ikey].multiEnrolledData['category'] %}
+                {% if counter <= 5 %}
+                  <th class="views-field views-field-field-after-year">
+                    {{ categoryName }}
+                  </th>
+                {% endif %}
+                {% set counter = counter + 1 %}
+              {% endfor %}
+              
+            </tr>
+          </thead>
+          <tbody> 
+          {% for key1, param in term_params %}
+            {% if param.multiEnrolledData|length > 0 %}
+              {% for key1, rows in param.multiEnrolledData["data"] %}
+                {% for key2, row in rows %} 
+                  <tr>
+                    <td>{{ param.school_year }}</td>
+                    <td>{{ param.school }}</td>
+                    <td>{{ param.program_study }}</td>
+                    <td>{{ param.degree }}</td>
+                    {% set valueCounter = 1 %} 
+                    {% set flag = true %}
+                    {% for key, value2 in row %}
+                      {% if flag %}
+                        <td>{{ term_gender[value2.field_gender_target_id] }}</td>
+                        <td>{{ term_race[value2.field_race_target_id] }}</td>
+                        <td>{{ value2.field_after_year_value }}</td>
+                        {% set flag = false %}
+                      {% endif %}
+                      {# {% if valueCounter <= 5 %} #}
+                        <td class="views-field">
+                          {% if value2.field_enrollment_value and value2.field_graduate_value %}
+                            {% if value2.field_enrollment_value == -1 or value2.field_graduate_value == -1 %}
+                              Data Suppressed
+                            {% else %}
+                              {% set outcome_percentage = (value2.field_enrollment_value/value2.field_graduate_value)*100 %}
+                              {{ outcome_percentage|round(2, 'floor') }}%
+                            {% endif %}
+                          {% else %}
+                          0
+                          {% endif %}
+                        </td>
+                      {# {% endif %} #}
+                      {% set valueCounter = valueCounter + 1 %}
+                    {% endfor %}
+                    {% if valueCounter < counter %}
+                      {% for i in (valueCounter+1)..counter %}
+                          <td></td>
+                      {% endfor %}
+                    {% endif %}
+
+                  </tr>
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  {% if footer %}
+    <footer>
+      {{ footer }}
+    </footer>
+  {% endif %}
+
+  {{ feed_icons }}
+</div>

@@ -1,0 +1,5 @@
+name: 'NC Towers: Custom Twig filter and function'
+type: module
+description: 'Custom Twig filter and function'
+core: 8.x
+package: 'NC Towers'

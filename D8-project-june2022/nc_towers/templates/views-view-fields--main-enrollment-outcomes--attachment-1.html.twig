@@ -1,0 +1,42 @@
+
+{% set currentYear = view.field.name.value(view.result[row.index]) | raw %}
+{% set selectedYear = search_param['school_year'] %}
+{% set customClass = '' %}
+  {% if selectedYear == currentYear %}
+     {% set customClass = 'yearItem-0' %}
+  {% endif %}
+  {% if (selectedYear+1) == currentYear %}
+     {% set customClass = 'yearItem-1' %}
+  {% endif %}
+  {% if (selectedYear+2) == currentYear %}
+     {% set customClass = 'yearItem-2' %}
+  {% endif %}
+  {% if (selectedYear+3) == currentYear %}
+     {% set customClass = 'yearItem-3' %}
+  {% endif %}
+  {% if (selectedYear+4) == currentYear %}
+     {% set customClass = 'yearItem-4' %}
+  {% endif %}
+<div class="{{ customClass }}">
+  {% for field in fields -%} 
+    {{ field.separator }}
+    {%- if field.wrapper_element -%}
+      <{{ field.wrapper_element }}{{ field.wrapper_attributes }}>
+    {%- endif %}
+    {%- if field.label -%}
+      {%- if field.label_element -%}
+        <{{ field.label_element }}{{ field.label_attributes }}>{{ field.label }}{{ field.label_suffix }}</{{ field.label_element }}>
+      {%- else -%}
+        {{ field.label }}{{ field.label_suffix }}
+      {%- endif %}
+    {%- endif %}
+    {%- if field.element_type -%}
+      <{{ field.element_type }} {#{ field.element_attributes }#} {% if loop.last %} {{ field.element_attributes }} {%- endif %}>{{ field.content }}</{{ field.element_type }}>
+    {%- else -%}
+      {{ field.content }}
+    {%- endif %}
+    {%- if field.wrapper_element -%}
+      </{{ field.wrapper_element }}>
+    {%- endif %}
+  {%- endfor %}
+</div>

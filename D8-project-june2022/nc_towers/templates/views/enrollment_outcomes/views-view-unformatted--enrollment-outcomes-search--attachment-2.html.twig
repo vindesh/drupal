@@ -1,0 +1,12 @@
+<div class="after-year" data-afteryear="{{ title }}">
+{% for row in rows %}
+  {%
+    set row_classes = [
+      default_row_class ? 'views-row',
+    ]
+  %}
+  <div{{ row.attributes.addClass(row_classes) }} data-index="{{ loop.index }}">
+    {{- row.content -}}
+  </div>
+{% endfor %}
+</div>

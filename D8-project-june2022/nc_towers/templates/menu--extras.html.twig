@@ -1,0 +1,17 @@
+<nav class="nav-main">
+	<ul data-region="header" class="menu">
+	{% for item in items %}
+		<li class="menu-item">
+			<a class="home-show" href='{{ item.url }}' title='{{ item.content['#menu_link_content'].description.value }}'>{{ item.content['#menu_link_content'].field_home_title.value }}</a>
+			<a class="home-none" href='{{ item.url }}' title='{{ item.content['#menu_link_content'].description.value }}'>
+				<span class="icon_img">{{ item.content['#menu_link_content'].field_svg_source.value|raw }}</span>
+				
+				{% set menu_item_title = item.title|convert_encoding('UTF-8', 'HTML-ENTITIES') |split("<br>") %}
+				<span class="icon_txt">{{ menu_item_title[0] }}<br>{{ menu_item_title[1] }}</span>
+
+				{# <span class="icon_txt">{{ item.title|convert_encoding('UTF-8', 'HTML-ENTITIES') }}</span> #}
+			</a>
+		</li>
+	{% endfor %}
+	</ul>
+</nav>
