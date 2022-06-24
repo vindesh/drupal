@@ -1,0 +1,15 @@
+kh_agencies.add_goal:
+  path: '/agency/activity/add-theme'
+  defaults:
+    _title: 'Add Theme'
+    _form: '\Drupal\kh_agencies\Form\AddGoalForm'
+  requirements:
+    _role: 'administrator + agency_manager + agency_administrator + superadministrator'
+
+kh_agencies.edit_goal:
+  path: '/agency/activity/edit-theme/{tid}'
+  defaults:
+    _title: 'Add Theme'
+    _form: '\Drupal\kh_agencies\Form\EditGoalForm'
+  requirements:
+    _role: 'administrator + agency_manager + agency_administrator + superadministrator'

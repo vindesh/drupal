@@ -1,0 +1,14 @@
+global-styling:
+  css:
+    theme:
+      css/style.css: {}
+      css/fonts.css: {}
+magic:
+  header: true
+  css:
+  js:
+    js/ScrollMagic.js: {}
+    # js/plugins/debug.addIndicators.js: {}
+    js/script.js: {}
+  dependencies:
+    - core/jquery

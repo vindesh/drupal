@@ -1,0 +1,18 @@
+<?php
+/**
+ *
+ */
+
+/**
+ * Implements hook_mail().
+ */
+function kh_import_mail($key, &$message, $params) {
+  $options = ['langcode' => $message['langcode']];
+  switch ($key) {
+    case 'email_notification':
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['message'];
+      break;
+  }
+}

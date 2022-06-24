@@ -1,0 +1,11 @@
+name: Kindlyhub Agencies operations
+type: module
+description: 'Manage the agengies related operations'
+package: Custom
+dependencies:
+  - node
+  - user
+  - views_bulk_operations
+version: '8.x-1.00'
+core: '8.x'
+project: 'kh_agencies'

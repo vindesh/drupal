@@ -1,0 +1,46 @@
+<?php
+/**
+ *
+ */
+use Drupal\views\ViewExecutable;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+
+function kh_agencies_page_attachments(array & $attachments) {
+  $attachments['#attached']['library'][] = 'kh_agencies/kh_agencies';
+}
+
+function kh_agencies_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+{
+  $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  if ( ($form_id == 'node_activity_form' || $form_id == 'node_activity_edit_form') && !$user->hasRole('node_activity_form') && !$user->hasRole('administrator')) {
+    $form['#prefix'] = '<div class="agemcy-activity-form">';
+    $form['#suffix'] = '</div>';
+
+  }
+  $len = strlen('views_form_agency_activities_page');
+  if ( substr($form_id, 0, $len) === 'views_form_agency_activities_page' ) {
+    $title = $form['header']['views_bulk_operations_bulk_form']['select_all']['#title'];
+    if ($title) {
+      $argument = $title->getArguments();
+      $form['header']['views_bulk_operations_bulk_form']['select_all']['#title'] = t('Select All Students (@count Total Records)', $argument);
+    }
+  }
+
+}
+
+function kh_agencies_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  if ($view->id() == 'agency_based_goals') {
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    if ($user->hasRole('superadministrator') || $user->hasRole('administrator')) {
+      if ($query->where) {
+        foreach ($query->where as $k1 => $where1) {
+          foreach ($where1['conditions'] as $k2 => $condition) {
+            if (isset($condition['field']) && trim($condition['field']) == 'taxonomy_term__field_agency.field_agency_target_id = :taxonomy_term__field_agency_field_agency_target_id') {
+              unset($query->where[$k1]['conditions'][$k2]);
+            }
+          }
+        }
+      }
+    }
+  }
+}

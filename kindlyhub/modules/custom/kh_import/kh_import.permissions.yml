@@ -1,0 +1,10 @@
+import staff:
+    title: 'Allow User to import the staff from CSV'
+    description: 'Allow User to import the staff from CSV file'
+    restrict access: true
+import student:
+  title: 'Allow User to import the student from CSV'
+  restrict access: true
+send notification to imported staff:
+    title: 'Send the notification to imported staff'
+    restrict access: true

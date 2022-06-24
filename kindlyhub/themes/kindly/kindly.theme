@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function kindly_preprocess_html(&$variables) {
+  if ($node = \Drupal::request()->attributes->get('node')) {
+    $variables['attributes']['class'][] = 'page-node-' . $node->id();
+  }
+}
+
+/**
+ * @file
+ * Bootstrap sub-theme.
+ *
+ * Place your custom PHP code in this file.
+ */
+function kindly_preprocess_page(&$variables) {
+  $variables['base_path'] = base_path();
+  
+  if($variables['is_front']){
+    $variables['#attached']['library'][] = 'kindly/magic';
+  }
+
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node){ 
+    $nodeType = $node->getType();
+     $typeArr = ['page', 'region', 'student','family_group','classroom','agency','location'];
+     if(in_array($nodeType, $typeArr)){
+       $colorCode1 = $node->field_background_color->color;
+       $colorCode2 = $node->field_background_color_middle->color;
+       $colorCode3 = $node->field_background_color_bottom->color; 
+       $variables['page']['colorcode1'] = $colorCode1;
+       $variables['page']['colorcode2'] = str_replace("#", "", $colorCode2);
+       $variables['page']['colorcode3'] = str_replace("#", "", $colorCode3);
+     }
+  }
+  //dsm($variables);
+}
+
+function kindly_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  // Add content type suggestions.
+  $typeArr = ['page', 'region', 'student','family_group','classroom','agency','location'];
+  if ($node = \Drupal::request()->attributes->get('node')) {
+    if( in_array($node->getType(), $typeArr)){
+    array_splice($suggestions, 1, 0, 'page__page');
+    }
+  }
+}

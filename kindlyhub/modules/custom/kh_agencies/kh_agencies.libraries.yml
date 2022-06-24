@@ -1,0 +1,5 @@
+kh_agencies:
+  version: "8.x"
+  css:
+    theme:
+      css/style.css: {}

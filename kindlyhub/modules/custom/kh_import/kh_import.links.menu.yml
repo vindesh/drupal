@@ -1,0 +1,24 @@
+kh_import.import:
+  title: 'KindlyHub Import'
+  parent: system.admin_config
+  description: 'Import content.'
+  route_name: kh_import.import
+  weight: 9
+kh_import.staff:
+  title: 'Import Staff'
+  parent: kh_import.import
+  description: 'Import Staff from CSV file.'
+  route_name: kh_import.import_staff
+  weight: 1
+kh_import.student:
+  title: 'Import Student'
+  parent: kh_import.import
+  description: 'Import Student from CSV file.'
+  route_name: kh_import.import_student
+  weight: 2
+kh_import.notification:
+  title: 'Send Notification'
+  parent: kh_import.import
+  description: 'Send notification email to user.'
+  route_name: kh_import.notification
+  weight: 3

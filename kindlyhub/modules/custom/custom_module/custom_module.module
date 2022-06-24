@@ -1,0 +1,3568 @@
+<?php
+/**
+ * @file
+ * Contains custom_module.module.
+ */
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormBase;
+use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Url;
+use Drupal\field_collection\Entity\FieldCollectionItem;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Ajax\ChangedCommand;
+use Drupal\user\Entity\User;
+use Drupal\Core\Ajax\CssCommand;
+use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Ajax\InvokeCommand;
+use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\user\Entity\Role;
+use Drupal\Core\Render\Markup;
+use Drupal\uc_order\Entity\Order;
+use Drupal\uc_order\OrderInterface;
+use Drupal\uc_order\Event\OrderCommentAddedEvent;
+use Drupal\Core\Mail\MailManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\views\Views;
+use Twilio\Rest\Client;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Drupal\views\ViewExecutable;
+use Drupal\flag\Entity\Flag;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
+
+
+
+
+function startsWith ($string, $startString)
+{
+    $len = strlen($startString);
+    return (substr($string, 0, $len) === $startString);
+}
+
+function custom_module_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+{
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $agency = $user->get('field_agency_reference')
+            ->getValue();
+    //$agencyid = $agency[0]['target_id'];
+    $agencyid = count($agency)>0?$agency[0]['target_id']:0;
+    $location =  $user->get('field_user_location_reference')
+            ->getValue();
+    $locid = isset($location[0]['target_id'])?$location[0]['target_id']:'';
+    $current_path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $current_path);
+    //dsm($path_args);
+//echo $form_id;
+
+if( startsWith($form_id,'views_form_manage_agency_school_block_4')
+||  startsWith($form_id,'views_form_manage_agency_school_block_6')
+){
+    $form['#prefix'] =  Markup::create('<div class="views-form"> <div id="approveButtonDiv"> <a class="siteButton" onClick="setValForApproveDonation();">Approve Selected Donations</a></div>');
+    $form['actions']['submit']['#value'] = '';
+
+         //$form['actions']['submit']['#submit'][] = 'Bulk_opration_custom_submit';
+  }
+
+  // if($form_id == 'views_form_manage_agency_school_block_4_'.$agencyid ){
+  //   //$form['#action'] = '/user-dashboard?_wrapper_format=drupal_ajax';
+  //   $form['#action'] = '/node/add/bulk_sign_update?destination=user-dashboard';
+
+  //        //$form['actions']['submit']['#submit'][] = 'Bulk_opration_custom_submit';
+  // }
+
+    if($form_id == 'node_bulk_sign_update_form'){
+    //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+         $uid = \Drupal::currentUser()->id();
+        $form['title']['widget'][0]['value']['#default_value'] ='Approved by '. $uid ;
+
+         $form['title']['#type'] = 'hidden';
+
+    }
+
+
+
+    if ($form_id == 'node_invite_user_form' || $form_id == 'node_invite_user_edit_form')
+    {
+        $form['title']['#type'] = 'hidden';
+        $form['title']['widget'][0]['value']['#default_value'] = 'invite_user';
+        $form['actions']['submit']['#value'] = t('Invite');
+        $form['actions']['submit']['#submit'][] = 'user_invite_form_submit';
+    }
+
+
+    if ($form_id == 'node_funding_source_form' || $form_id == 'node_funding_source_edit_form')
+    {
+        //     $form['title']['widget'][0]['value']['#default_value'] = 'funding_source';
+        //     $form['title']['#type'] = 'hidden';
+        //     $form['actions']['submit']['#submit'][] = 'funding_soure_hide';
+
+        //Custom submit handle will update agency Obligation ,annual goal & weekly hours
+        $form['actions']['submit']['#submit'][] = 'update_agency_total_annual_goal_submit';
+
+        $grant_id = $form_state->getformObject()->getEntity()->id();
+
+        $agency = Node::load($agencyid);
+
+        //Total Student
+        $total_student = \Drupal::service('custom_module.storage')->getAgencyTotalStudent($grant_id, 'funding_source');
+        if(empty($form['field_total_student']['widget'][0]['value']['#default_value']))
+        $form['field_total_student']['widget'][0]['value']['#default_value'] = $total_student;
+        $ts = Markup::create('<span class="agency-total-student">'. t('Total number of students currently attached with this grant: ') . $total_student.'</span>');
+        $form['field_total_student']['widget'][0]['value']['#suffix'] = $ts;
+
+        //Grant total week
+        //$school_start_date = $agency->get('field_date')->value;
+        //$school_end_date = $agency->get('field_date')->end_value;
+        $school_start_date = $form['field_project_period_start_date']['widget'][0]['value']['#default_value']->format('Y-m-d H:i:s');
+        $school_end_date = $form['field_project_period_start_date']['widget'][0]['end_value']['#default_value']->format('Y-m-d H:i:s');
+        $total_school_week = \Drupal::service('custom_module.storage')->getSchoolTotalWeeks($school_start_date, $school_end_date);
+        $tsw = Markup::create('<p><strong>'. t('Number of School Weeks: ') .'</strong><span id="total_school_week">'. $total_school_week .'</span></p>');
+        $form['total_week'] = array(
+          '#type' => 'hidden',
+          '#value' => $total_school_week,
+        );
+
+        $result = '<div id="calc_result"><h3>'. t('Results') .'</h3></div>';
+        $form['group_grant_calculator']['calculate_button'] = array(
+            '#type' => 'button',
+            '#value' => 'Calculate',
+            '#ajax' => array(
+                'callback' => 'grant_calculator_ajax_handler',
+                //'wrapper' => 'calc_result',
+                'method' => 'replace',
+                'event' => 'click',
+            ),
+            '#weight' => 11,
+            '#group' => 'group_grant_calculator',
+            '#name' => 'calculate_button',
+            '#prefix' => $tsw,
+            '#suffix' => $result,
+        );
+        //Accept average hours button
+        $form['group_grant_calculator']['accept'] = array(
+        '#type' => 'button',
+        '#value' => 'Accept Calculated Result',
+        '#ajax' => array(
+          'callback' => 'grant_accept_calculated_result_ajax_handler',
+          'method' => 'change',
+          'event' => 'click',
+        ),
+        '#weight' => 11,
+        '#group' => 'group_grant_calculator',
+        '#name' => 'accept',
+        '#attributes' => ['style'=>'display:none;' ],
+
+        );
+    }//end@vm0209
+
+
+
+
+    if ($form_id == 'node_bulk_sign_update_form' || $form_id == 'node_bulk_sign_update_edit_form'){
+
+        $form['actions']['submit']['#submit'][] = 'menualFlagUpdate';
+    }
+
+    if ($form_id == 'taxonomy_term_readiness_goal_form' || $form_id == 'taxonomy_term_readiness_goal_edit_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+        if (!in_array('superadministrator', $roles) || !in_array('administrator', $roles))
+        {
+            $form['field_region']['widget']['#default_value'] = $refrnceid;
+            $form['field_agency']['widget']['#default_value'] = $agencyid;
+            $form['field_region']['widget']['#attributes']['disabled'] = 'disabled';
+            $form['field_agency']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+    }
+
+    // user register form alter------------------------------------------------------------
+    if ($form_id == 'user_register_form')
+    {
+        $current_path = \Drupal::service('path.current')->getPath();
+        $path_args = explode('/', $current_path);
+        $current_user = \Drupal::currentUser();
+        $roles = $current_user->getRoles();
+        //print_r($roles);
+
+        $location = $user->get('field_user_location_reference')
+            ->getValue();
+        $locationid = $location[0]['target_id'];
+        $chklRoleArr = array(
+            'agency_administrator',
+            'agency_manager',
+            'administrator',
+            'school_manager'
+        );
+        if ($path_args[2] == 'register' && $path_args[3] == 'school_manager')
+        {
+            $result = array_intersect($chklRoleArr, $roles);
+            if (count($result) == 0)
+            {
+                unset($form['field_user_location_reference']);
+                $form['account']['roles']['access'] = false;
+
+            }
+            else
+            {
+                unset($form['field_how_did_you_hear_about_kin']);
+                unset($form['field_referred_by']);
+                unset($form['field_terms_condition']);
+                $form['account']['roles']['access'] = false;
+
+            }
+
+            if ($roles[1] == 'school_manager')
+            {
+                $form['field_user_location_reference']['widget']['#default_value'] = $locationid;
+                $form['field_user_location_reference']['widget']['#attributes']['disabled'] = 'disabled';
+            }
+        }
+        if ($path_args[2] == 'register' && ($path_args[3] == 'teacher' || $path_args[3] == 'agency_administrator' || $path_args[3] == 'agency_manager' || $path_args[3] == 'school_manager' || $path_args[3] == 'community_partner'))
+        {
+            $result = array_intersect($chklRoleArr, $roles);
+            if (count($result) > 0)
+            {
+                unset($form['field_how_did_you_hear_about_kin']);
+                unset($form['field_referred_by']);
+                unset($form['field_terms_condition']);
+                unset($form['field_do_you_want_to_join_existi']);
+                $form['account']['notify']['#default_value'] = 1;
+                $pass = user_password();
+                $form['account']['pass']['#value'] = array(
+                    'pass1' => $pass,
+                    'pass2' => $pass,
+                );
+                $form['account']['pass']['#access'] = false;
+            }
+        }
+        if (isset($_REQUEST['agency']))
+        {
+            if ($path_args[2] == 'register' && $path_args[3] == 'teacher' || $path_args[3] == 'community_partner')
+            {
+                $form['field_user_location_reference']['widget']['#multiple'] = 0;
+                if ($roles[1] == 'school_manager')
+                {
+                    $form['field_user_location_reference']['widget']['#default_value'] = $locationid;
+                    $form['field_user_location_reference']['widget']['#attributes']['disabled'] = 'disabled';
+                }
+            }
+        }
+        if (in_array('agency_administrator', $roles) || in_array('agency_administrator', $roles) || in_array('administrator', $roles) || in_array('school_manager', $roles))
+        {
+            $agency = $user->get('field_agency_reference')
+                ->getValue();
+            $agencyid = $agency[0]['target_id'];
+            $regionrefrence = $user->get('field_user_regional_reference')
+                ->getValue();
+            $refrnceid = $regionrefrence[0]['target_id'];
+            $form['field_user_regional_reference']['widget'][0]['target_id']['#default_value'] = node_load($refrnceid);
+            $form['field_agency_reference']['widget']['#default_value'] = $agencyid;
+            $form['field_user_regional_reference']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            $form['field_agency_reference']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        //$roles = $user->getRoles();
+        $form['account']['roles']['access'] = false;
+        $form['#validate'][] = 'my_test_validate';
+        $form['account']['mail']['#required'] = true;
+        $form['account']['mail']['#title'] = "Email Address";
+        $form['actions']['submit']['#submit'][] = 'user_register_form_submit';
+    }
+
+    // user Edit form alter--------------------------------------------------------------------
+    if ($form_id == 'user_form') {
+        // $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        // $uid = $user->id();
+
+        $roles = $user->getRoles();
+
+        if (in_array('superadministrator', $roles) || in_array('administrator', $roles) ) {
+            $form['field_agency_reference']['widget']['#ajax'] = [
+                'callback' => 'custom_module_agency_field_update_ajax_handler',
+                'event' => 'change',
+            ];
+        }
+
+        $status = false;
+        if (in_array('superadministrator', $roles) || in_array('administrator', $roles) || in_array('kindly_staff', $roles))
+        {
+            $status = true;
+        }
+        if ($status == false)
+        {
+            $form['field_expiration_date']['widget'][0]['value']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            $form['field_user_regional_reference']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            $form['field_agency_reference']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+        if ($roles[1] == 'school_manager')
+        {
+
+            $form['field_user_location_reference']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+        if ($uid == '93' || $uid == '95'|| $uid == '1084')
+        {
+            echo "<pre>";
+            print_r('<strong>OOps!! You are not able to edit this account</strong>');
+            die();
+        }
+        if (!in_array('superadministrator', $roles) && in_array('family_member', $roles))
+        {
+            $form['field_user_regional_reference']['#type'] = 'hidden';
+            $form['field_agency_reference']['#type'] = 'hidden';
+            $form['field_user_location_reference']['#type'] = 'hidden';
+            $form['field_classroom_reference']['#type'] = 'hidden';
+        }
+
+        if (in_array('community_partner', $roles)){
+            $form['field_community_partner_rate']['widget'][0]['value']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+        }
+    }
+    //---------------------------------------------------------------------------------------------------
+    if ($form_id == 'node_location_form' || $form_id == 'node_location_edit_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $agenecynid = node_load($agencyid);
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+        $refrencenid = node_load($refrnceid);
+        if (isset($_REQUEST['rid']))
+        {
+            $form['field_regional_reference']['widget'][0]['target_id']['#default_value'] = $refrencenid;
+            $form['field_agency']['widget']['#default_value'] = $agencyid;
+        }
+
+        if (!in_array('superadministrator', $roles) || !in_array('administrator', $roles))
+        {
+            $form['field_regional_reference']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            $form['field_agency']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+
+        //Submit handle will update agency annual goal
+        //$form['actions']['submit']['#submit'][] = 'update_agency_annual_goal_submit';
+
+        //   if(in_array('administrator', $roles) && in_array('agency_administrator', $roles) && in_array('school_manager', $roles) && in_array('kindly_staff', $roles)){
+        //   $form['actions']['submit']['#value'] = t('Save location/invite location manager');
+        //   $form['actions']['submit']['#submit'][] = 'user_redirection_inviteuser_submit';
+        // }
+
+      //@vm
+      //Average Hours per week
+      $agency = Node::load($agencyid);
+      $average_hour_week = $agency->get('field_average_hour_week')->value;
+      $swg = Markup::create('<p><strong>'. t('Student Weekly Goal: ') .'</strong><span id="average_hour_week">'. $average_hour_week . t(' hours') .'</span></p>');
+      $form['average_hour_week'] = array(
+        '#type' => 'hidden',
+        '#value' => $average_hour_week,
+      );
+      $form['field_number_of_slots_to_track_a']['widget'][0]['value']['#prefix'] = $swg;
+      //Total Student
+      $location_nid = $form_state->getformObject()->getEntity()->id();
+      $total_student = \Drupal::service('custom_module.storage')->getAgencyTotalStudent($location_nid, 'location');
+      if(empty($form['field_number_of_slots_to_track_a']['widget'][0]['value']['#default_value']))
+        $form['field_number_of_slots_to_track_a']['widget'][0]['value']['#default_value'] = $total_student;
+      $ts = Markup::create('<span class="agency-total-student">'. t('Total number of students currently enrolled in our system at this location: ') . $total_student.'</span>');
+      $form['field_number_of_slots_to_track_a']['widget'][0]['value']['#suffix'] = $ts;
+      //School Weeks
+      $school_start_date = $agency->get('field_date')->value;
+      $school_end_date = $agency->get('field_date')->end_value;
+      $total_school_week = \Drupal::service('custom_module.storage')->getSchoolTotalWeeks($school_start_date, $school_end_date);
+      $tsw = Markup::create('<p><strong>'. t('Number of School Weeks: ') .' </strong><span id="total_school_week">'. $total_school_week .'</span></p>');
+      $form['total_week'] = array(
+        '#type' => 'hidden',
+        '#value' => $total_school_week,
+      );
+
+      $result = '<div id="calc_result"><h1>'. t('Results') .'</h1></div>';
+      $form['group_calculator']['calculate_button'] = array(
+        '#type' => 'button',
+        '#value' => 'Calculate',
+        '#ajax' => array(
+          'callback' => 'location_calculator_ajax_handler',
+          //'wrapper' => 'calc_result',
+          'method' => 'replace',
+          'event' => 'click',
+        ),
+        '#weight' => 19,
+        '#group' => 'group_calculator',
+        '#name' => 'calculate_button',
+        '#prefix' => $tsw,
+        '#suffix' => $result,
+      );
+
+      //Accept average hours button
+      $form['group_calculator']['accept'] = array(
+        '#type' => 'button',
+        '#value' => 'Accept Calculated Result',
+        '#ajax' => array(
+          'callback' => 'location_accept_calculated_result_ajax_handler',
+          'method' => 'change',
+          'event' => 'click',
+        ),
+        '#weight' => 19,
+        '#group' => 'group_calculator',
+        '#name' => 'calculate_button',
+        '#attributes' => ['style'=>'display:none;' ],
+        //'#suffix' => '<h4 class="calc_heading">'. t('Or update your own values below:') .'</h4>',
+      );
+      //@vm
+
+    }
+
+    if ($form_id == 'node_family_member_by_agency_admin_form')
+    {
+        $queryyy = $_GET;
+        $new = $queryyy['new'];
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+        $existing = $queryyy['existing'];
+
+        if (isset($new))
+        {
+            $form['field_choose_family']['#type'] = 'hidden';
+            $form['field_regional_reference']['widget']['#default_value'] = $refrnceid;
+            $form['field_agency']['widget']['#default_value'] = $agencyid;
+            $form['field_regional_reference']['widget']['#attributes']['disabled'] = 'disabled';
+            $form['field_agency']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+
+        if (isset($existing))
+        {
+            $form['field_first_text']['widget'][0]['markup']['#text'] = '<p class="markup-header"><b>Add User to Existing Family</b></p>';
+            $form['field_second_text']['widget'][0]['markup']['#text'] = '<p class="markup-header"><b>New Family Member</b></p>';
+            $form['field_regional_reference']['#type'] = 'hidden';
+            $form['field_agency']['#type'] = 'hidden';
+            $form['field_family_first_name']['#type'] = 'hidden';
+            $form['field_family_first_name']['widget'][0]['value']['#default_value'] = 'exixting';
+
+        }
+
+        $form['actions']['submit']['#submit'][] = 'user_create_for_family_submit';
+    }
+
+    if ($form_id == 'node_classroom_form' || $form_id == 'node_classroom_edit_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+        $location = $user->get('field_user_location_reference')
+            ->getValue();
+        $locationid = $location[0]['target_id'];
+        if (isset($_REQUEST['rid']))
+        {
+            $form['field_regional_reference']['widget']['#default_value'] = $refrnceid;
+            $form['field_agency']['widget']['#default_value'] = $agencyid;
+            $form['field_location_reference']['widget']['#default_value'] = $locationid;
+        }
+        if (!in_array('superadministrator', $roles))
+        {
+            $form['field_regional_reference']['widget']['#attributes']['disabled'] = 'disabled';
+            $form['field_agency']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+        if (in_array('school_manager', $roles) && !in_array('superadministrator', $roles))
+        {
+            $form['field_location_reference']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+    }
+
+    if ($form_id == 'node_family_group_form' || $form_id == 'node_family_group_edit_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+        if (!in_array('superadministrator', $roles))
+        {
+            $form['field_regional_reference']['widget']['#default_value'] = $refrnceid;
+            $form['field_agency']['widget']['#default_value'] = $agencyid;
+            $form['field_regional_reference']['widget']['#attributes']['disabled'] = 'disabled';
+            $form['field_agency']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+    }
+
+    if ($form_id == 'node_agency_form' || $form_id == 'node_agency_edit_form')
+    {
+        $form['field_fun']['widget']['actions']['ief_add']['#value'] = t('Add New');
+        $form['field_community_']['widget']['actions']['ief_add']['#value'] = t('Add New Activity');
+        $form['field_fun']['widget']['actions']['ief_add_existing']['#value'] = t('add existing');
+        $form['title']['widget'][0]['value']['#default_value'] = 'title';
+        $form['title']['#type'] = 'hidden';
+        $form['actions']['submit']['#submit'][] = 'agency_title_action';
+        //Agency Annual Goal Disable...it will update according to location goal.
+        //$form['field_total_number_of_hours_requ']['widget'][0]['value']['#attributes']['disabled'] = 'disabled';
+
+        //@vm
+        //$budget = $form['field_agency_budget']['widget'][0]['value']['#default_value'];
+        //$budget = $budget?$budget:0;
+        //$budget = Markup::create('<p><b>Agency Budget: </b>'. $budget . '</p>');
+
+        //$hr = $form['field_hourly_rate_i_e_16_95']['widget'][0]['value']['#default_value'];
+        //$hr = $hr?$hr:0;
+        //$hr = Markup::create('<p><b>Hourly Rate: $</b>'. $hr .'</p>');
+        $form['field_total_student']['widget'][0]['value']['#prefix'] = $budget . $hr;
+
+        $total_student = \Drupal::service('custom_module.storage')->getAgencyTotalStudent($agencyid, 'agency');
+
+        if(empty($form['field_total_student']['widget'][0]['value']['#default_value']))
+          $form['field_total_student']['widget'][0]['value']['#default_value'] = $total_student;
+
+        $ts = Markup::create('<span class="agency-total-student">'.t('Total number of students currently enrolled in our system at this agency: '). $total_student.'</span>');
+        $form['field_total_student']['widget'][0]['value']['#suffix'] = $ts;
+
+        // $agency = Node::load($agencyid);
+        // $school_start_date = $agency->get('field_date')->value;
+        // $school_end_date = $agency->get('field_date')->end_value;
+        // $total_school_week = \Drupal::service('custom_module.storage')->getSchoolTotalWeeks($school_start_date, $school_end_date);
+        // $tsw = Markup::create('<p><strong>'. t('Number of School Weeks: ') .'</strong><span id="total_school_week">'. $total_school_week .'</span></p>');
+        // $form['total_week'] = array(
+        //   '#type' => 'hidden',
+        //   '#value' => $total_school_week,
+        // );
+
+      // $form['group_calculator']['calculate_button'] = array(
+      //   '#type' => 'button',
+      //   '#value' => 'Calculate',
+      //   '#ajax' => array(
+      //     'callback' => 'agency_calculator_ajax_handler',
+      //     //'wrapper' => 'calc_result',
+      //     'method' => 'replace',
+      //     'event' => 'click',
+      //   ),
+      //   '#weight' => 8,
+      //   '#group' => 'group_calculator',
+      //   '#name' => 'calculate_button',
+      //   '#prefix' => $tsw,
+      //   '#suffix' => '<div id="calc_result"><h3>'. t('Results') .'</h3></div>',
+      // );
+
+      //$form['field_average_hour_week']['widget'][0]['value']['#prefix'] = '<div id="calc_result"><h1>Results</h1></div>';
+
+
+      //$form['field_average_hour_week']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+      //$form['field_agency_obligation']['widget'][0]['value']['#prefix'] = t('Or update your own values below:');
+
+      //Accept average hours button
+      // $form['group_calculator']['accept'] = array(
+      //   '#type' => 'button',
+      //   '#value' => 'Accept Calculated Result',
+      //   '#ajax' => array(
+      //     'callback' => 'agency_accept_calculated_result_ajax_handler',
+      //     'method' => 'change',
+      //     'event' => 'click',
+      //   ),
+      //   '#weight' => 8,
+      //   '#group' => 'group_calculator',
+      //   '#name' => 'calculate_button',
+      //   '#attributes' => ['style'=>'display:none;' ],
+
+      // );
+      //$form['field_average_hour_week']['#weight'] = 29;
+      //@vm
+
+    }
+
+    if ($form_id == 'node_student_form' || $form_id == 'node_student_edit_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+        $location = $user->get('field_user_location_reference')
+            ->getValue();
+        $locationid = $location[0]['target_id'];
+        $classroom = $user->get('field_classroom_reference')
+            ->getValue();
+        $classroomnid = $classroom[0]['target_id'];
+        $family = $user->get('field_family_reference')
+            ->getValue() [0]['target_id'];
+        $family_nid = node_load($family);
+
+        if ($form_id == 'node_student_form'){
+
+            $form['field_regional_reference']['widget']['#default_value'] = $refrnceid;
+            $form['field_agency']['widget']['#default_value'] = $agencyid;
+            if ($roles[1] == 'school_manager'){
+               //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+            $location = $user->get('field_user_location_reference')
+                ->getValue();
+            if (isset($location)){
+                $optArr1r[''] = 'Show All';
+                foreach ($location as $key => $value)
+                {
+                    $nid = $value['target_id'];
+                    $node = node_load($nid);
+                    $title = $node->get('title')->value;
+                    $nid = $node->get('nid')->value;
+                    $optArr1r[$nid] = $title;
+                }
+                $form['field_location_reference']['widget']['#options'] = $optArr1r;
+                $form['field_location_reference']['widget']['#default_value'] = $locationid;
+                // $form['field_location_reference']['widget']['#attributes']['disabled'] = 'disabled';
+              }
+            }
+
+            if (isset($family_nid)){
+                $form['field_family_reference']['widget'][0]['target_id']['#default_value'] = $family_nid;
+                //$form['field_location_reference']['widget']['#default_value'] = $locationid;
+                //$form['field_classroom_reference']['widget']['#default_value'] = $classroomnid;
+            }
+        }
+
+        if (!in_array('superadministrator', $roles) || !in_array('administrator', $roles)){
+            $form['field_regional_reference']['widget']['#attributes']['disabled'] = 'disabled';
+            $form['field_agency']['widget']['#attributes']['disabled'] = 'disabled';
+        }
+
+
+        $query = db_query("SELECT node__field_fun.delta AS node__field_fun_delta, node__field_fun.langcode AS node__field_fun_langcode, node__field_fun.bundle AS node__field_fun_bundle, node__field_fun.field_fun_target_id AS node__field_fun_field_fun_target_id, node_field_data.nid AS nid, node_field_data_node__field_fun.nid AS node_field_data_node__field_fun_nid FROM
+       {node_field_data} node_field_data LEFT JOIN {node__field_fun} node__field_fun ON node_field_data.nid = node__field_fun.entity_id AND node__field_fun.deleted = '0'
+     LEFT JOIN {node_field_data} node_field_data_node__field_fun ON node__field_fun.field_fun_target_id = node_field_data_node__field_fun.nid
+     WHERE ((node_field_data.nid = $agencyid )) AND ((node_field_data.type IN ('agency')) AND (node_field_data_node__field_fun.status = '1'))")->fetchAll();
+        $arrayval = [];
+        foreach ($query as $key => $csvDataRow)
+        {
+            $vall1 = $csvDataRow->node__field_fun_field_fun_target_id;
+            $val_node = node_load($vall1);
+            $title = $val_node->get('title')->value;
+            $arrayval[$vall1] = $title;
+        }
+        $form['field_funded_by']['widget']['#options'] = $arrayval;
+
+    }
+
+    if ($form_id == 'node_in_kind_donation_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $uid = $user->id();
+        $userfirstname = $user->get('field_adult_first_name')->value;
+        $userlastname = $user->get('field_adult_last_name')->value;
+        $roles = $user->getRoles();
+        $cmr = $user->get('field_community_partner_rate')
+            ->getvalue();
+        $hourlyrate = $cmr[0]['value'];
+        $form['field_date_of_signature']['#type'] = 'hidden';
+        $form['field_which_type_of_in_kind_dona']['#empty_option'] = t('Select A Form');
+
+        if( in_array('teacher', $roles) || in_array('community_partner', $roles) || in_array('school_manager', $roles) || in_array('family_member', $roles) ){
+
+               $optionchange['_none'] = 'Select A Form';
+                //$q = json_decode(drupal_render(views_embed_view('in_kind_donation_option_change', 'data_export_1')));
+               $in_kind_donation_option_change = views_embed_view('in_kind_donation_option_change', 'data_export_1');
+               $q = json_decode(\Drupal::service('renderer')->render($in_kind_donation_option_change));
+                foreach ($q as $key => $csvDataRow)
+                {
+                    $fieldArray = (array)$csvDataRow;
+                    $key = $fieldArray['name'];
+                    $nid = $fieldArray['tid'];
+                    $fieldval1 = html_entity_decode($key, ENT_QUOTES);
+                    //$fieldval1 = $key . ' ('.$nid.')';
+                    $optionchange[$nid] = $fieldval1;
+
+                }
+
+             $form['field_which_type_of_in_kind_dona']['widget']['#options'] = $optionchange;
+        }
+
+       // community partner activity option------------------------------------------------
+        $optArrrr = [];
+        //$q = json_decode(drupal_render(views_embed_view('agency_based_goals', 'data_export_1')));
+        $agency_based_goals = views_embed_view('agency_based_goals', 'data_export_1');
+        $q = json_decode(\Drupal::service('renderer')->render( $agency_based_goals ) );
+        foreach ($q as $key => $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['name'];
+            $nid = $fieldArray['tid'];
+            $fieldval1 = $key . ' ('.$nid.')';
+            $optArrrr[$fieldval1] = $key;
+
+        }
+        $array1 = $form['field_community_partner_activity']['widget']['#options'];
+       $newopt = array_intersect($array1, $optArrrr);
+       $form['field_community_partner_activity']['widget']['#options'] = $newopt;
+        //-------------------------------------------------------------------------------------
+        if (in_array('administrator', $roles))
+        {
+            $form['field_for_student']['widget'][0]['target_id']['#attributes'] = array(
+                'enabled' => 'enabled'
+            );
+        }
+        if ($uid == '93' || $uid == '95')
+        {
+            $form['field_for_student']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+        }
+            $query = $_GET;
+            $id = isset($query['id'])?$query['id']:'';
+            $fid = isset($query['fid'])?$query['fid']:'';
+            if(empty($fid) && $fid != 'community_partner'){
+                $form['field_community_par']['#type'] = 'hidden';
+            }
+
+        if (isset($_REQUEST['id']))
+        {
+            $min = $query['min'];
+            $node = node_load($id);
+            $refrence = $node->get('field_regional_reference')
+                ->getValue();
+            $refrnceid = $refrence[0]['target_id'];
+            $refrencenid = node_load($refrnceid);
+            $agnecy = $node->get('field_agency')
+                ->getValue();
+            $agnecyid = $agnecy[0]['target_id'];
+            $agenecynid = node_load($agnecyid);
+            $family = $node->get('field_family_reference')
+                ->getValue();
+            $classroom = $node->get('field_classroom_reference')
+                ->getValue();
+            $classrefrence = $classroom[0]['target_id'];
+            $classroomnid = node_load($classrefrence);
+            $location = $node->get('field_location_reference')
+                ->getValue();
+            $locationrefrence = $location[0]['target_id'];
+            $locationnid = node_load($locationrefrence);
+
+            //@vm0209bug: old code bug....
+            // $query = \Drupal::database()->select('node_field_data', 'nfd');
+            // $query->addField('nfd', 'uid');
+            // $query->condition('nfd.nid', $id);
+            // $query->condition('nfd.type', 'student');
+            // $result = $query->execute()
+            //     ->fetchField();
+            // $user = \Drupal\user\Entity\User::load($result);
+            // $firstname = $user->get('field_adult_first_name')->value;
+            // $lastname = $user->get('field_adult_last_name')->value;
+            //@vm0209bug
+
+            $node1 = node_load($id);
+            $goal = $node1->get('field_readiness_goals')
+                ->getValue();
+            foreach ($goal as $key => $value)
+            {
+                $tid = $value['target_id'];
+                $db = \Drupal::database();
+                $query = $db->select('node__field_readiness_goals', 'n');
+                $query->fields('n', ['entity_id']);
+                $nodeId = $query->condition('n.field_readiness_goals_target_id', $tid)->condition('n.bundle', 'activity')
+                    ->execute()
+                    ->fetchAll();
+                $valArr['_none'] = 'Select a Value';
+                foreach ($nodeId as $key => $value)
+                {
+                    $nid = node_load($value->entity_id);
+                    $title = $nid->get('title')->value;
+                    $valArr[$value->entity_id] = $title;
+                }
+            }
+            $secondss = $form['field_hour']['widget'][0]['seconds']['#value'];
+            $hour_minute = $time / 60;
+            $agency = $user->get('field_agency_reference')
+                ->getValue();
+            $agencyid = $agency[0]['target_id'];
+            $agencyi_load = node_load($agencyid);
+            if (isset($agencyi_load))
+            {
+                $com_rate = $agencyi_load->get('field_hourly_rate_i_e_16_95')->getValue() [0]['value'];
+            }
+
+            $form['field_hourly_rate']['widget'][0]['value']['#default_value'] = isset($com_rate)?$com_rate:'';
+            $form['field_activity_type']['widget']['#options'] = $valArr;
+            $form['field_minutes']['widget'][0]['value']['#default_value'] = $hour_minute;
+            $form['field_for_student']['widget'][0]['target_id']['#default_value'] = $node;
+            $form['field_agency']['widget'][0]['target_id']['#default_value'] = $agenecynid;
+            $form['field_regional_reference']['widget'][0]['target_id']['#default_value'] = $refrencenid;
+            $form['field_school_reference']['widget'][0]['target_id']['#default_value'] = $schoolnode;
+            $form['field_classroom_reference']['widget'][0]['target_id']['#default_value'] = $classroomnid;
+            $form['field_location_reference']['widget'][0]['target_id']['#default_value'] = $locationnid;
+            $form['field_regional_reference']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            //Student field disable for teacher, school-manager & parent.
+            if( in_array('teacher', $roles) || in_array('school_manager', $roles) || in_array('family_member', $roles)  ){
+                $form['field_for_student']['widget'][0]['target_id']['#attributes'] = array(
+                    'disabled' => 'disabled'
+                );
+            }
+
+        }
+        $form["field_date_of_activity"]["widget"][0]['value']['#attributes']['data-drupal-date-format'] = ['m/d/Y'];
+        $form["field_date_of_activity"]["widget"][0]['value']['#date_date_format'] = 'm/d/Y';
+        $form["field_date_of_activity"]["widget"][0]['value']['#date_date_element'] = 'text';
+        $form["field_date_of_activity"]["widget"][0]['value']['#attributes']['title'] = t('Enter a valid date - e.g. @format', ['@format' => (new \DateTime())->format('m/d/Y') , ]);
+        if (!empty($hourlyrate))
+        {
+            $form['field_hourly_rate']['widget'][0]['value']['#default_value'] = $hourlyrate;
+        }
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+
+        $regionrefrence = $user->get('field_user_regional_reference')
+            ->getValue();
+        $refrnceid = $regionrefrence[0]['target_id'];
+
+        $form['field_agency']['widget'][0]['target_id']['#default_value'] = node_load($agencyid);
+        $form['field_regional_reference']['widget'][0]['target_id']['#default_value'] = node_load($refrnceid);
+        $form['field_regional_reference']['widget'][0]['target_id']['#attributes'] = array(
+            'disabled' => 'disabled'
+        );
+        $form['field_agency']['widget'][0]['target_id']['#attributes'] = array(
+            'disabled' => 'disabled'
+        );
+
+        $form['field_hourly_rate']['widget'][0]['value']['#default_value'] = $com_rate;
+        $form['field_user_first_name']['widget'][0]['value']['#default_value'] = $userfirstname;
+        $form['field_user_last_name']['widget'][0]['value']['#default_value'] = $userlastname;
+        $form['field_minutes']['#type'] = 'hidden';
+        $form['field_decimal_hoiur']['#type'] = 'hidden';
+        $form['actions']['submit']['#submit'][] = 'in_kind_donation_submit';
+
+    }
+    if ($form_id == 'node_in_kind_donation_form')
+    {
+        $form['actions']['submit']['#submit'][] = 'pending_default_value';
+
+        //@vm0209inkd
+        //$form['#validate'][] = '_field_community_partner_activity_validate';
+        //if( count(array_intersect($roles, ['family_member', 'community_partner','school_manager','agency_manager', 'agency_administrator', 'administrator'])) > 0 ){
+        $form['field_for_student']['widget'][0]['target_id']['#ajax'] = [
+            'callback' => 'custom_module_student_grant_ajax_handler',
+            'event' => 'autocompleteclose',
+            ];
+
+        if (in_array('superadministrator', $roles) || in_array('administrator', $roles) ){
+            $form['field_which_type_of_in_kind_dona']['widget']['#ajax'] = [
+                'callback' => 'custom_module_cpactivity_other_ajax_handler',
+                'event' => 'change',
+            ];
+        }
+
+        if (!in_array('superadministrator', $roles) || !in_array('administrator', $roles) ){
+            $form['field_funded_by']['widget'][0]['target_id']['#attributes'] = array(
+                'readonly' => 'readonly'
+            );
+        }
+        if(isset($node) && $node->bundle() == 'student'){
+            $form['field_funded_by']['widget'][0]['target_id']['#default_value'] = node_load($node->get('field_funded_by')->getValue()[0]['target_id']);
+            if(!in_array('family_member', $roles) ){
+                $form['field_funded_by']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+                );
+            }
+        }//@end-vm0209
+
+    }
+
+    if($form_id == 'node_in_kind_donation_edit_form'){
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        if($roles[1] == 'family_member'){
+            $form['field_community_par']['#type'] = 'hidden';
+         }
+
+
+        $form['actions']['submit']['#submit'][] = 'resubmit_by_parents';
+
+    }
+
+    if ($form_id == 'node_in_kind_donation_edit_form')
+    {
+        //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $nodetest = $form_state->getFormObject()
+            ->getEntity();
+        $date = $nodetest->get('created')
+            ->getValue() [0]['value'];
+        date_default_timezone_set('Asia/Kolkata');
+        $time = date('F j, Y - H:i', $date);
+        $activityval = $nodetest->get('field_activity_type')
+            ->getString();
+        $finalval = $nodetest->get('field_for_student')
+            ->getString();
+        $sql = db_select('node__field_readiness_goals', 'i')->fields('i', ['field_readiness_goals_target_id'])
+            ->condition('i.entity_id', $finalval, '=')->condition('i.bundle', 'student')
+            ->execute()
+            ->fetchCol();
+        foreach ($sql as $value)
+        {
+            $db = \Drupal::database();
+            $query = $db->select('node__field_readiness_goals', 'n');
+            $query->fields('n', ['entity_id']);
+            $nodeId = $query->condition('n.field_readiness_goals_target_id', $value)->condition('n.bundle', 'activity')
+                ->execute()
+                ->fetchAll();
+            $valArr['_none'] = 'select';
+            foreach ($nodeId as $key => $value)
+            {
+                $nid = node_load($value->entity_id);
+                $title = $nid->get('title')->value;
+                $valArr[$value->entity_id] = $title;
+            }
+        }
+        $form['field_date_of_signature']['widget'][0]['markup']['#text'] = $time;
+        $form['field_date_of_signature']['widget'][0]['#default_value'] = 'asfs';
+        // dsm($nodetest->get('field_date_of_signature')->getValue());
+        if (!in_array('superadministrator', $roles))
+        {
+            $form['field_regional_reference']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            $form['field_agency']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+            $form['field_funded_by']['widget'][0]['target_id']['#attributes'] = array(
+                'disabled' => 'disabled'
+            );
+        }
+        $form['field_activity_type']['widget']['#options'] = $valArr;
+        $form['field_activity_type']['widget']['#default_value'] = $activityval;
+        $form['field_minutes']['#type'] = 'hidden';
+        $form['field_decimal_hoiur']['#type'] = 'hidden';
+        // if(in_array('family_member', $roles) && !in_array('administrator', $roles)){
+        //  $form['actions']['submit']['#submit'][] = 'in_kind_donation_revision_submit';
+        // }
+
+    }
+
+    /**
+     * Filter Value of Student Grants (Funded-by field)
+     * Student bulk update operation
+     * @vm0209
+     **/
+    if($form_id == 'views_bulk_operations_configure_action'){
+        $storage = $form_state->getStorage();
+        if( ($storage['views_bulk_operations']['view_id'] == 'all_students' && ($storage['views_bulk_operations']['display_id'] == 'page_6' || $storage['views_bulk_operations']['display_id'] == 'page_7')) || ($storage['views_bulk_operations']['view_id'] == 'view_bulk_opration_for_hourly_rate' && $storage['views_bulk_operations']['display_id'] == 'page_3')  ){
+            //dpm($storage['views_bulk_operations']['list']);
+            $list = $storage['views_bulk_operations']['list'];
+            foreach ($list as $key => $student) break;
+            //$student[0] = 9488 (nid)
+            $agency_grants = $form['node']['student']['field_funded_by']['widget']['#options'];
+            //$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+            $grants = node_load($student[0])->get('field_agency')->entity->get('field_fun')->getValue();
+            foreach($grants as $key => $value){
+                $gids[$value['target_id']] = $value['target_id'];
+            }
+            $form['node']['student']['field_funded_by']['widget']['#options'] = array_intersect_key($agency_grants, array_flip($gids) );
+        }
+    }//@end-vm0209
+}
+//@end of hook_form_alter.
+
+
+/**
+ * Validates submission values in the FORM_ID() form.
+ * @vm0209
+ */
+/*
+function _field_community_partner_activity_validate(array &$form, FormStateInterface $form_state) {
+  $type = $form_state->getValue('field_which_type_of_in_kind_dona');
+
+    $type = (count($type) == 1 ? $type[0]['target_id'] : FALSE);
+    if($type && $type == 11){ //11=Community partner Visit
+        $cp_activity = $form_state->getValue('field_community_partner_activity');
+        $cp_activity = (count($cp_activity) > 0 ? TRUE : FALSE);
+
+        if(!$cp_activity){
+            $form_state->setErrorByName('field_community_partner_activity', t('The Community Partner Activity field is required!'));
+            return false;
+        }
+    }
+}
+*/
+
+
+
+/**
+ * @param $form
+ * @param $form_state
+ * @return AjaxResponse
+ */
+function grant_calculator_ajax_handler(&$form, $form_state){
+    $response = new AjaxResponse();
+  $budget = $form_state->getValue('field_agency_budget') [0]['value'];
+  $budget = (($budget) > 0 ? $budget : 0);
+
+  $hour_rate = $form_state->getValue('field_current_year_hourly_rate') [0]['value'];
+  $hour_rate = (($hour_rate) > 0 ? $hour_rate : 0);
+
+  $total_student = $form_state->getValue('field_total_student')[0]['value'];
+  $total_student = (($total_student) > 0 ? $total_student : 0);
+
+  $total_week = $form_state->getValue('total_week');
+  $total_week = (($total_week) > 0 ? $total_week : 0);
+
+  if($total_week == 0){
+    $school_start_date = $form_state->getValue('field_project_period_start_date')[0]['value'];
+    $school_end_date = $form_state->getValue('field_project_period_start_date')[0]['end_value'];
+    $total_week = \Drupal::service('custom_module.storage')->getSchoolTotalWeeks($school_start_date, $school_end_date);
+    $response->addCommand(new HtmlCommand('#total_school_week', Markup::create($total_week)));
+  }
+
+  $share_obligation = $budget * (0.25); // 25% of budget.
+  $agency_goal = $share_obligation / $hour_rate; // share obligation divide by hourly rate.
+  $average_hour = $agency_goal / ($total_student * $total_week);//agency goal divide by (total student x total week)
+
+
+  $output = '<p id="result1"> <h3>'. t('Results').'</h3><h4>'. t('Grant Obligation: ') .'💲'. floor($share_obligation) .'</h4>';
+  $output .= '<span class="calcregulartext">'. t('This is how much in-kind the grant must generate annually.') .'</span></p>';
+  $output .= '<p id="result2"> <h4>'. t('Grant Annual Goal: ').' ⌛'. floor($agency_goal) . t(' hours') .'</h4>';
+  $output .= '<span class="calcregulartext">'. t('This is the number of in-kind hours it will take to meet the grant obligation.') .'</span></p>';
+
+  $output .= '<p id="result3"> <h4>'. t('Average Hours per Week: ') .' 🕒 <span id="average_hour">'. floor($average_hour) .' </span> '. t('hours') .'</h4>';
+  $output .= '<p><span class="calcregulartext">'. t('This is the number of hours needed per student per week in order to meet the grant obligation.') .'</span></p>';
+
+  // In this case, we alter the color of the description.
+  $response->addCommand(new InvokeCommand('#edit-accept', 'css', array('display', 'block')));
+
+  $output = Markup::create($output);
+
+  $selector = '#calc_result';
+  $response->addCommand(new HtmlCommand($selector, $output));
+
+  return $response;
+
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * @return AjaxResponse
+ */
+function grant_accept_calculated_result_ajax_handler(&$form, $form_state){
+  $budget = $form_state->getValue('field_agency_budget') [0]['value'];
+  $budget = (($budget) > 0 ? $budget : 0);
+
+  $hour_rate = $form_state->getValue('field_current_year_hourly_rate') [0]['value'];
+  $hour_rate = (($hour_rate) > 0 ? $hour_rate : 0);
+
+  $total_student = $form_state->getValue('field_total_student')[0]['value'];
+  $total_student = (($total_student) > 0 ? $total_student : 0);
+
+  $total_week = $form_state->getValue('total_week');
+  $total_week = (($total_week) > 0 ? $total_week : 0);
+
+  $share_obligation = $budget * (0.25); // 25% of budget.
+  $agency_goal = $share_obligation / $hour_rate; // share obligation divide by hourly rate.
+  $average_hour = $agency_goal / ($total_student * $total_week);//agency goal divide by (total student x total week)
+  $response = new AjaxResponse();
+
+  //Average Hours
+  $response->addCommand(new InvokeCommand('#edit-field-average-hour-week-0-value', 'val', [floor($average_hour)]));
+  //Agency Annual Goal
+  $response->addCommand(new InvokeCommand('#edit-field-current-year-hourly-goal-0-value', 'val', [floor($agency_goal)]));
+  //Agency Obligation
+  $response->addCommand(new InvokeCommand('#edit-field-current-year-monetary-amt-0-value', 'val', [floor($share_obligation)]));
+
+  return $response;
+}
+
+
+
+
+/**
+ * @param $form
+ * @param $form_state
+ * @return AjaxResponse
+ */
+function location_calculator_ajax_handler(&$form, $form_state){
+  $total_student = $form_state->getValue('field_number_of_slots_to_track_a')[0]['value'];
+  $total_student = (($total_student) > 0 ? $total_student : 0);
+
+  $total_week = $form_state->getValue('total_week');
+  $total_week = (($total_week) > 0 ? $total_week : 0);
+
+  $average_hour_week = $form_state->getValue('average_hour_week');
+  $average_hour_week = (($average_hour_week) > 0 ? $average_hour_week : 0);
+
+  $location_goal = $average_hour_week * $total_student * $total_week;
+
+  $output = '<p id="result1"> <h3>'. t('Results') .'</h3><h4>'. t('Location Annual Goal: ') . floor($location_goal) .t(' hours').'</h4>';
+  $output .= '<span class="calcregulartext">'. t('Location-specific hours, in order to reach location goal.') .'</span></p>';
+
+  //Location Goal = location annual goal x agency hourly rate.
+  $agency_id = $form_state->getValue('field_agency');
+  $agency_id = (count($agency_id) > 0 ? $agency_id[0]['target_id'] : FALSE);
+  $agency_hourly_rate = 0;
+  if($agency_id){
+    $agency_hourly_rate = Node::load($agency_id)->get('field_hourly_rate_i_e_16_95')->getValue();
+    $agency_hourly_rate = (count($agency_hourly_rate) > 0 ? $agency_hourly_rate[0]['value'] : FALSE);
+  }
+  $location_goal_amount = $location_goal * $agency_hourly_rate;
+  $output .= '<p id="result2"> <h4>'. t('Location Annual Goal: ').'💲'. floor($location_goal_amount) .'</h4>';
+  $output .= '<span class="calcregulartext">'. t('Location-specific goal amount.') .'</span></p>';
+
+  $response = new AjaxResponse();
+  $selector = '#calc_result';
+  $response->addCommand(new HtmlCommand($selector, $output));
+
+  //Location annual goal
+  $method = 'val';
+  $selector = '#field_average_hours_expected';
+  $response->addCommand(new InvokeCommand($selector, $method, [$location_goal]));
+
+  // In this case, we alter the color of the description.
+  $response->addCommand(new InvokeCommand('#edit-accept', 'css', array('display', 'block')));
+
+
+
+  return $response;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * @return AjaxResponse
+ */
+function location_accept_calculated_result_ajax_handler(&$form, $form_state){
+  $total_student = $form_state->getValue('field_number_of_slots_to_track_a')[0]['value'];
+  $total_student = (($total_student) > 0 ? $total_student : 0);
+
+  $total_week = $form_state->getValue('total_week');
+  $total_week = (($total_week) > 0 ? $total_week : 0);
+
+  $average_hour_week = $form_state->getValue('average_hour_week');
+  $average_hour_week = (($average_hour_week) > 0 ? $average_hour_week : 0);
+
+  $location_goal = $average_hour_week * $total_student * $total_week;
+  $response = new AjaxResponse();
+
+  //Location annual goal hours
+  $response->addCommand(new InvokeCommand('#edit-field-average-hours-expected-0-value', 'val', [floor($location_goal)]));
+
+  //Location Goal = location annual goal x agency hourly rate.
+  $agency_id = $form_state->getValue('field_agency');
+  $agency_id = (count($agency_id) > 0 ? $agency_id[0]['target_id'] : FALSE);
+  $agency_hourly_rate = 0;
+  if($agency_id){
+    $agency_hourly_rate = Node::load($agency_id)->get('field_hourly_rate_i_e_16_95')->getValue();
+    $agency_hourly_rate = (count($agency_hourly_rate) > 0 ? $agency_hourly_rate[0]['value'] : FALSE);
+  }
+  $location_goal_amount = $location_goal * $agency_hourly_rate;
+  //Location annual goal amount
+  $response->addCommand(new InvokeCommand('#edit-field-location-goal-0-value', 'val', [floor($location_goal_amount)]));
+
+  return $response;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * @return AjaxResponse
+ */
+function agency_accept_calculated_result_ajax_handler(&$form, $form_state){
+  $budget = $form_state->getValue('field_agency_budget') [0]['value'];
+  $budget = (($budget) > 0 ? $budget : 0);
+
+  $hour_rate = $form_state->getValue('field_hourly_rate_i_e_16_95') [0]['value'];
+  $hour_rate = (($hour_rate) > 0 ? $hour_rate : 0);
+
+  $total_student = $form_state->getValue('field_total_student')[0]['value'];
+  $total_student = (($total_student) > 0 ? $total_student : 0);
+
+  $total_week = $form_state->getValue('total_week');
+  $total_week = (($total_week) > 0 ? $total_week : 0);
+
+  $share_obligation = $budget * (0.25); // 25% of budget.
+  $agency_goal = $share_obligation / $hour_rate; // share obligation divide by hourly rate.
+  $average_hour = $agency_goal / ($total_student * $total_week);//agency goal divide by (total student x total week)
+  $response = new AjaxResponse();
+
+  //Average Hours
+  $response->addCommand(new InvokeCommand('#edit-field-average-hour-week-0-value', 'val', [floor($average_hour)]));
+  //Agency Annual Goal
+  $response->addCommand(new InvokeCommand('#edit-field-total-number-of-hours-requ-0-value', 'val', [floor($agency_goal)]));
+  //Agency Obligation
+  $response->addCommand(new InvokeCommand('#edit-field-agency-obligation-0-value', 'val', [floor($share_obligation)]));
+
+  return $response;
+}
+
+
+//@vm
+/**
+ * @param $form
+ * @param $form_state
+ * @return AjaxResponse
+ * @author @vm
+ */
+function agency_calculator_ajax_handler(&$form, $form_state){
+  $budget = $form_state->getValue('field_agency_budget') [0]['value'];
+  $budget = (($budget) > 0 ? $budget : 0);
+
+  $hour_rate = $form_state->getValue('field_hourly_rate_i_e_16_95') [0]['value'];
+  $hour_rate = (($hour_rate) > 0 ? $hour_rate : 0);
+
+  $total_student = $form_state->getValue('field_total_student')[0]['value'];
+  $total_student = (($total_student) > 0 ? $total_student : 0);
+
+  $total_week = $form_state->getValue('total_week');
+  $total_week = (($total_week) > 0 ? $total_week : 0);
+
+  $share_obligation = $budget * (0.25); // 25% of budget.
+  $agency_goal = $share_obligation / $hour_rate; // share obligation divide by hourly rate.
+  $average_hour = $agency_goal / ($total_student * $total_week);//agency goal divide by (total student x total week)
+  $response = new AjaxResponse();
+
+  $output = '<p id="result1"> <h3>'. t('Results').'</h3><h4>'. t('Agency Obligation: ') .'💲'. floor($share_obligation) .'</h4>';
+  $output .= '<span class="calcregulartext">'. t('This is how much in-kind the agency must generate annually.') .'</span></p>';
+  $output .= '<p id="result2"> <h4>'. t('Agency Annual Goal: ').' ⌛'. floor($agency_goal) . t(' hours') .'</h4>';
+  $output .= '<span class="calcregulartext">'. t('This is the number of in-kind hours it will take to meet the agency obligation.') .'</span></p>';
+
+  $output .= '<p id="result3"> <h4>'. t('Average Hours per Week: ') .' 🕒 <span id="average_hour">'. floor($average_hour) .' </span> '. t('hours') .'</h4>';
+  $output .= '<p><span class="calcregulartext">'. t('This is the number of hours needed per student per week in order to meet the agency obligation.') .'</span></p>';
+  //$output .= '<p><button id="accept-avg-hrs" type="button" class="btn btn-success">Accept Average Hours</button></p>';
+
+  // In this case, we alter the color of the description.
+  $response->addCommand(new InvokeCommand('#edit-accept', 'css', array('display', 'block')));
+
+  $output = Markup::create($output);
+
+  $selector = '#calc_result';
+  $response->addCommand(new HtmlCommand($selector, $output));
+
+  //Average Hours
+//  $arguments = [floor($average_hour)];
+//  $method = 'val';
+//  $selector = '#avg_hours';
+//  $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+
+  return $response;
+
+}
+
+/**
+ * @param array $form
+ * @param FormStateInterface $form_state
+ * @throws Entity\EntityStorageException
+ * @author @vm
+ */
+function update_agency_total_annual_goal_submit(array & $form, FormStateInterface & $form_state) {
+  $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  $agency = $user->get('field_agency_reference')->getValue();
+  $agency_id = $agency[0]['target_id'];
+
+  $agency_total_annual_goal = \Drupal::service('custom_module.storage')->getAgencyTotalAnnualGoal($agency_id);
+  //print_r($agency_total_annual_goal);exit('sdf');
+  $annual_goal = $share_obligation = $budget = $student = 0;
+  $average_hour_week = [];
+  foreach ($agency_total_annual_goal as $key => $row)
+    {
+        $annual_goal += $row->field_current_year_hourly_goal_value;
+        $share_obligation += $row->field_current_year_monetary_amt_value;
+        $budget += $row->field_agency_budget_value;
+        $average_hour_week[] = $row->field_average_hour_week_value;
+        $student += $row->field_total_student_value;
+    }
+
+    $average_hour_week = max($average_hour_week);
+
+  $agency_node = Node::load($agency_id);
+  //Annual Goal  = total of all funding source annual goals
+  $agency_node->set('field_total_number_of_hours_requ', $annual_goal);
+  //Share Obligation = total of all funding source federal obligation
+  $agency_node->set('field_agency_obligation', $share_obligation);
+  //Budget = total of all funnding source budeget
+  $agency_node->set('field_agency_budget', $budget);
+  //highets avg hours per week from all funding source
+  $agency_node->set('field_average_hour_week', $average_hour_week);
+  //total of all funding source students
+  $agency_node->set('field_total_student', $student);
+
+  $agency_node->save();
+
+  \Drupal::messenger()->addMessage('Agency obligation, goal & weekly hours has been update!');
+}
+
+/*
+ * @arg $form & $form_states
+ * Output: updating region according to agency.
+ */
+function custom_module_agency_field_update_ajax_handler($form, $form_state) {
+  $agency = Node::load($form_state->getValue('field_agency_reference') [0]['target_id']);
+
+  $region_id = $agency->get('field_regional_reference')->getValue();
+  $region_id = (count($region_id) == 1 ? $region_id[0]['target_id'] : FALSE);
+  if($region_id) {
+    $region = Node::load($region_id);
+    $region = $region->get('title')->value . ' (' . $region->id() . ')';
+  }else{
+    $region = NULL;
+  }
+  $arguments = [$region];
+  $response = new AjaxResponse();
+  $method = 'val';
+  $selector = '#edit-field-user-regional-reference-0-target-id';
+  $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+
+  return $response;
+}
+
+/**
+ * Implements Ajax custom callback function().
+ * field_which_type_of_in_kind_dona => Ajax handle
+ * Community Partner Visit  => Other option
+ * Pull Agency Hourly rate and put into
+ * edit-field-community-partner-activity-other
+ **/
+function custom_module_cpactivity_other_ajax_handler($form, $form_state) {
+    //pull agency hourly rate
+    $agency = node_load($form_state->getValue('field_agency') [0]['target_id']);
+    $arguments = [$agency->get('field_hourly_rate_i_e_16_95')->value];
+
+    $response = new AjaxResponse();
+    $method = 'val';
+    $selector = '#edit-field-community-partner-activity-other';
+    $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+    return $response;
+}
+
+/**
+* Implements Ajax custom callback function().
+* 3 fields value updating:- edit-field-funded-by-0-target-id,
+* field_current_year_hourly_rate, edit-field-community-partner-activity-other
+* @vm0209
+*/
+function custom_module_student_grant_ajax_handler($form, $form_state) {
+    $nid = $form_state->getValue('field_for_student')[0]['target_id'];
+    $node = \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+    $method = 'val';
+    $response = new AjaxResponse();
+    $field_funded_by = $node->get('field_funded_by')->getValue();
+    $field_funded_by = (count($field_funded_by) == 1 ? $field_funded_by[0]['target_id'] : FALSE);
+    if($field_funded_by){
+        $grant = Node::load($field_funded_by);
+        $grant_number = $grant->get('title')->value . ' ('.$grant->id().')';
+        $selector = '#edit-field-funded-by-0-target-id';
+        $arguments = [ $grant_number ];
+        $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+        $arguments = [ $grant->get('field_current_year_hourly_rate')->value ];
+        //\Drupal::logger('my_module')->error('hourly rate:'. $arguments);
+
+    }else{
+        $arguments = [NULL];
+        $selector = '#edit-field-funded-by-0-target-id';
+        $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+    }
+
+    //if(!empty($grant->get('field_current_year_hourly_rate')->value) ) {
+        //pull agency hourly rate
+        $agency = Node::load($node->get('field_agency')->getValue()[0]['target_id']);
+        $cp_arguments = [$agency->get('field_hourly_rate_i_e_16_95')->value];
+        $response->addCommand(new InvokeCommand('#edit-field-community-partner-activity-other', $method, $cp_arguments));
+
+        if (empty($arguments[0]) ) {
+            $arguments = $cp_arguments; //copy agency hourly rate.
+        }
+        //Get Grant/Agency Hourly Rate.
+        $selector = '#edit-field-hourly-rate-0-value';
+        $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+    //}
+
+    //Student Location field
+    $field_location = $node->get('field_location_reference')->getValue();
+    $field_location = (count($field_location) > 0 ? $field_location[0]['target_id'] : FALSE);
+    $location = '';
+    if($field_location){
+      $location = Node::load($field_location);
+      $location = $location->get('title')->value . ' ('.$location->id().')';
+    }
+    $selector = '#edit-field-location-reference-0-target-id';
+    $arguments = [ $location ];
+    $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+
+    //Student Classroom field
+    $field_classroom = $node->get('field_classroom_reference')->getValue();
+    $field_classroom = (count( $field_classroom ) > 0 ? $field_classroom[0]['target_id'] : FALSE);
+    $classroom = '';
+    if($field_classroom){
+      $classroom = Node::load($field_classroom);
+      $classroom = $classroom->get('title')->value . ' ('.$classroom->id().')';
+    }
+    $selector = '#edit-field-classroom-reference-0-target-id';
+    $arguments = [ $classroom ];
+    $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+
+    //Student Family field -1
+    $field_family = $node->get('field_family_reference')->getValue();
+    $field_family = (count($field_family) > 0 ? $field_family[0]['target_id'] : FALSE);
+    $family = '';
+    if($field_family){
+      $family = Node::load($field_family);
+      $family = $family->get('title')->value . ' ('.$family->id().')';
+    }
+    $selector = '#edit-field-family-reference-0-target-id';
+    $arguments = [ $family ];
+    $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+
+    //Student Family field -2
+    $field_family = (count($field_family) > 1 ? $field_family[1]['target_id'] : FALSE);
+    $family = '';
+    if($field_family){
+      $family = Node::load($field_family);
+      $family = $family->get('title')->value . ' ('.$family->id().')';
+    }
+    $selector = '#edit-field-family-reference-1-target-id';
+    $arguments = [ $family ];
+    $response->addCommand(new InvokeCommand($selector, $method, $arguments));
+
+    return $response;
+}
+
+/**
+ * Pull hourly rate from Funding-Source entity.
+ * param - student entity and get grant or agency hourly rate.
+ **/
+function kindlyhub_grant_hourly_rate($student_entity)
+{
+
+  if ($student_entity != NULL && $student_entity->bundle() == 'student') {
+    $fundedby = $student_entity->get('field_funded_by')->getValue();
+    $fundedby = (count($fundedby) > 0) ? $fundedby[0]['target_id'] : FALSE;
+    $hourly_rate = 0;
+    if ($fundedby) {
+      $hourly_rate = $student_entity->get('field_funded_by')->entity->get('field_current_year_hourly_rate')->value;
+    }
+    if (!empty($hourly_rate) && $hourly_rate > 0) {
+      //Pull Grant hourly rate.
+      return $hourly_rate;
+    } else {
+      //Pull agency hourly rate.
+      return $student_entity->get('field_agency')->entity->get('field_hourly_rate_i_e_16_95')->value;
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * Input argument = $node entity of in_kind_donation bundle
+ * Output = array('minute' => integer 30, 'hour' => float 0.5)...example
+ * @vm0209
+ */
+function kindlyhub_inkind_donation_activity_time($node){
+    if($node != NULL && $node->bundle() == 'in_kind_donation') {
+        $sec = $node->get('field_hour')->getvalue();
+        $second = $sec[0]['seconds'];
+        $time1 = gmdate('H:i:s', $second);
+        foreach ([$time1] as $time){
+            list($h, $m, $s) = explode(':', $time);
+            $diff = mktime($h, $m, $s) - mktime(0, 0, 0);
+            $hours = $diff / 60 / 60;
+        }
+        $minute = $second / 60;
+
+        return ['minute'=>$minute, 'hour' => $hours];
+    }
+
+    return 0;
+}
+//@end of vm0209
+
+/**
+ * Implements hook_user_insert().
+ */
+
+function custom_module_entity_insert(Drupal\Core\Entity\EntityInterface $entity)
+{
+
+    // Insert the new entity into a fictional table of all entities.
+    $type = $entity->getEntityTypeId();
+    if ($type == 'user')
+    {
+        $current_path = \Drupal::service('path.current')->getPath();
+        $path_args = explode('/', $current_path);
+        if($path_args[3] != 'family_member_by_agency_admin'){
+        $user = \Drupal\user\Entity\User::load($entity->id());
+        if (!empty($user->get('field_mobile_number')
+            ->getvalue() [0]['value']))
+        {
+            $phone = $user->get('field_mobile_number')
+                ->getvalue() [0]['value'];
+            //$send = sendWelcomeMessage($phone, $name);
+            $phone = str_replace("(", "", $phone);
+            $phone = str_replace(")", "", $phone);
+            $phone = str_replace("-", " ", $phone);
+            $phone = str_replace(" ", "", $phone);
+            //$mobile = '+1'.$phone;
+            $resetUrl = user_pass_reset_url($user, $options = array(
+                'langcode' => 'en'
+            ));
+            $name = $user->get('name')
+                ->getValue() [0]['value'];
+            $long_url = $resetUrl;
+            $apiv4 = 'https://api-ssl.bitly.com/v4/bitlinks';
+            $genericAccessToken = '6b13086f30a1651153f092238034a9b8a6ba9423';
+
+            $data = array(
+                'long_url' => $long_url
+            );
+            $payload = json_encode($data);
+            $header = array(
+                'Authorization: Bearer ' . $genericAccessToken,
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($payload)
+            );
+            $ch = curl_init($apiv4);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            $result = curl_exec($ch);
+            $resultToJson = json_decode($result);
+            if (isset($resultToJson->link))
+            {
+                $shortLink = $resultToJson->link;
+            }
+
+            //$mobile = '+919875177770';
+            //$mobile = '+91'.$phone;
+            $mobile = '+1' . $phone;
+            $messages = "Sunrise created you a Kindly account! \nClick " . $shortLink . " to set your password. Log in at kindlyhub.com with username: " . $name . "";
+            $sid = "ACf0272a70bab8c01234842e1f228eb258";
+            $token = "af852c9f229aa05f1d374fe490e20fe7";
+            $twilio = new Client($sid, $token);
+            $message = $twilio
+                ->messages
+                ->create($mobile, // to
+            ["from" => "+1 205 463 5990", "body" => $messages]);
+            $sent = $message->sid;
+            if ($sent != '')
+            {
+                //dsm('One time login send to -- '.$mobile);
+
+            }
+        }
+     }
+    }
+    if ($type == 'flagging')
+    {
+        $current_path = \Drupal::service('path.current')->getPath();
+        $path_args = explode('/', $current_path);
+        $node_val = node_load($path_args[5]);
+        if (isset($node_val))
+        {
+            $agency = $node_val->get('field_agency')
+                ->getValue();
+            $agency_id = $agency[0]['target_id'];
+            $node1 = node_load($agency_id);
+
+            $title = $node1->get('title')->value;
+            $author_id = $node_val->getOwnerId();
+            $user = User::load($author_id);
+            $email = $user->get('mail')->value;
+
+            if ($path_args[4] == 'approve')
+            {
+                $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+                $query->addField('nfd', 'flag_id');
+                $query->condition('nfd.entity_id', $path_args[5]);
+                $result = $query->execute()->fetchField();
+
+                if($result == 'pending'){
+                $flag_service = \Drupal::service('flag');
+                $flag = $flag_service->getFlagById($result);
+                $node = node_load($path_args[5]);
+                $flag_service->unflag($flag, $node);
+               }
+               if($result == 'reject'){
+                $flag_service = \Drupal::service('flag');
+                $flag = $flag_service->getFlagById($result);
+                $node = node_load($path_args[5]);
+                $flag_service->unflag($flag, $node);
+               }
+                $langcode = \Drupal::currentUser()->getPreferredLangcode();
+                $mailManager = \Drupal::service('plugin.manager.mail');
+                $params['context']['subject'] = "APPROVED";
+                $params['context']['message'] = 'Your donation has been approved. Every minute makes a big difference. You rock! <br></br> Thank you kindly!<br></br>' . $title . '</br>';
+                $to = $email;
+                $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+                if ($result['result'] !== true)
+                {
+                    drupal_set_message(t('There was a problem sending your message and it was not sent.') , 'error');
+                }
+                else
+                {
+                    drupal_set_message('Mail sent to parent of the in-kind donation');
+                }
+            }
+
+            if ($path_args[4] == 'reject')
+            {
+                $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+                $query->addField('nfd', 'flag_id');
+                $query->condition('nfd.entity_id', $path_args[5]);
+                $result = $query->execute()->fetchField();
+
+                if($result == 'pending'){
+                $flag_service = \Drupal::service('flag');
+                $flag = $flag_service->getFlagById($result);
+                $node = node_load($path_args[5]);
+                $flag_service->unflag($flag, $node);
+               }
+
+                $langcode = \Drupal::currentUser()->getPreferredLangcode();
+                $mailManager = \Drupal::service('plugin.manager.mail');
+                $params['context']['subject'] = "REJECTED";
+                $params['context']['message'] = "Uh oh! There was a hiccup with your donation and we had to send it back. Don't worry, it's an easy fix. Just read the comment below for more information.";
+                $to = $email;
+                $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+                if ($result['result'] !== true)
+                {
+                    drupal_set_message(t('There was a problem sending your message and it was not sent.') , 'error');
+                }
+                else
+                {
+                    drupal_set_message('Mail sent to parent of the in-kind donation');
+                }
+            }
+            if ($path_args[4] == 'inactive')
+            {
+
+              $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+                $query->addField('nfd', 'flag_id');
+                $query->condition('nfd.entity_id', $path_args[5]);
+                $result = $query->execute()->fetchField();
+              if($result == 'active' && !empty($result) ){
+                $flag_service = \Drupal::service('flag');
+                $flag = $flag_service->getFlagById($result);
+                $entityy = node_load($path_args[5]);
+                $flag_service->unflag($flag, $entityy);
+            }
+        }
+
+            if ($path_args[4] == 'active')
+            {
+              $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+                $query->addField('nfd', 'flag_id');
+                $query->condition('nfd.entity_id', $path_args[5]);
+                $result = $query->execute()->fetchField();
+
+            if($result == 'inactive' && !empty($result) ){
+                $flag_id = 'inactive';
+                $flag_service = \Drupal::service('flag');
+                $flag = $flag_service->getFlagById($flag_id);
+                $entityy = node_load($path_args[5]);
+                $flag_service->unflag($flag, $entityy);
+             }
+           }
+
+        }
+    }
+}
+
+function Bulk_opration_custom_submit(&$form, &$form_state){
+    //print_r('expression'); die;
+
+$response = new RedirectResponse("/node/add/bulk_sign_update?destination=checkinkind");
+            $response->send();
+            return;
+}
+
+function bulk_redirect(){
+$response = new RedirectResponse("/dashboard");
+            $response->send();
+            return;
+}
+
+
+
+
+// otp send on given mobile number by using ajax callback ----------------------
+function twilio_otp_send_otp_callback(&$form, &$form_state)
+{
+    $ajax_response = new AjaxResponse();
+    $mobile_no = $form_state->getValue('field_mobile_number') [0]['value'];
+    $six_digit_random_number = mt_rand(100000, 999999);
+    $_SESSION['some_namespace']['my_variable_name'] = $six_digit_random_number;
+    $messages = "Twilio OTP: $six_digit_random_number";
+    $sid = "ACd19421ba5beb76111116671e24ad6921";
+    $token = "39281d646dd23f0fb436d55b8375fdaa";
+    $twilio = new Client($sid, $token);
+    $message = $twilio
+        ->messages
+        ->create($mobile_no, // to
+    ["from" => "+15005550006", "body" => "body"]);
+    $sent = $message->sid;
+    if ($sent != '')
+    {
+        $option = (t('OTP Sent.' . $six_digit_random_number));
+    }
+    else
+    {
+        $options = watchdog('twilio_otp', 'Unable to send OTP.');
+    }
+    $color = '<p style="color: #439C44">';
+    $ajax_response->addCommand(new ReplaceCommand('#edit-field-verification-code-wrapper', $option));
+    $ajax_response->addCommand(new InvokeCommand('#edit-field-verification-code-wrapper', 'css', array(
+        'color',
+        $color
+    )));
+    return $ajax_response;
+}
+
+function my_test_validate(array & $form, FormStateInterface & $form_state)
+{
+    // $sessionval = $_SESSION['some_namespace']['my_variable_name'];
+    // $twilio_otp = $form_state->getValue('twilio_otp');
+    // if ($sessionval != $twilio_otp) {
+    //     $form_state->setErrorByName('twilio_otp', t('Otp Not matched'));
+    // }
+    $tc = $form_state->getValue('field_terms_condition');
+    $terms_conditions = $tc[0]['value'];
+    if (isset($terms_conditions) && $terms_conditions == 'I Do Not Agree')
+    {
+        $form_state->setErrorByName('field_terms_condition', t('You are not able to create a new account!!'));
+    }
+}
+
+// function test_callback(&$form, &$form_state) {
+//     $ajax_response = new AjaxResponse();
+//     $sessionval = $_SESSION['some_namespace']['my_variable_name'];
+//     $twilio_otp = $form_state->getValue('twilio_otp');
+//     if ($sessionval != $twilio_otp) {
+//         $option = (t('OTP not  matched.'));
+//         $ajax_response->addCommand(new ReplaceCommand('#edit-field-verification-wrapper', $option));
+//     } else {
+//         $options = (t('Verified'));
+//         $ajax_response->addCommand(new ReplaceCommand('#edit-field-verification-wrapper', $options));
+//     }
+//     return $ajax_response;
+// }
+//---------------------------------------------------------------------------------------------------
+function user_register_form_submit(array & $form, FormStateInterface & $form_state)
+{
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $uid = $user->get('uid')
+        ->getValue();
+    $uidno = $uid[0]['value'];
+    $region = $form_state->getValue('field_user_regional_reference');
+    $regionID = $region[0]['target_id'];
+    $agency = $form_state->getValue('field_agency_reference');
+    $agencyID = $agency[0]['target_id'];
+    if (isset($agencyID) && !empty($agencyID))
+    {
+        $agencynid = node_load($agencyID);
+        $hourly_rate = $agencynid->get('field_hourly_rate_i_e_16_95')
+            ->getValue();
+        $rate = $hourly_rate[0]['value'];
+        if ($entity = $form_state->getFormObject()
+            ->getEntity())
+        {
+            $entity->set('field_community_partner_rate', $rate);
+            $entity->save();
+        }
+        //$form['field_community_partner_rate']['widget'][0]['value']['#default_value'] = $rate;
+
+    }
+    $existing = $form_state->getValue('field_do_you_want_to_join_existi');
+    $extfamily = $existing[0]['value'];
+    if (isset($extfamily) && !empty($extfamily))
+    {
+        $family = $form_state->getValue('field_family_reference');
+        $familyrefrence = $family[0]['target_id'];
+        if ($extfamily == 'yes')
+        {
+            $node = Node::load($familyrefrence);
+            $node->field_joined_user[] = $uidno;
+            $node->save();
+        }
+        if ($extfamily == 'no')
+        {
+            $value = $form_state->getValue('field_adult_last_name');
+            $lastname = $value[0]['value'];
+            $node = Node::create(['type' => 'family_group']);
+            $node->set('field_family_last_name', $lastname . '-family');
+            $node->set('field_regional_reference', $regionID);
+            $node->set('field_agency', $agencyID);
+            $node->set('field_joined_user', $uidno);
+            $node->set('uid', $uidno);
+            $node->status = 1;
+            $node->enforceIsNew();
+            $node->save();
+            if ($entity = $form_state->getFormObject()
+                ->getEntity())
+            {
+                $entity->set('field_family_reference', $node->id());
+                $entity->save();
+            }
+            $response = new RedirectResponse("/user/" . $uidno . "/edit");
+            $response->send();
+            return;
+            drupal_get_messages('status');
+            drupal_set_message('please Complete Your Family Details');
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------
+function family_group_member_submit(array & $form, FormStateInterface & $form_state)
+{
+    $id = $form_state->getValue('nid');
+    $response = new RedirectResponse("/user/family_member?fid=$id&destination=/dashboard");
+    $response->send();
+    return;
+}
+
+function agency_title_action(array & $form, FormStateInterface & $form_state)
+{
+    $title12 = $form_state->getValue('field_name_of_this_agency') [0]['value'];
+    $entity = $form_state->getFormObject()
+        ->getEntity();
+    $entity->set('title', $title12);
+    $entity->save();
+}
+
+// function funding_soure_hide(array & $form, FormStateInterface & $form_state)
+// {
+//     $title12 = $form_state->getValue('field_gr') [0]['value'];
+//     $entity = $form_state->getFormObject()
+//         ->getEntity();
+//     $entity->set('title', $title12);
+//     $entity->save();
+// }
+
+function menualFlagUpdate(array & $form, FormStateInterface & $form_state)
+{
+    $signVal = $form_state->getValue('field_signature')[0]['value'];
+    $tempstore = \Drupal::service('user.private_tempstore')->get('custom_module');
+    $some_data1 = $tempstore->get('inkind_nodes');
+        //print_r(json_decode($some_data1)); die;
+//print_r(\Drupal::currentUser()->getPreferredLangcode()); die;
+    $inNode = json_decode($some_data1);
+    //kint($inNode); die();
+    foreach ($inNode as $value) {
+
+        # code...
+        //$nid = trim($value);
+        $nid = trim(strip_tags($value) );
+        $fid = 'approve';
+
+        $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+        $query->addField('nfd', 'id');
+        $query->condition('nfd.entity_id', $nid);
+        $query->condition('nfd.flag_id', $fid);
+        $flagID = $query->execute()->fetchField();
+        //echo $flagID; die;
+        if(empty($flagID)){
+            $flag_service = \Drupal::service('flag');
+            $flag = $flag_service->getFlagById($fid);
+            $entity = node_load($nid);
+            $flag_service->flag($flag, $entity);
+        }
+
+
+        $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+        $query->addField('nfd', 'id');
+        $query->condition('nfd.entity_id', $nid);
+        $query->condition('nfd.flag_id', $fid);
+        $flagID = $query->execute()->fetchField();
+        //echo $flagID; die;
+        //print_r($result); die;
+        $varArr =  [
+            'bundle' => $fid,
+            'entity_id' => $flagID,
+            'revision_id' => $flagID,
+            'field_signature_1_value' => $signVal,
+            'delta' => 0,
+            'langcode' => \Drupal::currentUser()->getPreferredLangcode(),
+        ];
+
+       // kint($varArr); die();
+        if(!empty($flagID) and $flagID != NULL)
+        {
+
+            $queryFinal = \Drupal::database()->select('flagging__field_signature_1', 'nfd');
+
+        $queryFinal->addField('nfd', 'entity_id');
+        $queryFinal->condition('nfd.bundle', $fid);
+        $queryFinal->condition('nfd.entity_id', $flagID);
+        $flagIDResult = $queryFinal->execute()->fetchAll();
+           // kint(count($flagIDResult));die();
+            if(count($flagIDResult)==0)
+            {
+                $result = \Drupal::database()->insert('flagging__field_signature_1')
+                ->fields(['bundle', 'entity_id', 'revision_id', 'field_signature_1_value','delta', 'langcode'])
+                ->values(
+                    $varArr
+                )
+                ->execute();
+            }
+
+        }
+
+    }
+    $tempstore->set('inkind_nodes', '');
+}
+
+function user_create_for_family_submit(array & $form, FormStateInterface & $form_state)
+{
+    $id = $form_state->getValue('nid');
+    $node = node_load($id);
+    $existing_group = $node->get('field_choose_family')
+        ->getValue() [0]['target_id'];
+    $queryyy = $_GET;
+    $new = $queryyy['new'];
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $uidno = $user->id();
+    $region = $user->get('field_user_regional_reference')
+        ->getValue();
+    $regionID = $region[0]['target_id'];
+
+    $agency = $user->get('field_agency_reference')
+        ->getValue();
+    $agencyID = $agency[0]['target_id'];
+    if (isset($new))
+    {
+        $region = $form_state->getValue('field_regional_reference') [0]['target_id'];
+        $agency = $form_state->getValue('field_agency') [0]['target_id'];
+        $familyname = $form_state->getValue('field_family_first_name') [0]['value'];
+        //family group crete-----------------------------
+        $node = Node::create(['type' => 'family_group']);
+        $node->set('field_family_last_name', $familyname);
+        $node->set('field_regional_reference', $region);
+        $node->set('field_agency', $agency);
+        $node->set('uid', $uidno);
+        $node->status = 1;
+        $node->enforceIsNew();
+        $node->save();
+    }
+    //user create in family group----------------------------------------------------
+    $firstname = $form_state->getValue('title') [0]['value'];
+    $Lastname = $form_state->getValue('field_last') [0]['value'];
+    $Email = $form_state->getValue('field_email') [0]['value'];
+    $MObile = $form_state->getValue('field_mobile_') [0]['value'];
+    $user = User::create();
+    $user->enforceIsNew();
+    $user->setEmail($Email);
+    $user->setUsername($Email);
+    $user->set('field_adult_first_name', $firstname);
+    $user->set('field_adult_last_name', $Lastname);
+    $user->set('field_mobile_number', $MObile);
+    $user->set('field_user_regional_reference', $regionID);
+    $user->set('field_agency_reference', $agencyID);
+    if (!empty($existing_group))
+    {
+        $user->set('field_family_reference', $existing_group);
+    }
+    else
+    {
+        $user->set('field_family_reference', $node->id());
+    }
+    $user->addRole('family_member');
+    $user->activate();
+    $user->save();
+    $uid = $user->id();
+    $users = user_load($uid);
+    $op = 'register_no_approval_required';
+    $mail = _user_mail_notify($op, $users, $langcode = 'en');
+    //set value in joined member ---------
+    if (isset($new))
+    {
+        $node = Node::load($node->id());
+        $node->field_joined_user[] = $uid;
+        $node->save();
+    }
+    // set value in existing family member-------
+    if (isset($existing_group))
+    {
+        $node = Node::load($existing_group);
+        $node->field_joined_user[] = $uid;
+        $node->save();
+    }
+    $check_query = $_GET['existing'];
+    if(isset($check_query)){
+        drupal_get_messages('status');
+        drupal_set_message('New User Successfully Added');
+    }
+    if(isset($new)){
+        drupal_get_messages('status');
+        drupal_set_message('Family Group has been created');
+    }
+    // $response = new RedirectResponse("/user-dashboard");
+    // $response->send();
+    // return;
+
+}
+
+function in_kind_donation_submit(array & $form, FormStateInterface & $form_state)
+{
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $roles = $user->getRoles();
+    $email = $user->get('mail')->value;
+    $name = $user->get('name')->value;
+    $agency = $user->get('field_agency_reference')
+        ->getValue();
+    $agencyid = $agency[0]['target_id'];
+    $agencyi_load = node_load($agencyid);
+    $agency_title = $agencyi_load->get('title')->value;
+
+    if (isset($agencyi_load))
+    {
+        $agency_rate = $com_rate = $agencyi_load->get('field_hourly_rate_i_e_16_95')
+            ->getValue() [0]['value'];
+    }
+    $nid = $form_state->getValue('nid');
+    $node_agency = $form_state->getValue('field_agency') [0]['target_id'];
+    $node_location = $form_state->getValue('field_location_reference') [0]['target_id'];
+    $node_class = $form_state->getValue('field_classroom_reference') [0]['target_id'];
+
+    // $node = node_load($nid);
+    // $sec = $node->get('field_hour')
+    //     ->getvalue();
+    // $second = $sec[0]['seconds'];
+    // $time1 = gmdate('H:i:s', $second);
+    // foreach ([$time1] as $time)
+    // {
+    //     list($h, $m, $s) = explode(':', $time);
+    //     $diff = mktime($h, $m, $s) - mktime(0, 0, 0);
+    //     $diff1 = $diff / 60 / 60;
+    // }
+    // $second1 = $second / 60;
+
+
+    $entity = $form_state->getFormObject()->getEntity();
+    if (in_array('family_member', $roles) && !in_array('administrator', $roles))
+    {
+        $langcode = \Drupal::currentUser()->getPreferredLangcode();
+        $mailManager = \Drupal::service('plugin.manager.mail');
+        $params['context']['subject'] = "THANK YOU";
+        $params['context']['message'] = "There's nothing like the power of giving! You just made an incredible impact in the world, for your child and for our agency.<br></br> Thank you kindly,<br></br>" . $agency_title . "</br>";
+        $to = $email;
+        $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+        if ($result['result'] == true)
+        {
+             drupal_set_message('Successfully Submitted');
+        }
+        //$entity->set('field_hourly_rate', $com_rate);
+    }
+
+    //@vm0209cp
+    $inkind_donation_type = $form_state->getValue('field_which_type_of_in_kind_dona')[0]['target_id'];
+    $default_hourly_rate = FALSE;
+    $com_rate = '';
+    //11 = Community Partner Activity
+    if($inkind_donation_type == 11 && count(array_intersect($roles, ['community_partner','agency_manager', 'agency_administrator', 'administrator', 'superadministrator'])) > 0 ){
+        $user_input = $form_state->getUserInput();
+        $cp_activity = $form_state->getValue('field_community_partner_activity')[0]['target_id'];
+        if(!empty($cp_activity) && is_numeric($cp_activity) ){
+            $term = Drupal\taxonomy\Entity\Term::load($cp_activity);
+            //pull community partner activity hour rate from taxonomy term.
+            $com_rate = $term->field_hourly_rate->value;
+        }elseif( $user_input['field_community_partner_activity']['select'] == 'select_or_other'){
+            //pull community partner activity hour rate when select Other option in field.
+            $com_rate = $user_input['field_community_partner_activity']['other'];
+        }else{
+            //Community Partner rate for NONE option...
+            $com_rate = $user->get('field_community_partner_rate')->value;
+        }
+
+    }else{
+        $default_hourly_rate = TRUE;
+    }
+
+    if(!$default_hourly_rate && !empty($com_rate)) {
+
+        $entity->set('field_hourly_rate', $com_rate );
+    } else {
+        /*  Community Partner with no others roles have.
+         *  If they have others roles then it will get grant/agency hourly rate.
+        **/
+        $student = $entity->field_for_student->getValue();
+        if(count($student) > 0) {
+            $com_rate = kindlyhub_grant_hourly_rate($entity->field_for_student->entity);
+            $entity->set('field_hourly_rate', $com_rate);
+        }else{
+            $entity->set('field_hourly_rate', $com_rate=$agency_rate);
+        }
+
+    }
+
+    if($activity_time = kindlyhub_inkind_donation_activity_time($entity)){
+        $entity->set('field_minutes', $activity_time['minute']);
+        $entity->set('field_decimal_hoiur', $activity_time['hour'] );
+        //$entity->set('field_decimal_hoiur', round($activity_time['hour'] * $agency_rate, 2) );
+        if(empty($com_rate))
+            $com_rate = $agency_rate;
+
+        $entity->set('field_donation_amount', round($activity_time['hour'] * $com_rate, 2) );
+    }
+    //@end of vm0209
+    /********
+    if($com_rate = kindlyhub_grant_hourly_rate($entity->field_for_student->entity) ) {
+        $entity->set('field_hourly_rate', $com_rate);
+    }
+    if($activity_time = kindlyhub_inkind_donation_activity_time($entity)){
+        $entity->set('field_minutes', $activity_time['minute'] );
+        $entity->set('field_decimal_hoiur', $activity_time['hour'] );
+        //$entity->set('field_decimal_hoiur', round($activity_time['hour'] * $com_rate, 2) );
+    }
+    ********/
+    //$entity->set('field_minutes', $second1);
+    //$entity->set('field_decimal_hoiur', $diff1);
+    //$entity->set('field_decimal_hoiur', round($diff1 * $com_rate, 2) );
+
+    //Case-Donation of Goods or Services
+    if($inkind_donation_type == 52){
+        $entity->set('field_hourly_rate', 0);
+        $entity->set('field_minutes', 0);
+        $entity->set('field_doctor_visit_mileage', 0);
+        $entity->set('field_donation_amount', 0);
+        $entity->set('field_hour', NULL);
+    }
+
+
+    $entity->save();
+
+    // mail for agency admin & agency maneger -----------------
+    //     if(isset($node_agency)){
+    //     $q =db_query("
+    //     SELECT users_field_data.mail AS mail
+    //     FROM
+    //     {users_field_data} users_field_data
+    //     INNER JOIN {user__roles} user__roles ON users_field_data.uid = user__roles.entity_id AND user__roles.deleted = '0'
+    //     LEFT JOIN {user__field_agency_reference} user__field_agency_reference ON users_field_data.uid = user__field_agency_reference.entity_id AND user__field_agency_reference.deleted = '0'
+    //     WHERE ((user__roles.roles_target_id IN('agency_manager', 'agency_administrator'))) AND ((users_field_data.status = '1') AND (user__field_agency_reference.field_agency_reference_target_id = $node_agency))")->fetchAll();
+    //     foreach($q  as $key => $value ){
+    //     $mail = $value->mail;
+    //     $langcode = \Drupal::currentUser()->getPreferredLangcode();
+    //     $mailManager = \Drupal::service('plugin.manager.mail');
+    //     $params['context']['subject'] = "NEW DONATION";
+    //     $params['context']['message'] = "Great news! You received an in-kind donation from ".$name." Wooohooo! <br></br>";
+    //     $to = $mail;
+    //     $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+    //    }
+    // }
+    // Mail to location manager -------------
+    if (isset($node_location))
+    {
+        $q1 = db_query("
+    SELECT users_field_data.mail AS mail
+    FROM
+    {users_field_data} users_field_data
+    INNER JOIN {user__roles} user__roles ON users_field_data.uid = user__roles.entity_id AND user__roles.deleted = '0'
+    LEFT JOIN {user__field_user_location_reference} user__field_user_location_reference ON users_field_data.uid = user__field_user_location_reference.entity_id AND user__field_user_location_reference.deleted = '0'
+    WHERE ((user__roles.roles_target_id = 'school_manager')) AND ((users_field_data.status = '1') AND (user__field_user_location_reference.field_user_location_reference_target_id = $node_location))")->fetchAll();
+        foreach ($q1 as $key => $value)
+        {
+            $mail = $value->mail;
+            $langcode = \Drupal::currentUser()->getPreferredLangcode();
+            $mailManager = \Drupal::service('plugin.manager.mail');
+            $params['context']['subject'] = "NEW DONATION";
+            $params['context']['message'] = "Great news! You received an in-kind donation from " . $name . " Wooohooo! <br></br>";
+            $to = $mail;
+            $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+        }
+    }
+
+    // mail for teacher--------------
+    if (isset($node_class))
+    {
+        $q2 = db_query("
+    SELECT users_field_data.mail  AS mail
+    FROM
+    {users_field_data} users_field_data
+    INNER JOIN {user__roles} user__roles ON users_field_data.uid = user__roles.entity_id AND user__roles.deleted = '0'
+    LEFT JOIN {user__field_classroom_reference} user__field_classroom_reference ON users_field_data.uid = user__field_classroom_reference.entity_id AND user__field_classroom_reference.deleted = '0'
+    WHERE ((user__roles.roles_target_id = 'school_manager')) AND ((users_field_data.status = '1') AND (user__field_classroom_reference.field_classroom_reference_target_id = $node_class))")->fetchAll();
+        foreach ($q2 as $key => $value)
+        {
+            $uid = $value->mail;
+            $mail = $value->mail;
+            $langcode = \Drupal::currentUser()->getPreferredLangcode();
+            $mailManager = \Drupal::service('plugin.manager.mail');
+            $params['context']['subject'] = "NEW DONATION";
+            $params['context']['message'] = "Great news! You received an in-kind donation from " . $name . " Wooohooo! <br></br>";
+            $to = $mail;
+            $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+        }
+    }
+}
+
+// // node revision mail for flagged user of in-kind donation-----------
+//   function in_kind_donation_submit(array & $form, FormStateInterface & $form_state) {
+//     $nid = $form_state->getValue('nid');
+//     $revisionIds =count(\Drupal::entityTypeManager()->getStorage('node')->revisionIds(node_load($nid)));
+//     if($revisionIds > 1){
+//     }
+//   }
+function pending_default_value(array & $form, FormStateInterface & $form_state){
+    $nid = $form_state->getValue('nid');
+    $fid = 'pending';
+    $flag_service = \Drupal::service('flag');
+    $flag = $flag_service->getFlagById($fid);
+    $entity = node_load($nid);
+   $flag_service->flag($flag, $entity);
+
+    $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+    $query->addField('nfd', 'flag_id');
+    $query->condition('nfd.entity_id', $nid);
+    $result = $query->execute()->fetchField();
+    //dsm($result);
+}
+
+
+function resubmit_by_parents(array & $form, FormStateInterface & $form_state){
+    $nid = $form_state->getValue('nid');
+    $flag_q = $query = \Drupal::database()->select('flagging', 'nfd');
+    $query->addField('nfd', 'flag_id');
+    $query->condition('nfd.entity_id', $nid);
+    $result = $query->execute()->fetchField();
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $roles = $user->getRoles();
+    if($roles[1] == 'family_member'){
+        if(!empty($result)){
+            $rid = 'reject';
+            $flag_service = \Drupal::service('flag');
+            $flag = $flag_service->getFlagById($rid);
+            $entity = node_load($nid);
+            $flag_service->unflag($flag, $entity);
+
+            $fid = 'pending';
+            $flag_service = \Drupal::service('flag');
+            $flag = $flag_service->getFlagById($fid);
+            $entity = node_load($nid);
+           $flag_service->flag($flag, $entity);
+        }
+
+        //@vm0209
+        // $entity = $form_state->getFormObject()->getEntity();
+        // if($activity_time = kindlyhub_inkind_donation_activity_time($entity)){
+        //     $entity->set('field_minutes', $activity_time['minute']);
+        //     $entity->set('field_decimal_hoiur', round($activity_time['hour'] * $com_rate, 2) );
+        //     $entity->save();
+        // }//@vm0209
+
+    }
+}
+
+
+function custom_module_user_login($account) {
+
+    $response = new RedirectResponse("/node/8075");
+    $response->send();
+    return;
+
+    /*
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+
+    $current_path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $current_path);
+
+    $roles = $user->getRoles();
+    //check if user has admin roles on priority, (I have changed only order in follwing section  ) @ByNirav KND-65
+    if(in_array('agency_administrator', $roles) || in_array('agency_manager', $roles)  ||  in_array('administrator', $roles) ){
+        $response = new RedirectResponse("/node/8075");
+        $response->send();
+    }
+
+    //This secondary priority @ByNirav
+    if($roles[1] == 'school_manager' && $roles[2] == 'agency_manager' ){
+      $response = new RedirectResponse("/node/8075");
+      $response->send();
+      return;
+    }
+
+    //If user does not have any admin roles then check other roles @ByNirav
+
+    // if(in_array('family_member', $roles) || in_array('community_partner', $roles) || in_array('teacher', $roles) || !in_array('administrator', $roles)){
+    if($roles[1] == 'family_member' || $roles[1] == 'community_partner' || $roles[1] == 'teacher' || $roles[1] == 'school_manager' && $roles[2] != 'agency_manager'){
+        $response = new RedirectResponse("/node/345");
+        $response->send();
+        return;
+    }
+    */
+}
+
+function custom_module_page_attachments(array & $attachments)
+{
+    $attachments['#attached']['library'][] = 'custom_module/custom_module';
+}
+
+function accessCheckUser($order)
+{
+    $status = false;
+    $current_path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $current_path);
+    $uid = \Drupal::currentUser()->id();
+    $order_load = Order::load($path_args[4]);
+    $author_id = $order_load->getOwner()
+        ->id();
+    $roles = \Drupal::currentUser()->getRoles();
+    if (in_array('administrator', $roles))
+    {
+        $status = true;
+    }
+    if ($uid === $author_id)
+    {
+        $status = true;
+    }
+    return $status;
+}
+
+function accessordercheck($order)
+{
+    $status = false;
+    $current_path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $current_path);
+    $uid = \Drupal::currentUser()->id();
+    $order_load = Order::load($path_args[2]);
+    $author_id = $order_load->getOwner()
+        ->id();
+    $roles = \Drupal::currentUser()->getRoles();
+    if (in_array('administrator', $roles))
+    {
+        $status = true;
+    }
+    if ($uid === $author_id)
+    {
+        $status = true;
+    }
+    return $status;
+}
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function custom_module_menu_local_tasks_alter(&$data, $route_name)
+{
+    // Remove 'Edit' tab from the user page.
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $roles = $user->getRoles();
+    $uid = $user->id();
+    if ($uid == '93' || $uid == '95')
+    {
+        unset($data['tabs'][0]['entity.user.edit_form']);
+    }
+    if (!in_array('administrator', $roles))
+    {
+        unset($data['tabs'][0]['entity.user.contact_form']);
+        unset($data['tabs'][0]['entity.user.edit_form']);
+        unset($data['tabs'][0]['uc_file.user_downloads']);
+        unset($data['tabs'][0]['entity.user.view_form']);
+        unset($data['tabs'][0]['views_view:view.uc_order_history.page_1']);
+        unset($data['tabs'][0]['role_delegation.edit_form']);
+        if ($route_name == 'uc_role.expiration')
+        {
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
+        }
+    }
+    if (!in_array('administrator', $roles))
+    {
+        if ($route_name == 'entity.node.canonical')
+        {
+            $current_path = \Drupal::service('path.current')->getPath();
+            $path_args = explode('/', $current_path);
+            $node = node_load($path_args[2]);
+            $node_type = $node->bundle();
+            if ($node_type == 'in_kind_donation' || $node_type == 'classroom' || $node_type == 'family_group' || $node_type == 'location' || $node_type == 'activity' || $node_type == 'student')
+            {
+                unset($data['tabs'][0]['entity.node.edit_form']);
+                unset($data['tabs'][0]['entity.node.delete_form']);
+            }
+        }
+        if ($route_name == 'entity.node.edit_form')
+        {
+            $current_path = \Drupal::service('path.current')->getPath();
+            $path_args = explode('/', $current_path);
+            $node = node_load($path_args[2]);
+            $node_type = $node->bundle();
+            if ($node_type == 'in_kind_donation' || $node_type == 'classroom' || $node_type == 'family_group' || $node_type == 'location' || $node_type == 'activity' || $node_type == 'student')
+            {
+                unset($data['tabs'][0]['entity.node.edit_form']);
+                unset($data['tabs'][0]['entity.node.delete_form']);
+                unset($data['tabs'][0]['entity.node.canonical']);
+            }
+        }
+        if ($route_name == 'entity.taxonomy_term.canonical' || $route_name == 'entity.taxonomy_term.edit_form')
+        {
+            $current_path = \Drupal::service('path.current')->getPath();
+            $path_args = explode('/', $current_path);
+            unset($data['tabs'][0]['entity.taxonomy_term.edit_form']);
+            unset($data['tabs'][0]['entity.taxonomy_term.canonical']);
+
+        }
+    }
+}
+
+// order status completed functionality -----
+function custom_module_uc_order_update(OrderInterface $order)
+{
+    if ($order->getStatusId() == 'completed')
+    {
+        $orderId = $order->id();
+        $query = db_select('uc_orders', 'o');
+        $query->leftjoin('uc_order_products', 'p', 'o.order_id=p.order_id');
+        $query->leftjoin('uc_roles_products', 'rp', 'rp.nid=p.nid');
+        $query->fields('o', array(
+            'uid',
+            'primary_email'
+        ));
+        $query->fields('p', array(
+            'nid',
+            'title'
+        ));
+        $query->fields('rp');
+        $query->condition('o.order_id', $orderId, '=');
+        $query->condition('rp.rid', '', '!=');
+        $results = $query->execute()
+            ->fetchAll();
+        $counter = count($results);
+        foreach ($results as $result)
+        {
+            $user = \Drupal\user\Entity\User::load($result->uid);
+        }
+        if ($counter == '2')
+        {
+            $num_deleted = db_delete('uc_roles_expirations')->condition('uid', $result->uid)
+                ->execute();
+        }
+        if ($result->granularity == 'day')
+        {
+            $days = $result->duration * 24;
+            $timestamp = time() + (60 * 60 * $days);
+        }
+        elseif ($result->granularity == 'month')
+        {
+            $days = $result->duration * 24 * 30;
+            $timestamp = time() + (60 * 60 * $days);
+        }
+        elseif ($result->granularity == 'week')
+        {
+            $days = $result->duration * 24 * 7;
+            $timestamp = time() + (60 * 60 * $days);
+        }
+        elseif ($result->granularity == 'year')
+        {
+            $days = $result->duration * 24 * 365;
+            $timestamp = time() + (60 * 60 * $days);
+        }
+        $user->addRole($result->rid);
+        $newDate = date("Y-m-d", $timestamp);
+        $user->set('field_expiration_date', $newDate);
+        $user->save();
+        db_insert('uc_roles_expirations')
+            ->fields(array(
+            'uid' => $result->uid,
+            'rid' => $result->rid,
+            'expiration' => $timestamp,
+            'notified' => 0,
+        ))->execute();
+        $recipient = 'billing@kindlyhub.com';
+        $params = ['order' => $order];
+        $mailManager = \Drupal::service('plugin.manager.mail');
+        $mailManager->mail('uc_order', 'invoice', $recipient, uc_store_mail_recipient_langcode($recipient) , $params, uc_store_email_from());
+    }
+}
+//---------------------------------------------------------------------------------------------------
+// Exposed filter's alter on user dashboard ------------------------------------------------------------------
+function custom_module_form_views_exposed_form_alter(&$form, &$form_state)
+{
+    /**
+    * ByNirav 210916 - show listing default by agecny current school year
+    */
+    if ( startsWith( $form['#id'],'views-exposed-form-reportgrant') )
+    {
+
+        //?schoolyear=yes
+        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $agency = $user->get('field_agency_reference')->getValue();
+        $agencyid = $agency[0]['target_id'];
+       //dsm($agencyid);
+
+        $flagSchoolyear = \Drupal::request()->get('schoolyear');
+        if($flagSchoolyear == 'yes' )
+        {
+            $q = db_query("SELECT node_field_data.nid AS nid,node__field_date.field_date_value,node__field_date.field_date_end_value
+            FROM
+            node_field_data
+            LEFT JOIN  node__field_date ON node_field_data.nid = node__field_date.entity_id AND node__field_date.deleted = '0'
+            WHERE (node_field_data.status = '1') AND (node_field_data.type IN ('agency')) AND (node_field_data.nid = '".$agencyid."')")->FetchAll();
+            if(count($q)>0)
+            {
+                if(!empty($q[0]->field_date_value) and !empty($q[0]->field_date_end_value))
+                {
+
+                    $form['created']['min']['#default_value'] = date("m/d/Y", strtotime($q[0]->field_date_value));
+                    $form['created']['max']['#default_value'] = date("m/d/Y", strtotime($q[0]->field_date_end_value));
+                }
+            }
+
+        }
+    }
+
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-9' || $form['#id'] == 'views-exposed-form-classroom-users-block-11' || $form['#id'] == 'views-exposed-form-classroom-users-block-6'
+    ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-4'
+    ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-4-approved'
+    ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-4-reject'
+    )
+    {
+        // select location for the agency admin
+        $optArrrr[''] = 'Show All';
+        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $uid = $user->id();
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+        $q = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_5')));
+        foreach ($q as $key => $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $fieldval1 = html_entity_decode($key, ENT_QUOTES);
+            $optArrrr[$nid] = $fieldval1;
+        }
+
+        $form['field_location_reference_target_id']['#type'] = 'select';
+        $form['field_location_reference_target_id']['#multiple'] = false;
+        $form['field_location_reference_target_id']['#chosen'] = true;
+       // $form['field_location_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_location_reference_target_id']['#options'] = $optArrrr;
+        unset($form['field_location_reference_target_id']['#size']);
+    }
+
+    if ($form['#id'] == 'views-exposed-form-dashboard--block-6')
+    {
+      if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+
+    }
+
+    if(
+        $form['#id'] == 'views-exposed-form-manage-agency-school-block-6'
+        ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-6-approved'
+        ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-6-reject'
+    ){
+
+        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $agency = $user->get('field_agency_reference')
+            ->getValue();
+        $agencyid = $agency[0]['target_id'];
+
+        $optArr1[''] ='Show All';
+        try {
+            $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_4')));
+        } catch (\Exception $e) {}
+
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $optArr1[$nid] = $key;
+        }
+
+        $form['field_classroom_reference_target_id']['#type'] = 'select';
+        $form['field_classroom_reference_target_id']['#multiple'] = false;
+        $form['field_classroom_reference_target_id']['#chosen'] = false;
+        $form['field_classroom_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_classroom_reference_target_id']['#options'] = $optArr1;
+        unset($form['field_classroom_reference_target_id']['#size']);
+
+
+        // select Family for the agency admin
+        $optArr2[''] = 'Show All';
+        try {
+            $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_6')));
+        } catch (\Exception $e) {}
+
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['nid'];
+            $val = $fieldArray['title'];
+            $optArr2[$key] = $val;
+        }
+        $form['field_family_reference_target_id']['#type'] = 'select';
+        $form['field_family_reference_target_id']['#multiple'] = false;
+        $form['field_family_reference_target_id']['#chosen'] = true;
+      //  $form['field_family_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_family_reference_target_id']['#options'] = $optArr2;
+        unset($form['field_family_reference_target_id']['#size']);
+
+
+
+    }
+
+    if(
+    $form['#id'] == 'views-exposed-form-manage-agency-school-block-4'
+    ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-4-approved'
+    ||$form['#id'] == 'views-exposed-form-manage-agency-school-block-4-reject'
+    ){
+        $optArr1[''] ='Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_4')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $optArr1[$nid] = $key;
+        }
+
+        $form['field_classroom_reference_target_id']['#type'] = 'select';
+        $form['field_classroom_reference_target_id']['#multiple'] = false;
+        $form['field_classroom_reference_target_id']['#chosen'] = false;
+        $form['field_classroom_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_classroom_reference_target_id']['#options'] = $optArr1;
+        unset($form['field_classroom_reference_target_id']['#size']);
+
+// select For Student for the agency admin
+        $optArr3[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_7')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $optArr3[$key] = html_entity_decode($fieldArray['title'], ENT_QUOTES);
+        }
+        $form['title']['#type'] = 'select';
+        $form['title']['#multiple'] = false;
+        $form['title']['#empty_option'] = t('Show All');
+        $form['title']['#options'] = $optArr3;
+        $form['title']['#chosen'] = true;
+        unset($form['title']['#size']);
+
+        // select Family for the agency admin
+        $optArr2[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_6')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['nid'];
+            $val = $fieldArray['title'];
+            $optArr2[$key] = $val;
+        }
+        $form['field_family_reference_target_id']['#type'] = 'select';
+        $form['field_family_reference_target_id']['#multiple'] = false;
+        $form['field_family_reference_target_id']['#chosen'] = true;
+      //  $form['field_family_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_family_reference_target_id']['#options'] = $optArr2;
+        unset($form['field_family_reference_target_id']['#size']);
+
+ // select Funded By for Student for the agency admin
+        $query = db_query("SELECT node__field_fun.delta AS node__field_fun_delta, node__field_fun.langcode AS node__field_fun_langcode, node__field_fun.bundle AS node__field_fun_bundle, node__field_fun.field_fun_target_id AS node__field_fun_field_fun_target_id, node_field_data.nid AS nid, node_field_data_node__field_fun.nid AS node_field_data_node__field_fun_nid FROM
+       {node_field_data} node_field_data LEFT JOIN {node__field_fun} node__field_fun ON node_field_data.nid = node__field_fun.entity_id AND node__field_fun.deleted = '0'
+     LEFT JOIN {node_field_data} node_field_data_node__field_fun ON node__field_fun.field_fun_target_id = node_field_data_node__field_fun.nid
+     WHERE ((node_field_data.nid = $agencyid )) AND ((node_field_data.type IN ('agency')) AND (node_field_data_node__field_fun.status = '1'))")->fetchAll();
+
+        $agencyngrants[''] = $grantval[''] = 'Show All';
+        $agencyngrants['agency'] = 'Agency current year';
+        foreach ($query as $key => $csvDataRow)
+        {
+            $vall1 = $csvDataRow->node__field_fun_field_fun_target_id;
+            $val_node = node_load($vall1);
+            $title = $val_node->get('title')->value;
+            $grantval[$vall1] = $title;
+            $agencyngrants[$vall1] = $title;
+        }
+        $form['field_funded_by_target_id']['#type'] = 'select';
+        $form['field_funded_by_target_id']['#multiple'] = false;
+        $form['field_funded_by_target_id']['#chosen'] = true;
+       // $form['field_funded_by_target_id']['#empty_option'] = t('Show All');
+        $form['field_funded_by_target_id']['#options'] = $grantval;
+        unset($form['field_funded_by_target_id']['#size']);
+
+           if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+
+        /*vm0209------------------*/
+        //Filter by Agency & grants Years
+        $form['field_date_of_activity_value_1']['#type'] = 'select';
+        $form['field_date_of_activity_value_1']['#multiple'] = false;
+        $form['field_date_of_activity_value_1']['#chosen'] = true;
+        $form['field_date_of_activity_value_1']['#options'] = $agencyngrants;
+        unset($form['field_date_of_activity_value_1']['#size']);
+
+    }
+
+    //@vm0209grant
+    if ($form['#id'] == 'views-exposed-form-all-students-page-7' || $form['#id'] == 'views-exposed-form-all-in-kind-donations-page-5') {
+        $form = kindlyhub_views_expose_filter_funded_by($form);
+
+        if(isset($form['created']['min']['#size']))
+            $form['created']['min']['#size'] = 12;
+        if(isset($form['created']['max']['#size']))
+            $form['created']['max']['#size'] = 12;
+
+    }
+    //@end@vm0209grant
+
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-9')
+    {
+
+        //$form['flag_id_1']['#value'] = 'pending';
+        // select Classroom for the agency admin
+        $optArr1[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_4')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $optArr1[$nid] = $key;
+        }
+
+        $form['field_classroom_reference_target_id_1']['#type'] = 'select';
+        $form['field_classroom_reference_target_id_1']['#multiple'] = false;
+        $form['field_classroom_reference_target_id_1']['#chosen'] = false;
+        $form['field_classroom_reference_target_id_1']['#empty_option'] = t('Show All');
+        $form['field_classroom_reference_target_id_1']['#options'] = $optArr1;
+        unset($form['field_classroom_reference_target_id_1']['#size']);
+
+        // select Family for the agency admin
+        $optArr2[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_6')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['nid'];
+            $val = $fieldArray['title'];
+            $optArr2[$key] = $val;
+        }
+        $form['field_family_reference_target_id']['#type'] = 'select';
+        $form['field_family_reference_target_id']['#multiple'] = false;
+        $form['field_family_reference_target_id']['#chosen'] = true;
+        $form['field_family_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_family_reference_target_id']['#options'] = $optArr2;
+        unset($form['field_family_reference_target_id']['#size']);
+
+        // select For Student for the agency admin
+        $optArr3[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_7')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $optArr3[$key] = html_entity_decode($fieldArray['title'], ENT_QUOTES);
+        }
+        $form['title_7']['#type'] = 'select';
+        $form['title_7']['#multiple'] = false;
+        $form['title_7']['#empty_option'] = t('Show All');
+        $form['title_7']['#options'] = $optArr3;
+        $form['title_7']['#chosen'] = true;
+        unset($form['title_7']['#size']);
+
+        // select Funded By for Student for the agency admin
+        $query = db_query("SELECT node__field_fun.delta AS node__field_fun_delta, node__field_fun.langcode AS node__field_fun_langcode, node__field_fun.bundle AS node__field_fun_bundle, node__field_fun.field_fun_target_id AS node__field_fun_field_fun_target_id, node_field_data.nid AS nid, node_field_data_node__field_fun.nid AS node_field_data_node__field_fun_nid FROM
+       {node_field_data} node_field_data LEFT JOIN {node__field_fun} node__field_fun ON node_field_data.nid = node__field_fun.entity_id AND node__field_fun.deleted = '0'
+     LEFT JOIN {node_field_data} node_field_data_node__field_fun ON node__field_fun.field_fun_target_id = node_field_data_node__field_fun.nid
+     WHERE ((node_field_data.nid = $agencyid )) AND ((node_field_data.type IN ('agency')) AND (node_field_data_node__field_fun.status = '1'))")->fetchAll();
+
+        $grantval[''] = 'Show All';
+        foreach ($query as $key => $csvDataRow)
+        {
+            $vall1 = $csvDataRow->node__field_fun_field_fun_target_id;
+            $val_node = node_load($vall1);
+            $title = $val_node->get('title')->value;
+            $grantval[$vall1] = $title;
+        }
+        $form['field_funded_by_target_id']['#type'] = 'select';
+        $form['field_funded_by_target_id']['#multiple'] = false;
+        $form['field_funded_by_target_id']['#chosen'] = true;
+        $form['field_funded_by_target_id']['#empty_option'] = t('Show All');
+        $form['field_funded_by_target_id']['#options'] = $grantval;
+        unset($form['field_funded_by_target_id']['#size']);
+
+        if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+
+    }
+    //---------------------------------------------------------------------------------------------------------
+    // Location filter in mange staff for agency admin--------------------------------------
+    if ($form['#id'] == 'views-exposed-form-user-profile-block-3')
+    {
+        $optArrrr[''] = 'Show All';
+        $q = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_5')));
+        foreach ($q as $key => $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $fieldval1 = html_entity_decode($key, ENT_QUOTES);
+            $optArrrr[$nid] = $fieldval1;
+        }
+        $form['field_user_location_reference_target_id']['#type'] = 'select';
+        $form['field_user_location_reference_target_id']['#multiple'] = false;
+        $form['field_user_location_reference_target_id']['#chosen'] = true;
+        $form['field_user_location_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_user_location_reference_target_id']['#options'] = $optArrrr;
+        unset($form['field_user_location_reference_target_id']['#size']);
+
+        if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+
+    }
+    //--------------------------------------------------------------------------------------------
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-13'){
+        $optArr2[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_6')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['nid'];
+            $val = $fieldArray['title'];
+            $optArr2[$val] = $val;
+        }
+        $form['title']['#type'] = 'select';
+        $form['title']['#multiple'] = false;
+        $form['title']['#chosen'] = true;
+        $form['title']['#empty_option'] = t('Show All');
+        $form['title']['#options'] = $optArr2;
+        unset($form['title']['#size']);
+
+    }
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-7' || $form['#id'] == 'views-exposed-form-classroom-users-block-12')
+    {
+// views-exposed-form-classroom-users-page-5
+        //Location Select fo location manager-------
+        $query = $_GET;
+        $lid = $query['lid'];
+
+        $optArrer[''] = 'Show All';
+        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $uid = $user->id();
+        $q = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_5')));
+        foreach ($q as $key => $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $fieldval1 = html_entity_decode($key, ENT_QUOTES);
+            $optArrer[$fieldval1] = $fieldval1;
+        }
+        $form['title']['#type'] = 'select';
+        $form['title']['#multiple'] = false;
+        // Specify the empty option for our select list
+        $form['title']['#empty_option'] = t('Show All');
+        $form['title']['#chosen'] = true;
+        // Add the $options from above to our select list
+        $form['title']['#options'] = $optArrer;
+        if (isset($lid))
+        {
+            $form['title']['#value'] = $lid;
+        }
+        unset($form['title']['#size']);
+
+        if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+
+    }
+    //--------------------------------------------------------------------------------------------
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-10' || $form['#id'] == 'views-exposed-form-classroom-users-block-2' || $form['#id'] == 'views-exposed-form-classroom-users-block-5') {
+       $optArrr[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_4')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $optArrr[$nid] = $fieldArray['title'];
+        }
+        $form['field_classroom_reference_target_id']['#type'] = 'select';
+        $form['field_classroom_reference_target_id']['#multiple'] = false;
+       // $form['field_classroom_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_classroom_reference_target_id']['#chosen'] = false;
+        $form['field_classroom_reference_target_id']['#options'] = $optArrr;
+        unset($form['field_classroom_reference_target_id']['#size']);
+
+        if ($form['#id'] == 'views-exposed-form-classroom-users-block-10') {
+            $optArrrr[''] ='Show All';
+            $q = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_5')));
+            foreach ($q as $key => $csvDataRow)
+            {
+                $fieldArray = (array)$csvDataRow;
+                $key = $fieldArray['title'];
+                $nid = $fieldArray['nid'];
+                $fieldval1 = html_entity_decode($key, ENT_QUOTES);
+                $optArrrr[$nid] = $fieldval1;
+            }
+            $form['field_location_reference_target_id']['#type'] = 'select';
+            $form['field_location_reference_target_id']['#multiple'] = false;
+            $form['field_location_reference_target_id']['#chosen'] = true;
+            //$form['field_location_reference_target_id']['#empty_option'] = t('Show All');
+            $form['field_location_reference_target_id']['#options'] = $optArrrr;
+            unset($form['field_location_reference_target_id']['#size']);
+            if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+            {
+                $submit_id = $form['actions']['submit']['#id'];
+                $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+            }
+        }
+
+    }
+
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-4')
+    {
+        $optArrr[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_8')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $optArrr[$nid] = $fieldArray['title'];
+        }
+        $form['field_classroom_reference_target_id']['#type'] = 'select';
+        $form['field_classroom_reference_target_id']['#multiple'] = false;
+       // $form['field_classroom_reference_target_id']['#empty_option'] = t('Show All');
+        $form['field_classroom_reference_target_id']['#chosen'] = true;
+        $form['field_classroom_reference_target_id']['#options'] = $optArrr;
+        unset($form['field_classroom_reference_target_id']['#size']);
+
+        // selected location of current loggedin location manager--------------------
+        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $location = $user->get('field_user_location_reference')
+            ->getValue();
+        if (isset($location))
+        {
+            $optArr1r[''] = 'Show All';
+            foreach ($location as $key => $value)
+            {
+                $nid = $value['target_id'];
+                $node = node_load($nid);
+                $title = $node->get('title')->value;
+                $optArr1r[$title] = $title;
+            }
+            $form['title']['#type'] = 'select';
+            $form['title']['#multiple'] = false;
+            // Specify the empty option for our select list
+            $form['title']['#chosen'] = true;
+
+            // Add the $options from above to our select list
+            $form['title']['#options'] = $optArr1r;
+            unset($form['title']['#size']);
+        }
+        if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+    }
+    if ($form['#id'] == 'views-exposed-form-classroom-users-block-6_REMOVED')
+    {
+        $optArr1[''] = 'Show All';
+        $csvData = json_decode(drupal_render(views_embed_view('classroom_users', 'data_export_4')));
+        foreach ($csvData as $csvDataRow)
+        {
+            $fieldArray = (array)$csvDataRow;
+            $key = $fieldArray['title'];
+            $nid = $fieldArray['nid'];
+            $optArr1[$nid] = $key;
+        }
+        $form['title']['#type'] = 'select';
+        $form['title']['#multiple'] = false;
+        $form['title']['#chosen'] = true;
+        $form['title']['#options'] = $optArr1;
+        unset($form['title']['#size']);
+    }
+ if ($form['#id'] == 'views-exposed-form-classroom-users-block-5')
+    {
+        if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+        {
+            $submit_id = $form['actions']['submit']['#id'];
+            $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+        }
+    }
+}
+
+
+
+/**
+ *  This function make funded by reference text field to select field.
+ *  Instead of having to enter entity IDs manually,
+ *  users can select the labels of the entities they want to filter on.
+ *  @vm0209funded
+ */
+function kindlyhub_views_expose_filter_funded_by(&$form){
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $agencyid = $user->get('field_agency_reference')->getValue()[0]['target_id'];
+    // select Funded By for Student for the agency grats admin
+    $query = db_query("SELECT node__field_fun.delta AS node__field_fun_delta, node__field_fun.langcode AS node__field_fun_langcode, node__field_fun.bundle AS node__field_fun_bundle, node__field_fun.field_fun_target_id AS node__field_fun_field_fun_target_id, node_field_data.nid AS nid, node_field_data_node__field_fun.nid AS node_field_data_node__field_fun_nid FROM
+    {node_field_data} node_field_data LEFT JOIN {node__field_fun} node__field_fun ON node_field_data.nid = node__field_fun.entity_id AND node__field_fun.deleted = '0'
+    LEFT JOIN {node_field_data} node_field_data_node__field_fun ON node__field_fun.field_fun_target_id = node_field_data_node__field_fun.nid
+    WHERE ((node_field_data.nid = $agencyid )) AND ((node_field_data.type IN ('agency')) AND (node_field_data_node__field_fun.status = '1'))")->fetchAll();
+
+
+    $grantval[''] = t('Show All');
+    foreach ($query as $key => $csvDataRow)
+    {
+        $vall1 = $csvDataRow->node__field_fun_field_fun_target_id;
+        $val_node = node_load($vall1);
+        $title = $val_node->get('title')->value;
+        $grantval[$vall1] = $title;
+    }
+    $form['field_funded_by_target_id']['#type'] = 'select';
+    $form['field_funded_by_target_id']['#multiple'] = false;
+    $form['field_funded_by_target_id']['#chosen'] = true;
+    // $form['field_funded_by_target_id']['#empty_option'] = t('Show All');
+    $form['field_funded_by_target_id']['#options'] = $grantval;
+    unset($form['field_funded_by_target_id']['#size']);
+
+       if (isset($form['actions']['reset']) && isset($form['actions']['submit']))
+    {
+        $submit_id = $form['actions']['submit']['#id'];
+        $form['actions']['reset']['#attributes']['onclick'] = 'javascript:jQuery(this.form).clearForm();jQuery("#' . $submit_id . '").trigger("click");return false;';
+    }
+
+    return $form;
+}
+//@end@vm0209funded
+
+// ------------------------------------------------------------------------------------------------------
+// function custom_module_inline_entity_form_reference_form_alter(&$reference_form, &$form_state) {
+//     if ($reference_form['#entity_type'] == 'node') {
+//          $field = field_info_field($reference_form['#parents'][0]);
+//          dsm($field);
+//         // $nodes = node_load_multiple(array(), array('type' => reset($field['settings']['handler_settings']['target_bundles'])));
+//         // $options = array();
+//         // foreach ($nodes as $node) {
+//         //     $options[$node->title . ' (' . $node->nid . ')'] = $node->title;
+//         // }
+//         // $reference_form['entity_id']['#type'] = 'select';
+//         // $reference_form['entity_id']['#options'] = $options;
+//     }
+// }
+
+// hiding administrator tab for other role user--------------------------------------------------
+function custom_module_preprocess_html(&$variables)
+{
+    global $base_url;
+    $user = \Drupal::currentUser()->getRoles();
+    if (in_array("administrator", $user) && in_array("superadministrator", $user))
+    {
+        $isadmin = '4';
+    }
+
+    if (in_array("agency_administrator", $user) || in_array("agency_manager", $user))
+    {
+        $isadmin = '2';
+    }
+
+    if (in_array('family_member', $user) && !in_array('superadministrator', $user))
+    {
+        $isadmin = '7';
+    }
+    //Add a JS library
+    if(isset($isadmin)){
+    $variables['#attached']['drupalSettings']['custom_module']['CustomModule']['isadmin'] = $isadmin;
+}
+    $variables['#attached']['drupalSettings']['custom_module']['base_url'] = $base_url;
+}
+
+//---------------------------------------------------------------------------------------------------
+//follow-up mail for panding order -----------------------------------------------------------------
+function custom_module_cron()
+{
+
+
+     // staff block after 30 day if status is inactive --------------------
+
+    $view_list = db_query("SELECT flagging_users_field_data.uid AS flagging_users_field_data_uid, user__field_adult_first_name.field_adult_first_name_value AS user__field_adult_first_name_field_adult_first_name_value, users_field_data.uid AS uid, flagging_users_field_data.id AS flagging_users_field_data_id
+FROM
+{users_field_data} users_field_data
+INNER JOIN {flagging} flagging_users_field_data ON users_field_data.uid = flagging_users_field_data.entity_id AND flagging_users_field_data.flag_id = 'staff_action'
+LEFT JOIN {user__field_adult_first_name} user__field_adult_first_name ON users_field_data.uid = user__field_adult_first_name.entity_id AND user__field_adult_first_name.deleted = '0'
+WHERE users_field_data.status = '1'
+ORDER BY user__field_adult_first_name_field_adult_first_name_value ASC")->fetchAll();
+
+// $csvData = json_decode(Render(views_embed_view("all_staff_users", "data_export_1")));
+   foreach ($view_list as $key => $value) {
+//     $uid = $value->;
+
+// print_r($uid); die;
+   }
+
+    echo date('d/m/Y',strtotime('+30 days',strtotime(str_replace('/', '-', '05/06/2016')))) . PHP_EOL;
+
+    // $result = db_query("SELECT order_id FROM {uc_orders} WHERE order_status
+    // IN ('abandoned', 'pending') ")->fetchAll();
+    // foreach($result as $key=>$value){
+    // $pending_order = $value->order_id;
+    // $orders = Order::load($pending_order);
+    // $author_id = $orders ->getOwner()->id();
+    // $mail = user_load($author_id );
+    // $mail_id =$mail->get('mail')->value;
+    // $send_mail = new \Drupal\Core\Mail\Plugin\Mail\PhpMail();
+    // $from = 'info@kindlyapp.com';
+    //      $message['headers'] = array(
+    //      'content-type' => 'text/html',
+    //      'MIME-Version' => '1.0',
+    //      'reply-to' => $from,
+    //      'from' => 'Kindly<'.$from.'>'
+    //      );
+    //  $message['to'] = $mail_id ;
+    // $message['subject'] = "We’ve saved your cart for order number -".$pending_order;
+    // $message['body'] = 'Still thinking about it? Ask yourself a few questions? Is our data collection process simple and easy? Can we reach families 24/7? Can they reach us 24/7? Could we benefit from reducing the time we spend pushing and tracking paper forms? If you said yes to one (or more) of these, you need Kindly! And we would LOVE to make your systems more efficient and effective than ever before.';
+    // $result = $send_mail->mail($message);
+    // if ($result == true) {
+    //      drupal_set_message(t('Pending order Followup mail sended'));
+    //     }
+    // }
+    $cron_last = db_query("SELECT watchdog.timestamp AS watchdog_timestamp, DATE_FORMAT(DATE_ADD('19700101', INTERVAL watchdog.timestamp SECOND), '%Y%m%d%H%i') AS watchdog_timestamp_minute
+    FROM
+    {watchdog} watchdog
+    WHERE watchdog.type IN ('cron')
+    ORDER BY watchdog_timestamp_minute DESC
+    LIMIT 1 OFFSET 0")->fetchAll();
+    foreach ($cron_last as $csvDataRow)
+    {
+        $val = $csvDataRow->watchdog_timestamp;
+    }
+    date_default_timezone_set('Asia/Kolkata');
+    $time = date('H:i A', $val);
+    if ($time == '18:00 PM')
+    {
+        $q = db_query("
+    SELECT users_field_data.uid AS uid
+    FROM
+    {users_field_data} users_field_data
+    INNER JOIN {user__roles} user__roles_value_0 ON users_field_data.uid = user__roles_value_0.entity_id AND user__roles_value_0.roles_target_id = 'teacher'
+    INNER JOIN {user__roles} user__roles_value_1 ON users_field_data.uid = user__roles_value_1.entity_id AND user__roles_value_1.roles_target_id = 'school_manager'
+    LEFT JOIN {user__field_agency_reference} user__field_agency_reference ON users_field_data.uid = user__field_agency_reference.entity_id AND user__field_agency_reference.deleted = '0'
+    INNER JOIN {user__field_manage_notifications_that_} user__field_manage_notifications_that_ ON users_field_data.uid = user__field_manage_notifications_that_.entity_id AND user__field_manage_notifications_that_.deleted = '0'
+    WHERE ((user__field_manage_notifications_that_.field_manage_notifications_that__value = 'Daily Report')) AND ((users_field_data.status = '1') AND ((user__roles_value_0.roles_target_id = 'teacher') AND (user__roles_value_1.roles_target_id = 'school_manager')) AND (user__field_agency_reference.field_agency_reference_target_id IS NOT NULL))")->FetchAll();
+        foreach ($q as $key => $value)
+        {
+            $uid = $value->uid;
+            $user = \Drupal\user\Entity\User::load($uid);
+            $email = $user->get('mail')->value;
+            $agency = $user->get('field_agency_reference')
+                ->getValue() [0]['target_id'];
+            $agency_name = node_load($agency)->get('title')->value;
+
+            $langcode = \Drupal::currentUser()->getPreferredLangcode();
+            $mailManager = \Drupal::service('plugin.manager.mail');
+            $params['context']['subject'] = "DAILY Report";
+            $params['context']['message'] = "Kindhearted people have been giving to " . $agency_name . "all day. Log in to view your daily donation summary.";
+            $to = $Email;
+            $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+            if ($result['result'] !== true)
+            {
+                drupal_set_message(t('There was a problem sending your message and it was not sent.') , 'error');
+            }
+            else
+            {
+                drupal_set_message('Mail sent to location manager & teacher of Daily Report');
+            }
+        }
+    }
+    // weekly report ------------------------------------------------------
+    $time1 = date('w', $val);
+    if ($time1 == '5')
+    {
+        $q1 = db_query("
+    SELECT users_field_data.uid AS uid
+    FROM
+    {users_field_data} users_field_data
+    INNER JOIN {user__roles} user__roles_value_0 ON users_field_data.uid = user__roles_value_0.entity_id AND user__roles_value_0.roles_target_id = 'teacher'
+    INNER JOIN {user__roles} user__roles_value_1 ON users_field_data.uid = user__roles_value_1.entity_id AND user__roles_value_1.roles_target_id = 'school_manager'
+    LEFT JOIN {user__field_agency_reference} user__field_agency_reference ON users_field_data.uid = user__field_agency_reference.entity_id AND user__field_agency_reference.deleted = '0'
+    INNER JOIN {user__field_manage_notifications_that_} user__field_manage_notifications_that_ ON users_field_data.uid = user__field_manage_notifications_that_.entity_id AND user__field_manage_notifications_that_.deleted = '0'
+    WHERE ((user__field_manage_notifications_that_.field_manage_notifications_that__value = 'Weekly Report')) AND ((users_field_data.status = '1') AND ((user__roles_value_0.roles_target_id = 'teacher') AND (user__roles_value_1.roles_target_id = 'school_manager')) AND (user__field_agency_reference.field_agency_reference_target_id IS NOT NULL))")->FetchAll();
+        foreach ($q1 as $key => $value)
+        {
+            $uid = $value->uid;
+            $user = \Drupal\user\Entity\User::load($uid);
+            $email = $user->get('mail')->value;
+            $agency = $user->get('field_agency_reference')
+                ->getValue() [0]['target_id'];
+            $agency_name = node_load($agency)->get('title')->value;
+
+            $langcode = \Drupal::currentUser()->getPreferredLangcode();
+            $mailManager = \Drupal::service('plugin.manager.mail');
+            $params['context']['subject'] = " WEEKLY Report";
+            $params['context']['message'] = "Kindhearted people have been giving to " . $agency_name . "all Week . Log in to view your weekly donation summary.";
+            $to = $Email;
+            $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+            if ($result['result'] !== true)
+            {
+                drupal_set_message(t('There was a problem sending your message and it was not sent.') , 'error');
+            }
+            else
+            {
+                drupal_set_message('Mail sent to location manager & teacher of Weekly Report');
+            }
+        }
+
+    }
+
+    // MONTHLY Report ------------------------------
+    $time2 = date('m', $val);
+    $last_day_this_month = date('Y-' . $time . '-t');
+    $last_day = date("Y-m-d");
+    if ($last_day_this_month == $last_day)
+    {
+        $query2 = db_query("
+    SELECT users_field_data.uid AS uid
+    FROM
+    {users_field_data} users_field_data
+    INNER JOIN {user__roles} user__roles_value_0 ON users_field_data.uid = user__roles_value_0.entity_id AND user__roles_value_0.roles_target_id = 'teacher'
+    INNER JOIN {user__roles} user__roles_value_1 ON users_field_data.uid = user__roles_value_1.entity_id AND user__roles_value_1.roles_target_id = 'school_manager'
+    LEFT JOIN {user__field_agency_reference} user__field_agency_reference ON users_field_data.uid = user__field_agency_reference.entity_id AND user__field_agency_reference.deleted = '0'
+    INNER JOIN {user__field_manage_notifications_that_} user__field_manage_notifications_that_ ON users_field_data.uid = user__field_manage_notifications_that_.entity_id AND user__field_manage_notifications_that_.deleted = '0'
+    WHERE ((user__field_manage_notifications_that_.field_manage_notifications_that__value = 'Monthly Report')) AND ((users_field_data.status = '1') AND ((user__roles_value_0.roles_target_id = 'teacher') AND (user__roles_value_1.roles_target_id = 'school_manager')) AND (user__field_agency_reference.field_agency_reference_target_id IS NOT NULL))")->FetchAll();
+        foreach ($query2 as $key => $value)
+        {
+            $uid = $value->uid;
+            $user = \Drupal\user\Entity\User::load($uid);
+            $email = $user->get('mail')->value;
+            $agency = $user->get('field_agency_reference')
+                ->getValue() [0]['target_id'];
+            $agency_name = node_load($agency)->get('title')->value;
+
+            $langcode = \Drupal::currentUser()->getPreferredLangcode();
+            $mailManager = \Drupal::service('plugin.manager.mail');
+            $params['context']['subject'] = " MONTHLY Report";
+            $params['context']['message'] = "Kindhearted people have been giving to " . $agency_name . "all month . Log in to view your Monthly donation summary.";
+            $to = $Email;
+            $result = $mailManager->mail('system', 'mail', $to, $langcode, $params);
+            if ($result['result'] !== true)
+            {
+                drupal_set_message(t('There was a problem sending your message and it was not sent.') , 'error');
+            }
+            else
+            {
+                drupal_set_message('Mail Sended to location manager & teacher of Monthly Report');
+            }
+        }
+
+    }
+
+   }
+
+//--------------------------------------------------------------------------------------------------
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for node entities.
+ *
+ * This tests saving a node on node insert.
+ *
+ * @see \Drupal\node\Tests\NodeSaveTest::testNodeSaveOnInsert()
+ */
+function custom_module_node_insert(NodeInterface $node) {
+  // Set the node title to the node ID and save.
+  if($node->getType() == 'funding_source') {
+    $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    $agency_nid = $user->get('field_agency_reference')->getValue() [0]['target_id'];
+    //Load Agency data & Insert new grant into Agency.
+    $agency = Node::load($agency_nid);
+    $fun = $agency->get('field_fun')->getValue();
+    $fun[] =['target_id' => $node->id()];
+    $agency->set('field_fun',$fun);
+    $agency->save();
+  }
+}
+
+// Student node Access according to the user selected agency ------------------------------------
+function custom_module_node_access(NodeInterface $node, $op, AccountInterface $account)
+{
+
+    $type = $node->getType();
+    $nid = $node->id();
+    $user = \Drupal::currentUser();
+    $uid = \Drupal::currentUser()->id();
+    $user_detail = user_load($uid);
+    $user_agency = $user_detail->get('field_agency_reference')
+        ->getvalue();
+    //$useraid = $user_agency[0]['target_id'];
+    $useraid = count($user_agency)>0?$user_agency[0]['target_id']:0;
+    $roles = $user_detail->getRoles();
+
+   //  if($nid == 345 || $op == 'view'){
+   //      if($uid == 0){
+   //     return AccessResult::forbidden();
+   // }
+   //  }
+
+    if ($type == 'student' || $type == 'classroom' || $type == 'in_kind_donation' || $type == 'family_group' || $type == 'location')
+    {
+        $node_detail = node_load($nid);
+        $agency = $node_detail->get('field_agency')
+            ->getvalue();
+        $aid = $agency[0]['target_id'];
+        if ($op == 'update' || $op == 'view')
+        {
+            if ($aid != $useraid)
+            {
+                return AccessResult::forbidden();
+            }
+        }
+    }
+
+    if ($type == 'agency')
+    {
+        if ($op == 'update' || $op == 'view')
+        {
+            if ($nid != $useraid)
+            {
+                return AccessResult::forbidden();
+
+            }
+        }
+    }
+
+}
+
+// -------------------------------------------------------------------------------------------------
+//Removing N/A option without making field required-----------------------------------------
+function custom_module_form_node_student_form_alter(&$form, &$form_state)
+{
+    unset($form['field_status_']['widget']['#options']['_none']);
+}
+//---------------------------------------------------------------------------------------
+
+function custom_module_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+    if ($entity_form['#entity_type'] == 'taxonomy_term' && $entity_form['#bundle'] == 'community_partneractivities') {
+        $entity_form['#ief_labels']['singular'] = 'community partner setup';
+        $entity_form['#ief_labels']['plural'] = 'community partner setup';
+     if($entity_form['#op'] == 'add'){
+            $entity_form['#ief_labels']['singular'] = 'New Activity';
+        }
+    }
+    if ($entity_form['#entity_type'] == 'node' && $entity_form['#bundle'] == 'funding_source') {
+        $entity_form['#ief_labels']['singular'] = 'Funding Source';
+        //Pull Agency hourly rate and put into Grant hourly rate field @vm0209
+        if(empty($entity_form['field_current_year_hourly_rate']['widget'][0]['value']['#default_value']) ){
+            $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+            $entity_form['field_current_year_hourly_rate']['widget'][0]['value']['#default_value'] = $user->get('field_agency_reference')->entity->get('field_hourly_rate_i_e_16_95')->value;
+        }//@end-vm0209
+
+    }
+ }
+
+// flag relationship is in one filter ---------------------------------------------------------------------------------
+
+function custom_module_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+    if ((  $view->id() == 'chart_monthly_bar'  )) {
+
+        $userCurrent = \Drupal::currentUser();
+        $user = \Drupal\user\Entity\User::load($userCurrent->id());
+        $uid = $user->get('uid')->value;
+        $agencyid = $user->get('field_agency_reference')->getValue()[0]['target_id'];
+        // kint($view->args);
+        $view->args[0]=$agencyid;
+        //kint($view->args[0]);
+    }
+    if ((   $view->id() ==  'chart_monthly_bar_by_location' )) {
+
+        $userCurrent = \Drupal::currentUser();
+        $user = \Drupal\user\Entity\User::load($userCurrent->id());
+        $uid = $user->get('uid')->value;
+        $agencyid = $user->get('field_agency_reference')->getValue()[0]['target_id'];
+        // kint($view->args);
+        $view->args[0]=$agencyid;
+        $agency_node = node_load($agencyid);
+        if (isset($agency_node)) {
+            $currentYear = $agency_node->get('field_date')->getValue();
+            $yearStartDate = strtotime($currentYear[0]['value']);
+            $yearEndDate = strtotime($currentYear[0]['end_value']);
+        }
+
+        $query->where[1]['conditions'][2]['field'] = "node_field_data.created BETWEEN $yearStartDate AND $yearEndDate";
+    }
+
+    if (($view->id() ==  'classroom_users' && $view->current_display == 'block_9' )) {
+     $val1 = $query->where[1]['conditions'][1]['value'][0];
+
+    if($val1 == 'pending'){
+    $chang =$query->where[1]['conditions'][1]['field'] = 'flagging_node_field_data_2.flag_id';
+    }
+
+    if($val1 == 'reject'){
+    $chang =$query->where[1]['conditions'][1]['field'] = 'flagging_node_field_data_1.flag_id';
+        }
+    }
+    //Get id of agency ID or Grants ID
+    $filterby_agency_grant = isset($view->exposed_raw_input['field_date_of_activity_value_1'])?$view->exposed_raw_input['field_date_of_activity_value_1']:'';
+
+    if($filterby_agency_grant == 'agency') {
+        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+        $roles = $user->getRoles();
+        $uid = $user->id();
+        $agency_nid = $user->get('field_agency_reference')->getValue() [0]['target_id'];
+        $agency_year_date = node_load($agency_nid)->get('field_date')->value;
+        //$agency_year_date = DATE_FORMAT($agency_year_date, '%Y-%m-%d');
+        $agency_year_end_date = node_load($agency_nid)->get('field_date')->end_value;
+        //$agency_year_end_date = DATE_FORMAT($agency_year_end_date, '%Y-%m-%d');
+        filter_by_activity_date($query, $filterby_agency_grant, $agency_year_date, $agency_year_end_date);
+    }elseif($filterby_agency_grant != ''){
+        $grant_year_date = node_load($filterby_agency_grant)->get('field_project_period_start_date')->value;
+        $grant_year_end_date = node_load($filterby_agency_grant)->get('field_project_period_start_date')->end_value;
+        filter_by_activity_date($query, $filterby_agency_grant, $grant_year_date, $grant_year_end_date);
+    }else{
+        //filter_by_activity_date($query, $filterby_agency_grant, $start_date, $end_date);
+    }
+
+    //Filter Criteria for Teacher Role
+    $roles = \Drupal::currentUser()->getRoles();
+    if(in_array('teacher', $roles)) {
+      //Staff/Teacher Role: Manage Classes - filter based on teacher classrooms.
+      if (($view->id() == 'classroom_users' && $view->current_display == 'block_14')) {
+        $classroom_ids = custom_module_get_staff_classroom();
+        if ($classroom_ids)
+          $query->addWhere('', 'field_location_reference_node_field_data.nid', $classroom_ids, 'IN');
+        else
+          $query->addWhere('', 'field_location_reference_node_field_data.nid', '0', '=');
+      }
+
+      //Staff/Teacher-Role: Manage Donation - add condition for classroom
+      if (($view->id() == 'manage_agency_school' && ($view->current_display == 'block_6' || $view->current_display == 'block_6' || $view->current_display == 'block_6'))) {
+        // Write the join conditions.
+        $configuration = [
+          'type' => 'LEFT',
+          'table' => 'node__field_classroom_reference',
+          'field' => 'entity_id',
+          'left_table' => 'node_field_data',
+          'left_field' => 'nid',
+          'operator' => '=',
+        ];
+        $join_obj = \Drupal\views\Views::pluginManager('join')
+          ->createInstance('standard', $configuration);
+        $rel = $query->addRelationship('node__field_classroom_reference', $join_obj, 'node_field_data');
+        $query->addTable('node__field_classroom_reference', $rel, $join_obj, 'node__field_classroom_reference');
+        $join_obj->extra[] = array(
+          'field' => 'deleted',
+          'value' => '0',
+        );
+        $join_obj->extra_type = 'AND';
+        //      $join_obj->extra[] = array(
+        //        'field'=>'langcode',
+        //        'value' => 'node_field_data.langcode',
+        //      );
+        //      $join_obj->extra_type = 'OR';
+        //      $join_obj->extra[] = array(
+        //        'field'=>'bundle',
+        //        'value' => 'student',
+        //      );
+        //$join_obj->extra_type = 'AND';
+        $classroom_ids = custom_module_get_staff_classroom();
+        if ($classroom_ids)
+          $query->addWhere('', 'node__field_classroom_reference.field_classroom_reference_target_id', $classroom_ids, 'IN');
+        else
+          $query->addWhere('', 'node__field_classroom_reference.field_classroom_reference_target_id', '0', '=');
+
+      }
+    }
+
+    if(isset($_GET['test']) && $_GET['test'] == 'kint'){
+          //dpq($view->query->query());
+    }
+
+}
+
+
+/**
+ * @return bool or array
+ * Get Staff Teacher classroom
+ */
+function custom_module_get_staff_classroom() {
+  $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  $classroom = $user->get('field_classroom_reference')->getValue();
+  foreach ($classroom as $key => $value){
+    $classroom_ids[] = $value['target_id'];
+  }
+  return (count($classroom_ids) > 0 ) ? $classroom_ids : FALSE;
+}
+
+/**
+ * Add beetween condition in views query for field (field_date_of_activity)
+ *
+ **/
+function filter_by_activity_date(&$query, $filterby_agency_grant, $start_date, $end_date){
+    foreach($query->where[1]['conditions'] as $idx => $condition) {
+
+      if (!is_object($condition['field']) && $condition['field'] == 'node__field_date_of_activity.field_date_of_activity_value') {
+        if($filterby_agency_grant == ''){
+            $query->where[1]['conditions'][$idx]['value'] = '';
+            $query->where[1]['conditions'][$idx]['operator'] = '!=';
+        }else{
+            $query->where[1]['conditions'][$idx]['field'] = "DATE_FORMAT(node__field_date_of_activity.field_date_of_activity_value, '%Y-%m-%d') BETWEEN DATE_FORMAT('".$start_date."', '%Y-%m-%d') AND DATE_FORMAT('".$end_date."', '%Y-%m-%d')";
+            $query->where[1]['conditions'][$idx]['value'] = [];
+            $query->where[1]['conditions'][$idx]['operator'] = 'formula';
+        }
+      }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------------------------------------------------
+function custom_module_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
+    //debug($view->id());
+    // Modify contextual filters for my_special_view if user has 'my special permission'.
+    //$account = \Drupal::currentUser();
+    //$view->id() ==  'chart_monthly_bar' && $view->current_display == 'page_1'
+    if ($view->id() == 'chart_monthly_bar' or $view->id() == 'chart_monthly_bar_by_location') {
+        $userCurrent = \Drupal::currentUser();
+        $user = \Drupal\user\Entity\User::load($userCurrent->id());
+        $uid = $user->get('uid')->value;
+        $agencyid = $user->get('field_agency_reference')->getValue()[0]['target_id'];
+        // kint($view->args);
+        $view->args[0]=$agencyid;
+
+
+    }
+  }

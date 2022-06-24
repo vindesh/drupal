@@ -1,0 +1,43 @@
+kh_import.import:
+  path: '/admin/config/kh-import'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Kindlyhub Import'
+  requirements:
+    _permission: 'administer site configuration'
+kh_import.import_staff:
+  path: '/admin/config/kh-import/import-staff'
+  defaults:
+    _form: 'Drupal\kh_import\Form\ImportStaffForm'
+    _title: 'CSV Staff Import'
+  requirements:
+    _permission: 'import staff'
+kh_import.import_staff_by_usr:
+  path: '/kh-import/import-staff'
+  defaults:
+    _form: 'Drupal\kh_import\Form\ImportStaffForm'
+    _title: 'CSV Staff Import'
+  requirements:
+    _permission: 'import staff'
+kh_import.notification:
+  path: '/admin/config/kh-import/send-notification'
+  defaults:
+    _form: 'Drupal\kh_import\Form\SendNotificationForm'
+    _title: 'Send Notification'
+  requirements:
+    _permission: 'send notification to imported staff'
+
+kh_import.import_student:
+  path: '/admin/config/kh-import/import-student'
+  defaults:
+    _form: 'Drupal\kh_import\Form\ImportStudentForm'
+    _title: 'CSV Student Import'
+  requirements:
+    _permission: 'import student'
+kh_import.import_student_by_usr:
+  path: '/kh-import/import-student'
+  defaults:
+    _form: 'Drupal\kh_import\Form\ImportStudentForm'
+    _title: 'CSV Student Import'
+  requirements:
+    _permission: 'import student'

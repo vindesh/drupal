@@ -1,0 +1,339 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a view as a table.
+ *
+ * Available variables:
+ * - attributes: Remaining HTML attributes for the element.
+ *   - class: HTML classes that can be used to style contextually through CSS.
+ * - title : The title of this group of rows.
+ * - header: The table header columns.
+ *   - attributes: Remaining HTML attributes for the element.
+ *   - content: HTML classes to apply to each header cell, indexed by
+ *   the header's key.
+ * - caption_needed: Is the caption tag needed.
+ * - caption: The caption for this table.
+ * - accessibility_description: Extended description for the table details.
+ * - accessibility_summary: Summary for the table details.
+ * - responsive: Whether or not to use the .table-responsive wrapper.
+ * - rows: Table row items. Rows are keyed by row number.
+ *   - attributes: HTML classes to apply to each row.
+ *   - columns: Row column items. Columns are keyed by column number.
+ *     - attributes: HTML classes to apply to each column.
+ *     - content: The column content.
+ * - bordered: Flag indicating whether or not the table should be bordered.
+ * - condensed: Flag indicating whether or not the table should be condensed.
+ * - hover: Flag indicating whether or not table rows should be hoverable.
+ * - striped: Flag indicating whether or not table rows should be striped.
+ * - responsive: Flag indicating whether or not the table should be wrapped to
+ *   be responsive (using the Bootstrap Framework .table-responsive wrapper).
+ *
+ * @ingroup templates
+ *
+ * @see template_preprocess_views_view_table()
+ */
+#}
+<!-- ?created[min]=05%2F01%2F2020&created[max]=04%2F30%2F2021 -->
+{# {kint(_context|keys)} #}
+{% set dateArg = '&created[min]='~view.filter.created.value.min~'&created[max]='~view.filter.created.value.max %}
+{% if responsive %}
+  <div class="table-responsive">
+{% endif %}
+{%
+  set classes = [
+    'table',
+    bordered ? 'table-bordered',
+    condensed ? 'table-condensed',
+    hover ? 'table-hover',
+    striped ? 'table-striped',
+    sticky ? 'sticky-enabled',
+  ]
+%}
+
+{% set roles = user.getroles(TRUE) %}
+{% set showLinks = 0 %}
+
+
+
+{% if ('administrator' in roles 
+  or 'agency_manager' in roles
+  or 'agency_administrator' in roles
+  or 'superadministrator' in roles  )
+  and view.current_display == "pageall"
+%}
+    {% set showLinks = 1 %}
+
+{% endif  %}
+
+
+
+
+{% set grantReport =  [] %}
+{% set agencyName =  "" %}
+
+{# check all rows #} 
+{% for row in rows %}
+
+  {# get Funded by  #}
+  {% set varFundedby = (row.columns.field_funded_by['content'][0].field_output['#markup']|striptags|trim) ~ " " %}
+
+  
+  {% set agencyName = (row.columns.field_agency['content'][0].field_output['#markup']|striptags|trim) %}
+  {% set donation = 0 %}
+  {% set parenttime = 0 %}
+  {% set communitytime = 0 %}
+  
+  {% set fundName = (row.columns.field_funded_by['content'][0].field_output['#markup']|striptags|trim) ?(row.columns.field_funded_by['content'][0].field_output['#markup']|striptags|trim):"(Not Assigned)" %}
+
+  {% if fundName != "(Not Assigned)"  %}
+      {% set fundedby = showLinks? '<a href="/bulk-update-inkind-donation?field_funded_by_target_id='~(row.columns.field_funded_by_1['content'][0].field_output['#markup']|striptags|trim)~(dateArg)~'">'~  fundName ~'</a>': fundName %}
+  {% else %}
+      {% set fundedby = showLinks? '<a href="/bulk-update-inkind-donation?field_funded_by_target_id_1=1'~(dateArg)~'">'~fundName~'</a>': fundName %}  
+  {% endif %}
+
+  
+
+  
+    
+
+  {# Check if funded by is already in loop or not #}
+    {% if varFundedby not in grantReport|keys %}
+      {# If funded by for first time #}
+      
+        {% if (row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim) starts with 'Donation'  %}
+            {% set donation = (row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim) %}
+        {% endif %}  
+
+        {% if (row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim) starts with 'Parent'  %}
+            {% set parenttime = (row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim) %}
+        {% endif %}
+
+        {% if (row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim) starts with 'Community'  %}
+            {% set communitytime = (row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim) %}
+        {% endif %}
+
+        
+        {% set grantReport = grantReport|merge(  { (varFundedby): { 
+            'title':(row.columns.title['content'][0].field_output['#markup']|striptags|trim),
+            'donation_amount':donation,
+            'parent_time':parenttime,
+            'community_time':communitytime,
+            'field_agency':(row.columns.field_agency['content'][0].field_output['#markup']|striptags|trim),
+            'field_in_kind_donation_value':(row.columns.field_in_kind_donation_value['content'][0].field_output['#markup']|striptags|trim),
+            'field_doctor_visit_mileage':(row.columns.field_doctor_visit_mileage['content'][0].field_output['#markup']|striptags|trim),
+            'field_mileage_reimbursement':(row.columns.field_mileage_reimbursement['content'][0].field_output['#markup']|striptags|trim),
+            'field_donation_amount':(row.columns.field_donation_amount['content'][0].field_output['#markup']|striptags|trim),
+            'field_total_number_of_hours_requ':(row.columns.field_total_number_of_hours_requ['content'][0].field_output['#markup']|striptags|trim),
+            'field_funded_by':(fundedby),
+            'field_minutes_1':(row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim),
+            'field_which_type_of_in_kind_dona':(row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim),
+            'field_current_year_hourly_goal':(row.columns.field_current_year_hourly_goal['content'][0].field_output['#markup']|striptags|trim),
+            }})  
+        %}
+
+    {% else %}
+    {# if funded by is already in array #}
+      
+        {% if (row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim) starts with 'Donation'  %}
+          {% set donation = (grantReport[varFundedby]['donation_amount']) + (row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim) %}
+          {% set parenttime = (grantReport[varFundedby]['parent_time'])  %}
+          {% set communitytime = (grantReport[varFundedby]['community_time']) %}
+        {% endif %}       
+
+        {% if (row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim) starts with 'Parent'  %}
+          {% set donation = (grantReport[varFundedby]['donation_amount'])  %}
+          {% set parenttime = (grantReport[varFundedby]['parent_time']) + (row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim) %}
+          {% set communitytime = (grantReport[varFundedby]['community_time']) %}
+        {% endif %}
+
+        {% if (row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim) starts with 'Community'  %}
+          {% set donation = (grantReport[varFundedby]['donation_amount'])  %}
+          {% set parenttime = (grantReport[varFundedby]['parent_time'])  %}
+          {% set communitytime = (grantReport[varFundedby]['community_time']) +  (row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim) %}
+        {% endif %}
+
+        
+        
+
+        {% set grantReport = grantReport|merge(  { (varFundedby): { 
+          
+          'title':( (row.columns.title['content'][0].field_output['#markup']|striptags|trim|number_format(0, '.', '')) + (grantReport[varFundedby]['title']|number_format(0, '.', '')) ),
+          'donation_amount':donation,
+          'parent_time':parenttime,
+          'community_time':communitytime,
+          'field_agency':(row.columns.field_agency['content'][0].field_output['#markup']|striptags|trim),
+          'field_in_kind_donation_value':
+            ( (row.columns.field_in_kind_donation_value['content'][0].field_output['#markup']|striptags|trim) 
+            + (grantReport[varFundedby]['field_in_kind_donation_value']) ),
+          'field_doctor_visit_mileage':( (row.columns.field_doctor_visit_mileage['content'][0].field_output['#markup']|striptags|trim)
+          + (grantReport[varFundedby]['field_doctor_visit_mileage']) ),
+          'field_mileage_reimbursement':(row.columns.field_mileage_reimbursement['content'][0].field_output['#markup']|striptags|trim),
+          'field_donation_amount':( (row.columns.field_donation_amount['content'][0].field_output['#markup']|striptags|trim)
+          + (grantReport[varFundedby]['field_donation_amount']) ),
+          'field_total_number_of_hours_requ':
+            ((row.columns.field_total_number_of_hours_requ['content'][0].field_output['#markup']|striptags|trim ) 
+            + (grantReport[varFundedby]['field_total_number_of_hours_requ'])  ),
+          'field_funded_by':(fundedby),
+          'field_minutes_1':((row.columns.field_minutes_1['content'][0].field_output['#markup']|striptags|trim)
+            + (grantReport[varFundedby]['field_minutes_1']) ),
+          'field_which_type_of_in_kind_dona':(row.columns.field_which_type_of_in_kind_dona['content'][0].field_output['#markup']|striptags|trim),
+          'field_current_year_hourly_goal':
+            ((row.columns.field_current_year_hourly_goal['content'][0].field_output['#markup']|striptags|trim ) 
+            + (grantReport[varFundedby]['field_current_year_hourly_goal'])  ),
+          }})  
+        %}    
+
+    {% endif %}
+
+{% endfor %}
+
+<a href="report.pdf"  class="rbutton" style="float: right;" onClick="window.print(); return false">Print Report</a>
+
+<table{{ attributes.addClass(classes) }}>
+  {% if caption_needed %}
+    <caption>
+      {% if caption %}
+      <a href="/node/{{(rows[0].columns.field_agency_1['content'][0].field_output['#markup'])|striptags|trim}}" style="text-decoration: none;" >{{agencyName|convert_encoding('UTF-8', 'HTML-ENTITIES')}}</a>  - {{ caption }}
+      {% else %}
+        {{ title }}
+      {% endif %}
+      {% if (summary is not empty) or (description is not empty) %}
+        <details>
+          {% if summary is not empty %}
+            <summary>{{ summary }}</summary>
+          {% endif %}
+          {% if description is not empty %}
+            {{ description }}
+          {% endif %}
+        </details>
+      {% endif %}
+    </caption>
+  {% endif %}
+  <thead>
+    <tr>
+      <th id="field_funded_by" class="views-field cellBR" scope="col" style="text-align: center;vertical-align: middle; " >Grant</th>
+      <th id="title" class="views-field cellBR" scope="col" style="text-align: center;vertical-align: middle;" >Record <br>Count</th>
+      <th id="field_in_kind_donation_value" class="views-field cellBR" scope="col" style="text-align: center;vertical-align: middle;" >Goods <br>/ Leases <br> / Services </th>
+      <th id="field_doctor_visit_mileage" class="views-field cellBR"  style="text-align: center;vertical-align: middle;" scope="col" >Mileage</th>
+      <th id="parent_time" class="views-field " scope="col" style="text-align: center;vertical-align: middle;" >Parent <br>Hours </th>
+      <th id="community_time" class="views-field cellBR" scope="col" style="text-align: center;vertical-align: middle;" >Community <br>Partner <br>Hours</th>
+      
+      <th id="field_minutes_1" class="views-field" scope="col" style="text-align: center;vertical-align: middle;" >Total <br>(in Hours)</th>
+      <th id="field_donation_amount" class="views-field cellBR" scope="col" style="text-align: center;vertical-align: middle;" >Total <br>(in Dollars)</th>
+      <th id="field_total_number_of_hours_requ" class="views-field " style="text-align: center;vertical-align: middle;" scope="col" >Percent to <br>Agency <br>Goal</th>
+      {# <th id="field_current_year_hourly_goal" class="views-field" style="text-align: center;vertical-align: middle;" scope="col" >Percent to <br>Grant <br>Goal</th> #}
+    </tr>
+  </thead>
+  {% set total_Record_Count = 0 %}
+  {% set total_Goods_Donations = 0 %}
+  {% set total_Parent_Hours = 0 %}
+  {% set total_Community_Partner_Hours = 0 %}
+  {% set total_Mileage = 0 %}
+  {% set total_Volunteer_Hours = 0 %}
+  {% set total_Total_Donation = 0 %}
+  {% set total_Agency_Annual_Goal = 0 %}
+  
+  <tbody>
+    {% for grantDetails in grantReport %}
+    <tr>
+      <td headers="field_funded_by" class="views-field cellBR" style="text-align: left;">
+        {% if not grantDetails['field_funded_by']  %}
+              {% if showLinks %}
+                <a href="/bulk-update-inkind-donation?field_funded_by_target_id_1=1"> ( Not Assigned with link ) </a>
+              {% else %}
+                ( Not Assigned )
+              {% endif  %}
+        {% else %}
+              {{grantDetails['field_funded_by'] | raw}}
+        {% endif  %}
+        {# http://kindlysep.tst/bulk-update-inkind-donation?field_funded_by_target_id_1=1 #}
+        {#
+
+          agency_manager >> Agency Manager
+          agency_administrator >> Agency Administrator
+          administrator >> Administrator
+          superadministrator >> Superadministrator
+
+          school_manager >> Center Director / Location Manager
+
+          #}
+      </td>
+      <td headers="title" class="views-field cellBR" style="text-align: right;">
+          {{grantDetails['title']}}
+          {% set total_Record_Count = total_Record_Count + grantDetails['title'] %}
+      </td>
+      <td headers="field_in_kind_donation_value" class="views-field cellBR" style="text-align: right;">
+          ${{grantDetails['field_in_kind_donation_value']}}
+          {% set total_Goods_Donations = total_Goods_Donations + grantDetails['field_in_kind_donation_value'] %}
+      </td>
+      <td headers="field_doctor_visit_mileage" class="views-field cellBR" style="text-align: right;">
+        {% if grantDetails['field_doctor_visit_mileage']|number_format   %}
+            {{grantDetails['field_doctor_visit_mileage']}} miles x {{grantDetails['field_mileage_reimbursement']}} 
+              = ${{(grantDetails['field_doctor_visit_mileage']*grantDetails['field_mileage_reimbursement'])|round(2)}} 
+            {% set total_Mileage = total_Mileage + (grantDetails['field_doctor_visit_mileage']*grantDetails['field_mileage_reimbursement'])|round(2) %}
+        {% else %}
+            $0
+        {% endif %}
+      </td>
+      <td headers="parent_time" class="views-field" style="text-align: right;">
+          {{grantDetails['parent_time']}} Hrs
+          {% set total_Parent_Hours = total_Parent_Hours + grantDetails['parent_time'] %}
+      </td>
+      <td headers="community_time" class="views-field cellBR " style="text-align: right;">
+          {{grantDetails['community_time']}} Hrs
+          {% set total_Community_Partner_Hours = total_Community_Partner_Hours + grantDetails['community_time'] %}
+      </td>
+      
+      <td headers="field_minutes_1" class="views-field " style="text-align: right;">
+          {{grantDetails['field_minutes_1']}} Hrs
+          {% set total_Volunteer_Hours = total_Volunteer_Hours + grantDetails['field_minutes_1'] %}
+      </td>
+      <td headers="field_donation_amount" class="views-field  cellBR" style="text-align: right;">
+          ${{grantDetails['field_donation_amount']}}
+          {% set total_Total_Donation = total_Total_Donation + grantDetails['field_donation_amount'] %}
+      </td>
+      <td headers="field_total_number_of_hours_requ" class="views-field" style="text-align: right;">
+          {{grantDetails['field_total_number_of_hours_requ']}}%
+          {% set total_Agency_Annual_Goal = total_Agency_Annual_Goal + grantDetails['field_total_number_of_hours_requ'] %}
+      </td>
+      {# <td headers="field_current_year_hourly_goal" class="views-field" style="text-align: right;">
+          {{grantDetails['field_current_year_hourly_goal']?grantDetails['field_current_year_hourly_goal']~"%":""}}
+          
+      </td> #}
+    </tr>
+    {% endfor %}
+    <tr style="vertical-align: top; border-top: 2px solid #ddd;border-bottom: 2px solid #ddd;">
+      <td headers="field_funded_by" class="views-field cellBR" style="text-align: left;">
+        <b><a href="/node/{{(rows[0].columns.field_agency_1['content'][0].field_output['#markup'])|striptags|trim}}" >{{agencyName|convert_encoding('UTF-8', 'HTML-ENTITIES')}}</a> (Total) </b></td> 
+      <td headers="title" class="views-field cellBR" style="text-align: right;">{{total_Record_Count}}</td>
+      <td headers="field_in_kind_donation_value" class="views-field cellBR" style="text-align: right;">${{total_Goods_Donations}}</td>
+      <td headers="field_doctor_visit_mileage" class="views-field  cellBR" style="text-align: right;">${{total_Mileage}} </td>
+      <td headers="parent_time" class="views-field" style="text-align: right;">{{total_Parent_Hours}} Hrs</td>
+      <td headers="community_time" class="views-field cellBR" style="text-align: right;">{{total_Community_Partner_Hours}} Hrs</td>
+      <td headers="field_minutes_1" class="views-field " style="text-align: right;">{{total_Volunteer_Hours}} Hrs</td>
+      <td headers="field_donation_amount" class="views-field  cellBR" style="text-align: right;">${{total_Total_Donation}}</td>
+      <td headers="field_total_number_of_hours_requ" class="views-field " style="text-align: right;">{{total_Agency_Annual_Goal}}%</td>
+      {# <td headers="field_current_year_hourly_goal" class="views-field " style="text-align: right;"> </td> #}
+    </tr>
+    <tr style="vertical-align: top; border-top: 2px solid #ddd;border-bottom: 2px solid #ddd;">
+      <td headers="field_funded_by" class="views-field cellBR" style="text-align: right;"><b>${{total_Goods_Donations+total_Mileage+total_Total_Donation}} =
+        <br>  ( Goods / Leases  / Services <br>+ Mileage + Volunteer Donations )</b></td>
+      <td headers="title" class="views-field " style="text-align: right;"></td>
+      <td headers="field_in_kind_donation_value" class="views-field cellBR" style="text-align: right;">+${{total_Goods_Donations}}</td>
+      <td headers="field_doctor_visit_mileage" class="views-field cellBR" style="text-align: right;">+${{total_Mileage}} </td>
+      <td headers="parent_time" class="views-field" style="text-align: right;"></td>
+      <td headers="community_time" class="views-field" style="text-align: right;"></td>
+      
+      <td headers="field_minutes_1" class="views-field" style="text-align: right;"></td>
+      <td headers="field_donation_amount" class="views-field cellBR" style="text-align: right;">+${{total_Total_Donation}}</td>
+      <td headers="field_total_number_of_hours_requ" class="views-field" style="text-align: right;"></td>
+      {# <td headers="field_current_year_hourly_goal" class="views-field" style="text-align: right;"></td> #}
+    </tr>
+  </tbody>
+  
+</table>
+
+
+{% if responsive %}
+  </div>
+{% endif %}

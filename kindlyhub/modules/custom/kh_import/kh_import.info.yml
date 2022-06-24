@@ -1,0 +1,10 @@
+name: Kindlyhub Import
+type: module
+description: 'Import the content like Staff, users content etc from CSV file'
+package: Custom
+dependencies:
+  - node
+  - user
+version: '8.x-1.00'
+core: '8.x'
+project: 'kh_import'

@@ -1,0 +1,32 @@
+.required-fields.field-group-html-element .form-composite > legend {
+    width: 100px;
+    float: left;
+}
+.required-fields.field-group-html-element .form-composite > .fieldset-wrapper{
+    float: left;
+}
+.required-fields.field-group-html-element .form-composite .form-radios > .form-item {
+    display: inline-block;
+    min-width: 90px;
+    text-align: center;
+    margin: 0;
+}
+.required-fields.field-group-html-element .form-composite .form-radios > .form-item label{
+    display: none;
+}
+
+.time-width {
+    width: 100px;
+    float: left;
+}
+.time-width-items {
+    float: left;
+}
+.time-width-items span {
+    float: left;
+    width: 95px;
+    text-align: center;
+}
+.tabledrag-toggle-weight {
+display: none;
+}

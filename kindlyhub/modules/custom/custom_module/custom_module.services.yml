@@ -1,0 +1,4 @@
+services:
+  custom_module.storage:
+    class: Drupal\custom_module\CustomModuleStorage
+    arguments: ['@database']

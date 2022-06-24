@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Satisfyv11';
+    src: url('../fonts/satisfy-v11-latin-regular.eot');
+    src: url('../fonts/satisfy-v11-latin-regular.eot') format('embedded-opentype'),
+         url('../fonts/satisfy-v11-latin-regular.woff2') format('woff2'),
+         url('../fonts/satisfy-v11-latin-regular.woff') format('woff'),
+         url('../fonts/satisfy-v11-latin-regular.ttf') format('truetype'),
+         url('../fonts/satisfy-v11-latin-regular.svg') format('svg');
+}

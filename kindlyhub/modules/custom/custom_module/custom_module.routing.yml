@@ -1,0 +1,56 @@
+custom_module.postalreturn:
+  path: '/checktotal'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\ClassroomController::postalreturn'
+    _title: 'Coupon'
+  requirements:
+    _permission: 'access content'
+
+custom_module.communityPartnerRate:
+  path: '/communityPartnerRate'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\ClassroomController::communityPartnerRate'
+    _title: 'Community PartnerRate RAte'
+  requirements:
+    _permission: 'access content'
+
+custom_module.texoreturn:
+  path: '/checktexo'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\ClassroomController::texoreturn'
+    _title: 'texo'
+  requirements:
+    _permission: 'access content' 
+
+
+custom_module.getclassrooms:
+  path: '/getlocation'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\ClassroomController::getclassrooms'
+    _title: 'location'
+  requirements:
+    _permission: 'access content'    
+
+custom_module.custom_export:
+  path: '/export'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\ClassroomController::custom_export'
+    _title: 'export Result'
+  requirements:
+    _permission: 'access content'
+
+custom_module.dataimport:
+  path: '/dataimport-process'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\DataImortController::DataImport'
+    _title: 'Data Import Form'
+  requirements:
+    _permission: 'access content'
+
+custom_module.sessinkind:
+  path: '/sessinkind'
+  defaults:
+    _controller: 'Drupal\custom_module\Controller\DataImortController::sessinkind'
+    _title: 'Data Import Form'
+  requirements:
+    _permission: 'access content'
