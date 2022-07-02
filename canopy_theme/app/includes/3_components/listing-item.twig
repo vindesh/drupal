@@ -1,0 +1,19 @@
+<div class="ukg-list-default ukg-list-search-item{% if searchListItem.class %} {{ searchListItem.class }}{% endif %}">
+  <div class="uk-flex-middle uk-flex-wrap" uk-grid>
+    {% block image %}
+      <div class="ukg-search-image">
+        <img class="uk-width-1-4@m" src="build/files/images/logos/u_icon.png" alt="Image">
+      </div>
+    {% endblock %}
+    <div class="uk-search-body">
+      <a class="ukg-search-title" href="{{ searchListItem.link }}" title="{{ searchListItem.title }}">
+        <h3>{{ searchListItem.title }}</h3>
+      </a>
+      {% block description_container %}
+        <p>{{ description_text|striptags|trim }}</p>
+      {% endblock %}
+      {% block meta_container %}
+      {% endblock %}
+    </div>
+  </div>
+</div>

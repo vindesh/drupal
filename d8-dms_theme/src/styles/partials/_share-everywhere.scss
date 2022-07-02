@@ -1,0 +1,65 @@
+//------------------------------------------------------------------------------
+// WEBFORM.SCSS
+// Webform styling.
+//------------------------------------------------------------------------------
+
+.se-block {
+  margin: rem(20) 0 0;
+  color: $grey4;
+  line-height: rem(30);
+}
+.se-title {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 rem(20) 0 0;
+}
+.se-list {
+  display: inline-block;
+  vertical-align: middle;
+  @include reset-list;
+}
+.se-item {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 rem(20) 0 0;
+  font-size: rem(20);
+  a {
+    color: $grey4;
+    &:hover {
+      color: $fm-red;
+    }
+  }
+}
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .se-item {
+    &.whatsapp {
+      display: none;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

@@ -1,0 +1,129 @@
+//------------------------------------------------------------------------------
+// FABRIC.SCSS
+// Fabric styling.
+//------------------------------------------------------------------------------
+
+.fabric-instruction {
+  text-align: center;
+}
+
+.fabric__documents {
+  .fabric-instruction {
+    padding: rem(20) 0;
+  }
+  .slick-track {
+    display: flex;
+    .slick-slide {
+      display: flex;
+      height: auto;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.fabric__documents--nav {
+  .fabric-instruction {
+    padding: rem(5);
+    h2 {
+      margin: 0;
+      font-size: rem(18);
+      line-height: rem(24);
+    }
+    .btn {
+      display: none;
+    }
+    .field--name-field-fabric-instruction-image {
+      height: rem(70);
+      position: relative;
+      overflow: hidden;
+      img {
+        // // for images with color bg
+        // position: absolute;
+        // top: 50%;
+        // left: 50%;
+        // transform: translate(-50%,-50%);
+        // for images with white bg
+        height: rem(70);
+        margin: 0 auto;
+      }
+    }
+  }
+  .slick-slide {
+    border: 1px solid transparent;
+    &:hover {
+      border-color: $fm-red;
+    }
+    &.slick-current {
+      border-color: $grey1;
+    }
+  }
+  .slick-dots {
+    @include reset-list;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    line-height: rem(40);
+    li {
+      display: inline-block;
+      vertical-align: middle;
+      background-color: $grey1;
+      width: rem(12);
+      height: rem(12);
+      margin: 0 rem(5);
+      text-indent: rem(-9999);
+      border-radius: 50%;
+      cursor: pointer;
+      &:hover {
+        background-color: $fm-red;
+      }
+      &.slick-active {
+        background-color: $body;
+      }
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .fabric__documents {
+    .fabric-instruction {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .fabric-instruction__image {
+        width: 42.5%;
+      }
+      .fabric-instruction__info {
+        width: 52.5%;
+        text-align: left;
+        h2 {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

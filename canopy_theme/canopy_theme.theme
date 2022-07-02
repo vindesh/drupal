@@ -1,0 +1,1677 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Views;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+function canopy_theme_page_attachments_alter(array &$attachments) {
+  if ($node = canopy_theme_get_node_from_routeMatch()) {
+    $node_type = $node->bundle();
+    $has_querystring = FALSE;
+    $anonymous = FALSE;
+    $isHomepage = \Drupal::service('path.matcher')->isFrontPage();
+    if (\Drupal::currentUser()->isAnonymous()) {
+      $anonymous = TRUE;
+    }
+    // We check to see if the current request object contains any query parameters.
+    $request = \Drupal::request();
+    if (!is_null($request->getQueryString())) {
+      $has_querystring = TRUE;
+    }
+    foreach ($attachments['#attached']['html_head_link'] as $pos => $link) {
+      // if the link is alternate link
+      $rel = isset($link[0]['rel']) ? $link[0]['rel'] : '';
+      $href = isset($link[0]['href']) ? $link[0]['href'] : '';
+      $lang = isset($link[0]['hreflang']) ? $link[0]['hreflang'] : '';
+      if ($rel == 'alternate') {
+        // remove any unpublished translation.
+        if (!empty($lang) && $trannode = $node->getTranslation($lang)) {
+          // check translation is published
+          $ispublish = $trannode->isPublished();
+          if (!$ispublish || ($anonymous && $has_querystring)) {
+            // remove unpublished version
+            unset($attachments['#attached']['html_head_link'][$pos]);
+            continue;
+          }
+        }
+        // if it's homepage we remove the alias
+        if ($isHomepage) {
+          if (!empty($href) && $homepage_alternate_parse = parse_url($href)) {
+            $attachments['#attached']['html_head_link'][$pos][0]['href'] =
+              $homepage_alternate_parse['scheme'] . '://' . $homepage_alternate_parse['host'] . '/' . $lang;
+          }
+          continue;
+        }
+      }
+
+    }
+  }
+}
+
+/**
+ * Preprocess to add base path as global variable
+ */
+
+function canopy_theme_preprocess(&$variables, $hook) {
+  $variables['base_path'] = base_path();
+}
+
+/**
+ * Preprocess page title
+ */
+function canopy_theme_preprocess_page_title(&$variables) {
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+    // Load the label of the bundle
+    if ($node->bundle() == 'news_item' || $node->bundle() == 'event' && !$node->field_node_title_html->isEmpty()) {
+      // Set the page title
+      $variables['title'] = canopy_theme_get_field_render_array($node, 'field_node_title_html');
+    }
+  }
+}
+
+
+function canopy_theme_preprocess_node(&$variables, $hook) {
+  // Get the node type.
+  $node_type = $variables['node']->getType();
+  // Get the node view mode.
+  $view_mode = $variables['view_mode'];
+
+  $node = $variables['node'];
+  $allow_share_snippet = FALSE;
+
+  if (is_numeric($node)) {
+    $node = \Drupal\node\Entity\Node::load($node);
+  }
+  $langcode = $node->language()->getId();
+  switch ($node_type) {
+    // Preprocess News Item
+    case 'news_item':
+      if (in_array($view_mode, ['full', 'card', 'list'])) {
+        if (!empty($node->field_node_url_news_source->getValue())) {
+          $source_field = $node->field_node_url_news_source->getValue();
+          $variables['url'] = $source_field[0]['uri'];
+          if ($variables['view_mode'] == 'full') {
+            $reponse = new \Drupal\Core\Routing\TrustedRedirectResponse($variables['url']);
+            $reponse->send();
+            return;
+          }
+        }
+        // Process taxonomy filter value
+        $data_filters = [];
+        $data_tags = [];
+        foreach ($variables['content']['field_node_taxonomy_news_tags'] as $id => $tag) {
+          // Loop through all of the callout media fields and get the media entity
+          if (is_numeric($id)) {
+            $data_tags[] = str_replace(' ', '-', strtolower($tag['#title']));
+          }
+        }
+        $data_regions = [];
+        foreach ($variables['content']['field_node_taxonomy_news_region'] as $id => $region) {
+          // Loop through all of the callout media fields and get the media entity
+          if (is_numeric($id)) {
+            $data_regions[] = str_replace(' ', '-', strtolower($region['#title']));
+          }
+        }
+        $data_filters['tag'] = implode(' ', $data_tags);
+        $data_filters['region'] = implode(' ', $data_regions);
+        if ($news_type = $node->field_node_taxonomy_news_type->getValue()) {
+          if ($node->field_node_taxonomy_news_type->target_id > 0) {
+            if ($variables['node']->field_node_taxonomy_news_type->target_id == 1) {
+              $variables['content']['#is_media_coverage'] = TRUE;
+            }
+            $data_filters['type'] = str_replace(' ', '-', strtolower($variables['content']['field_node_taxonomy_news_type'][0]['#title']));
+          }
+        }
+        if ($node->hasField('field_node_desc_html') && !$node->field_node_desc_html->isEmpty()) {
+          $variables['content']['news_item_description_html'] = $node->field_node_desc_html->view();
+        }
+        $variables['content']['#data_filters'] = $data_filters;
+        $variables['content']['news_item_title'] = canopy_theme_process_title($variables['node']->title->value);
+        if ($view_mode == 'full') {
+          $allow_share_snippet = TRUE;
+          // Change "go back to previous page" CTA on news item pages
+          // Add a 'go back to previous page' based on referrer info.
+          // If referrer info is blank, we go back to newroom page.
+          $request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
+          $node_url = '/node/701';
+          $node_title = t('Go back to') . ' ' . t('newsroom');
+          if ($url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => 701])) {
+            $node_url = $url->toString();
+          }
+          if ($referrer = $request->headers->get('referer')) {
+            $node_url = $referrer;
+            $node_title = t('Go back to previous page');
+          }
+          $variables['content']['prev_page'] = [
+            '#url' => $node_url,
+            '#title' => $node_title,
+          ];
+          if (!$variables['node']->field_node_title_html->isEmpty()) {
+            $variables['content']['news_item_title'] = $variables['node']->field_node_title_html->view();
+          }
+          if (empty($node->field_node_taxonomy_contacts->getValue())) {
+            if ($field_settings = canopy_theme_get_field_default_settings($node, 'field_node_taxonomy_contacts')) {
+              if ($field_settings[0]['target_uuid']) {
+                $entityrepository = Drupal::service('entity.repository');
+                $term = $entityrepository->loadEntityByUuid('taxonomy_term', $field_settings[0]['target_uuid']);
+                $langcode = $node->language()->getId();
+//                if ($term->isDefaultTranslation() && $term->hasTranslation($langcode)) {
+//                  $term = $term->getTranslation($langcode);
+//                }
+                $variables['content']['field_node_taxonomy_contacts'] = \Drupal::entityTypeManager()
+                  ->getViewBuilder('taxonomy_term')
+                  ->view($term, 'default', $langcode);
+              }
+            }
+          }
+        }
+      }
+      break;
+    case 'news_listing':
+      if ($view_mode == 'full') {
+        // Attach all the views for news listing page
+        $attach_views['news_landing'][] = 'news_item';
+        $attach_views['news_landing'][] = 'filter_type';
+        $attach_views['news_landing'][] = 'filter_category';
+        $region_allowed_languages = [
+          'en',
+          'en-ca',
+          'en-gb',
+          'en-in',
+          'en-au',
+        ];
+        $langcode = $node->language()->getId();
+        if (in_array($langcode, $region_allowed_languages)) {
+          $attach_views['news_landing'][] = 'filter_region';
+        }
+        foreach ($attach_views as $view_name => $displays) {
+          foreach ($displays as $display_name) {
+            // Attempt to get embed code for this view and display.
+            if ($views_embed = views_embed_view($view_name, $view_name . '_' . $display_name)) {
+              // Have embed code, so add to content array.
+              // get rows number
+              $view_result = views_get_view_result($view_name, $view_name . '_' . $display_name);
+              if (count($view_result) > 0) {
+                $variables['content']['view_' . $view_name][$display_name] = $views_embed;
+              }
+            }
+          }
+        }
+      }
+      break;
+    // Preprocess News Item
+    case 'event':
+      if (in_array($view_mode, ['full', 'card', 'list'])) {
+
+        if ($node->hasField('field_node_desc_html') && !$node->field_node_desc_html->isEmpty()) {
+          $variables['content']['event_description_html'] = $node->field_node_desc_html->view();
+        }
+
+        $variables['content']['event_title'] = canopy_theme_process_title($variables['node']->title->value);
+        if ($view_mode == 'full') {
+          $allow_share_snippet = TRUE;
+          // Change "go back to previous page" CTA on news item pages
+          // Add a 'go back to previous page' based on referrer info.
+          // If referrer info is blank, we go back to newroom page.
+          $request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
+          $node_url = '/node/701';
+          $node_title = t('Go back to') . ' ' . t('events');
+          if ($url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => 701])) {
+            $node_url = $url->toString();
+          }
+          if ($referrer = $request->headers->get('referer')) {
+            $node_url = $referrer;
+            $node_title = t('Go back to previous page');
+          }
+          $variables['content']['prev_page'] = [
+            '#url' => $node_url,
+            '#title' => $node_title,
+          ];
+          if (!$variables['node']->field_node_title_html->isEmpty()) {
+            $variables['content']['event_title'] = $variables['node']->field_node_title_html->view();
+          }
+        }
+      }
+
+      $formatter = \Drupal::service('date.formatter');
+      $field_date_start = $node->get('field_event_date_start')->getValue();
+      $date_start = $field_date_start[0]['value'];
+      $time = strtotime($date_start.' UTC');
+      $start_time = $formatter->format($time, 'custom', 'g:ia', 'UTC');
+      $field_date_end = $node->get('field_event_date_end')->getValue();
+      $date_end = $field_date_end[0]['value'];
+      $time = strtotime($date_end.' UTC');
+      $end_time = $formatter->format($time, 'custom', 'g:ia', 'UTC');
+      $variables['start_time'] = $start_time;
+      $variables['end_time'] = $end_time;
+
+
+      $event_start_date = NULL;
+      $event_start_time = NULL;
+      $event_end_date = NULL;
+      $event_end_time = NULL;
+      $single_day_event = NULL;
+      $event_datetime_display = NULL;
+      $zero_array = [" 00", ":00"];
+
+      if (!is_null($node)) {
+        if ($node->hasField('field_event_date_start') && !$node->field_event_date_start->isEmpty()) {
+          $event_start_date = \Drupal::service('date.formatter')
+            ->format($node->field_event_date_start->date->getTimestamp(), 'event_date');
+          $event_start_time = \Drupal::service('date.formatter')
+            ->format($node->field_event_date_start->date->getTimestamp(), 'event_time');
+          $event_start_time = str_replace($zero_array, "", $event_start_time);
+        }
+        if ($node->hasField('field_event_date_end') && !$node->field_event_date_end->isEmpty()) {
+          $event_end_date = \Drupal::service('date.formatter')
+            ->format($node->field_event_date_end->date->getTimestamp(), 'event_date');
+          $event_end_time = \Drupal::service('date.formatter')
+            ->format($node->field_event_date_end->date->getTimestamp(), 'event_time');
+          $event_end_time = str_replace($zero_array, "", $event_end_time);
+        }
+        if (($event_start_date !== NULL && $event_end_date !== NULL)) {
+          if (($event_start_date === $event_end_date)) { // single day event
+            $language_id = \Drupal::languageManager()
+              ->getCurrentLanguage()
+              ->getId();
+            // grab the event timezone
+            $event_timezone = is_null($node->field_event_timezone->first()) ? "America/New_York" : $node->field_event_timezone->first()
+            ->getValue()['value']; // default to America/New_York if the timezone is left empty
+            $event_timezone_date_obj = new DateTime('now', new DateTimeZone($event_timezone));
+            $timezone_abbreviation = str_replace([
+              'ADT',
+              'AST',
+              'EDT',
+              'EST',
+              'CDT',
+              'CST',
+              'MDT',
+              'MST',
+              'PDT',
+              'PST',
+              ], [
+              'AT',
+              'AT',
+              'ET',
+              'ET',
+              'CT',
+              'CT',
+              'MT',
+              'MT',
+              'PT',
+              'PT',
+            ], $event_timezone_date_obj->format('T'));
+            switch ($language_id) {
+              case "en":
+              case "en-AU":
+              case "en-CA":
+              case "en-GB":
+              case "en-IN":
+                $event_start_time = str_replace(['am', 'pm'], [
+                  'a.m.',
+                  'p.m.',
+                ], $event_start_time);
+                $event_end_time = str_replace(['am', 'pm'], [
+                  'a.m.',
+                  'p.m.',
+                ], $event_end_time);
+              break;
+              case "fr-BE":
+              case "fr-CA":
+              case "fr-FR":
+                $timezone_abbreviation = str_replace([
+                  'ADT',
+                  'AST',
+                  'EDT',
+                  'EST',
+                  'CDT',
+                  'CST',
+                  'MDT',
+                  'MST',
+                  'PDT',
+                  'PST',
+                ], [
+                  'HA',
+                  'HA',
+                  'HE',
+                  'HE',
+                  'HC',
+                  'HC',
+                  'HR',
+                  'HR',
+                  'HP',
+                  'HP',
+                ], $event_timezone_date_obj->format('T'));
+                $event_start_date = ucfirst($event_start_date);
+                break;
+            }
+            $event_datetime_display = $event_start_date . "<br>" . $event_start_time . "&nbsp;&ndash;&nbsp;" . $event_end_time . "&nbsp;" . $timezone_abbreviation;
+          }
+          else { // multiple day event
+            // note: at some point we should update the event content type to fully support
+            // note: multi-day events (e.g. start/end datetime fields for each day of the event)
+            $event_datetime_display = $event_start_date . "&nbsp;&ndash;&nbsp;" . $event_end_date;
+          }
+        }
+        else { // the start or end date could be null
+          // note: logic within the node--event--full.html.twig template overrides the output below; not sure why, perhaps schedule a meeting?
+          if ($event_start_date !== NULL) { // start date isn't null
+            $event_datetime_display = $event_start_date;
+          }
+          else { // while the end date may not be null, we cannot display it as it would be inaccurate, display error message
+            $event_datetime_display = t('Date Not Defined');
+          }
+        }
+
+        $variables['timezone_abbreviation'] = $timezone_abbreviation;
+        $variables['event_datetime_display'] = $event_datetime_display;
+      }
+
+      break;
+    case 'events_listing':
+      if ($view_mode == 'full') {
+        // Attach all the views for news listing page
+        $attach_views['events_landing'][] = 'event';
+        $attach_views['events_landing'][] = 'filter_type';
+        $attach_views['events_landing'][] = 'filter_region';
+        $attach_views['events_landing'][] = 'filter_location';
+        $region_allowed_languages = [
+          'en',
+          'en-ca',
+          'en-gb',
+          'en-in',
+          'en-au',
+        ];
+        $langcode = $node->language()->getId();
+        if (in_array($langcode, $region_allowed_languages)) {
+          $attach_views['events_landing'][] = 'filter_region';
+        }
+        foreach ($attach_views as $view_name => $displays) {
+          foreach ($displays as $display_name) {
+            // Attempt to get embed code for this view and display.
+            if ($views_embed = views_embed_view($view_name, $view_name . '_' . $display_name)) {
+              // Have embed code, so add to content array.
+              // get rows number
+              $view_result = views_get_view_result($view_name, $view_name . '_' . $display_name);
+              if (count($view_result) > 0) {
+                $variables['content']['view_' . $view_name][$display_name] = $views_embed;
+              }
+            }
+          }
+        }
+      }
+      break;
+    case 'landing_page':
+    case 'blog_post':
+      if ($view_mode == 'full') {
+        $allow_share_snippet = TRUE;
+        $variables['content']['content_title'] = canopy_theme_process_title($variables['node']->title->value);
+        if (!$variables['node']->field_node_title_html->isEmpty()) {
+          $variables['content']['content_title'] = $variables['node']->field_node_title_html->view();
+        }
+        $allow_share_snippet = TRUE;
+        if ($node_type === 'blog_post') {
+          if (!$node->field_node_taxonomy_blog_name->isEmpty()) {
+            // Are there terms?
+            if ($terms = $node->field_node_taxonomy_blog_name->referencedEntities()) {
+              $blog_filter = canopy_theme_blog_get_blog_name_filters_by_terms($terms);
+              $variables['content']['blog_name_filters'] = $blog_filter['blog_name_filters'];
+              $variables['content']['blog_id_filters'] = $blog_filter['blog_id_filters'];
+              $blog_feed = canopy_theme_blog_get_blog_feed_burner_by_terms($terms, $langcode);
+              $variables['content']['blog_feed_info'] = $blog_feed['blog_feed_info'];
+              $variables['content']['blog_feed_burner_info'] = $blog_feed['blog_feed_burner_info'];
+              // Assign tag cloud to blog post and blog listing page.
+              if ($views_embed = views_embed_view('tag_cloud', 'default', join('+', $blog_filter['blog_id_filters']))) {
+                // Have embed code, so add to content array.
+                $variables['content']['view_tagcloud'] = $views_embed;
+              }
+            }
+          }
+        }
+      }
+      break;
+    case 'blog_listing':
+      if ($view_mode == 'full') {
+        $allow_share_snippet = TRUE;
+        if (!$node->field_node_taxonomy_blog_name->isEmpty()) {
+          // Are there terms?
+            if ($terms = $node->field_node_taxonomy_blog_name->referencedEntities()) {
+            $blog_filter = canopy_theme_blog_get_blog_name_filters_by_terms($terms);
+            $variables['content']['blog_name_filters'] = $blog_filter['blog_name_filters'];
+            $variables['content']['blog_id_filters'] = $blog_filter['blog_id_filters'];
+            $blog_feed = canopy_theme_blog_get_blog_feed_burner_by_terms($terms, $langcode);
+            $variables['content']['blog_feed_info'] = $blog_feed['blog_feed_info'];
+            $variables['content']['blog_feed_burner_info'] = $blog_feed['blog_feed_burner_info'];
+            // Assign tag cloud to blog post and blog listing page.
+            if ($views_embed = views_embed_view('tag_cloud', 'default', join('+', $blog_filter['blog_id_filters']))) {
+              // Have embed code, so add to content array.
+              $variables['content']['view_tagcloud'] = $views_embed;
+            }
+            if ($views_embed = views_embed_view('blogs', 'blogs_embed_all', join('+', $blog_filter['blog_name_filters']))) {
+              // Have embed code, so add to content array.
+              $variables['content']['view_blogs'] = $views_embed;
+            }
+          }
+        }
+      }
+      break;
+  }
+  if ($allow_share_snippet) {
+    $block = \Drupal\block\Entity\Block::load('socialmediachannels');
+    if (isset($block)) {
+      $build = \Drupal::entityTypeManager()
+        ->getViewBuilder('block')
+        ->view($block);
+      $renderer = \Drupal::service('renderer');
+      $renderer->addCacheableDependency($build, $variables['node']);
+      $variables['content']['addtoany_block'] = $build;
+    }
+  }
+}
+
+
+// Function to build the blog name filters
+function canopy_theme_blog_get_blog_name_filters_by_terms($terms) {
+  $blog_name_filters = [];
+  $blog_name_id_filters = [];
+  foreach ($terms as $term) {
+    // Check current node language is the same with $term language.
+    array_push($blog_name_filters, $term->getName());
+    array_push($blog_name_id_filters, $term->id());
+  }
+  return [
+    'blog_name_filters' => $blog_name_filters,
+    'blog_id_filters' => $blog_name_id_filters,
+  ];
+}
+
+// Function to build the blog name filters
+function canopy_theme_blog_get_blog_feed_burner_by_terms($terms, $langcode) {
+  $blog_feed_info = [];
+  $blog_feed_burner_info = [];
+  foreach ($terms as $term) {
+    // Check current node language is the same with $term language.
+    if ($term->isDefaultTranslation() && $term->hasTranslation($langcode)) {
+      $term = $term->getTranslation($langcode);
+    }
+    $blog_name = $term->getName();
+    $blog_id = $term->id();
+    array_push($blog_feed_info, [
+      'name' => $blog_name,
+      'id' => $blog_id,
+    ]);
+    // KRON-1178: Add blog burner info to blog post page.
+    // Here i added to both blog and bog listing page for later.
+    // What if they later want it on blog tag page?
+    // Just render the node and reference the blog burner array on tag page.
+    if ($term->hasField('field_feed_burner_link') && !$term->field_feed_burner_link->isEmpty()) {
+      if ($feed_burner = $term->field_feed_burner_link->getValue()) {
+        array_push($blog_feed_burner_info, [
+          'name' => $blog_name,
+          'url' => $feed_burner[0]['uri'],
+        ]);
+      }
+    }
+    return [
+      'blog_feed_info' => $blog_feed_info,
+      'blog_feed_burner_info' => $blog_feed_burner_info,
+    ];
+  }
+}
+
+function canopy_theme_preprocess_field(&$variables, $hook) {
+  if (($variables['element']['#field_name'] == 'field_node_taxonomy_news_tags')) {
+    // Loop through each item in the field.
+    foreach ($variables['items'] as &$item) {
+      $link_query = str_replace(' ', '-', strtolower($item['content']['#title']));
+      $node_url = Url::fromRoute('entity.node.canonical', [
+        'node' => 701,
+        'tag' => $link_query
+      ]);
+      $tag_link = Link::fromTextAndUrl($item['content']['#title'], $node_url)
+        ->toRenderable();
+      // If you need some attributes.
+      $tag_link['#attributes'] = array(
+        'class' => array(
+          'ukg-cta-inline',
+          'ukg-cta-secondary'
+        )
+      );
+      $item['content']['#tag_link'] = $tag_link;
+    }
+  }
+}
+
+/**
+ * Prepares variables for breakcrumb.
+ *
+ * Two controller logics that turns off breadcrumb:
+ * 1. if the breadcrumb controller set to true
+ * 2. if the breadcrm
+ *
+ * Default template: /templates/system/breadcrumb.html.twig.
+ *
+ */
+function canopy_theme_preprocess_breadcrumb(&$variables) {
+  // Get current node title
+  // Get the current node information from url
+  $variables['breadcrumb'] = [];
+  $node = canopy_theme_get_node_from_routeMatch();
+  $include_breadcrumb = TRUE;
+  if ($node && $node->hasField('field_node_breadcrumb')) {
+    if (!$node->field_node_breadcrumb->isEmpty()) {
+      $include_breadcrumb = filter_var($node->field_node_breadcrumb->getValue()[0]['value'], FILTER_VALIDATE_BOOLEAN);
+    }
+  }
+  if ($include_breadcrumb) {
+    /** @var \Drupal\Core\Link $link */
+    foreach ($variables['links'] as $key => $link) {
+      $link_text = $link->getText();
+      $variables['breadcrumb'][$key] = [
+        'text' => canopy_theme_process_title($link_text),
+        'url' => $link->getUrl()->toString(),
+        'active' => FALSE,
+      ];
+    }
+    if ($node && $node->getType() !== 'news_item') {
+      $variables['breadcrumb'][] = [
+        'text' => canopy_theme_process_title($node->getTitle()),
+        'url' => '',
+        'active' => TRUE,
+      ];
+    }
+  }
+  $variables['#cache']['contexts'][] = 'url.path';
+}
+
+/**
+ * Prepares variables for search results
+ *
+ * The display for search result logic:
+ * Default image field: reference image
+ * Default summary field: seo description
+ *
+ * When content type is resource:
+ * We use thumbnail image if exists
+ * We use resource text if exists
+ *
+ *
+ *
+ * Default template: /templates/search/search-result.html.twig
+ *
+ * @param array $variables -> ['content']['field_industry_color']
+ */
+function canopy_theme_preprocess_search_result(&$variables) {
+  $image_path = '';
+  $description_text = '';
+  $meta_info = [];
+  $page_title = '';
+  if (isset($variables['result']['node'])) {
+    $node = $variables['result']['node'];
+    $node_type = $node->getType();
+    $meta_info['node_type'] = $node_type;
+    if ($node->hasField('field_node_image')) {
+      $image_path = canopy_theme_get_image_field_url($node, 'field_node_image');
+    }
+    if ($node->hasField('field_node_description')) {
+      $description_text = canopy_theme_get_entity_field_render($node, 'field_node_description');
+    }
+    $page_title = $variables['title'];
+    if (isset($variables['title']) && $loc = strpos($variables['title'], '||')) {
+      // Only use everything before the pipe.
+      $page_title = substr($variables['title'], 0, $loc);
+    }
+    // if image field does not contain any field items, we will get default image path
+    switch ($node_type) {
+
+      case 'news_item' :
+        // if it's news item, we need to check if it's external URL.
+        if (!empty($node->field_node_url_news_source->getValue())) {
+          $source_field = $node->field_node_url_news_source->getValue();
+          $variables['url'] = $source_field[0]['uri'];
+        }
+        if ($node->hasField('field_node_taxonomy_news_tags')) {
+          $tags = canopy_theme_get_entity_field_render($node, 'field_node_taxonomy_news_tags');
+          $meta_info['tags'] = $tags[0];
+        }
+        if ($node->hasField('field_node_taxonomy_news_type')) {
+          $type = canopy_theme_get_entity_field_render($node, 'field_node_taxonomy_news_type');
+          $meta_info['type'] = $type;
+        }
+        $meta_title = '';
+        if ($node->hasField('field_node_metadata') && !$node->field_node_metadata->isEmpty()) {
+          if ($metadata = $node->field_node_metadata->getValue()[0]['value']) {
+            $metadata = unserialize($metadata);
+            if (isset($metadata['title']) && trim($metadata['title']) !== '') {
+              $meta_title = explode('|', $metadata['title']);
+              if (count($meta_title) > 1) {
+                $meta_title = trim($meta_title[0]);
+              }
+            }
+          }
+        }
+        if ($meta_title !== '') {
+          $page_title = $meta_title;
+        }
+        if ($node->hasField('field_node_text_news_location')) {
+          if ($location = canopy_theme_get_field_value($node, 'field_node_text_news_location', FALSE)) {
+            $meta_info['location'] = $location['value'];
+          }
+        }
+        if ($node->hasField('field_date_news_publication')) {
+          $meta_info['date'] = \Drupal::service('date.formatter')
+            ->format($node->field_date_news_publication->date->getTimestamp(), 'event_date');
+        }
+        break;
+    }
+  }
+  $variables['image_path'] = $image_path;
+  $variables['description_text'] = $description_text;
+  $variables['meta_info'] = $meta_info;
+  $variables['title'] = $page_title;
+}
+
+/**
+ * For media document entity, if the checkbox for render entity is checked
+ * We render out the media_document directly.
+ */
+function canopy_theme_preprocess_media(&$variables) {
+
+  $media = $variables['elements']['#media'];
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $bundle = $media->bundle();
+  $name = $variables['media']->label();
+  $media_bundles = [
+    'document' => 'field_media_document',
+  ];
+  $allowed_bundle = FALSE;
+  $entity_field = '';
+  if (array_key_exists($bundle, $media_bundles)) {
+    $allowed_bundle = TRUE;
+    $entity_field = $media_bundles[$bundle];
+  }
+  $no_index = FALSE;
+  if ($media->hasField('field_media_no_index')
+    && !$media->get('field_media_no_index')->isEmpty()
+    && $media->get('field_media_no_index')
+      ->first()
+      ->getValue()['value'] == 1) {
+    $no_index = TRUE;
+  }
+  if (($variables['elements']['#view_mode'] == 'full') && $allowed_bundle) {
+    if ($media->hasField('field_media_render_entity')
+      && !$media->get('field_media_render_entity')->isEmpty()
+      && $media->get('field_media_render_entity')
+        ->first()
+        ->getValue()['value'] == 1) {
+      if ($myFileRef = $media->{$entity_field}->referencedEntities()[0]) {
+        if (file_exists($myFileRef->getFileUri())) {
+          $media_file = $myFileRef->getFileUri();
+          ob_start();
+          $base_name_encoded = rawurlencode(basename($media_file));
+          header('Content-Type: ' . $myFileRef->getMimeType());
+          header('Content-Transfer-Encoding: Binary');
+          header('Content-Disposition: inline; filename=' . $base_name_encoded);
+          if ($no_index) {
+            header("X-Robots-Tag: noindex, nofollow, nosnippet", TRUE);
+          }
+          header('Accept-Ranges: bytes');
+          readfile($media_file);
+          ob_end_flush();
+          exit;
+        }
+      }
+      else {
+        throw new NotFoundHttpException();
+      }
+    }
+
+  }
+}
+
+function canopy_theme_get_content_taxonomy_by_field_name($node, $field_name) {
+  $terms = [];
+  if (!$node->$field_name->isEmpty()) {
+    // Are there terms?
+    if ($terms = $node->{$field_name}->referencedEntities()) {
+      // Loop through each term.
+      foreach ($terms as $term) {
+        // Check current node language is the same with $term language.
+        $langcode = $node->language()->getId();
+        if ($term->isDefaultTranslation() && $term->hasTranslation($langcode)) {
+          $term = $term->getTranslation($langcode);
+          $terms[] = $term;
+        }
+      }
+    }
+  }
+  return $terms;
+}
+
+/**
+ * Implements hook_preprocess_views_view_rss.
+ */
+function canopy_theme_preprocess_views_view_rss(&$variables) {
+  $current_language = \Drupal::languageManager()
+    ->getCurrentLanguage()
+    ->getId();
+  if ($view_data = $variables['view']) {
+    if ($args = $view_data->argument) {
+      foreach ($args as $index => $value) {
+        if ($value->field == 'tid') {
+          $tid = $value->getValue();
+          if ($term_object = canopy_theme_get_taxonomy_by_id($tid, $current_language)) {
+            if ($description = $term_object->getDescription()) {
+              $variables['description'] = trim($description);
+            }
+            $view_display = $variables['view']->current_display;
+            $link = '';
+            switch ($view_display) {
+              case 'resource_term_feed':
+                $link = canopy_theme_rss_get_resource_overview($term_object);
+                break;
+            }
+            if ($link) {
+              $variables['link'] = $link;
+            }
+            $variables['title'] = $term_object->label();
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_row_rss.
+ */
+function canopy_theme_preprocess_views_view_row_rss(&$variables) {
+  $view = $variables['view'];
+  $view_id = $view->id();
+  $view_display = isset($view->current_display);
+  if ($view_id === 'rss_feeds') {
+    switch ($view_display) {
+      case 'resource_term_feed':
+        // Was originally going to preprocess this view to use resource summary.
+        // Instead of description if the description field is empty.
+        // However, the plugins overwrites the output so it might require a higher
+        // Level modification to the plugin to support this feature.
+        canopy_theme_process_resource_view_row($variables);
+        break;
+    }
+  }
+}
+
+/**
+ * Functions to process the view output of resource RSS view
+ */
+function canopy_theme_process_resource_view_row(&$variables) {
+  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $link = '';
+  $media_path = '';
+  $node_path = '';
+  $desc = '';
+  if ($row_class = $variables['row']) {
+    if ($description = $row_class->description) {
+      $node = isset($description['#node']) ? $description['#node'] : FALSE;
+      if (!$node) {
+        // Check if nid is available.
+        if ($nid = $row_class->nid) {
+          $node = \Drupal\node\Entity\Node::load($nid);
+        }
+      }
+      $desc = canopy_theme_get_entity_field_render($node, 'field_node_description');
+      $node_path = \Drupal::service('path_alias.manager')
+        ->getAliasByPath('/node/' . $node->id(), $language);
+      // For media entities, we need to determine whether to use media path or entity path.
+      // We have a flag: "Render Entity" for this purpose.
+      // If Render Entity is on, we use either media path [/media/id] or Alias.
+      // If Render Enitty is off, we need to pull the entity from the media and get it's physical path.
+      if ($media_field = canopy_theme_get_field_value($node, 'field_node_media_resource_item', FALSE)) {
+        $media_id = $media_field['target_id'];
+        if ($media_document = canopy_theme_get_media_entity_by_id($media_id)) {
+          $pull_media_file = TRUE;
+          if ($media_document->hasField('field_media_render_entity')
+            && !$media_document->get('field_media_render_entity')->isEmpty()
+            && $media_document->get('field_media_render_entity')
+              ->first()
+              ->getValue()['value'] == 1) {
+            // We should pull the file
+            $pull_media_file = FALSE;
+          }
+          if ($pull_media_file) {
+            $media_document_file = canopy_theme_get_document_from_media($media_document);
+            if ($media_document_file) {
+              $media_path = file_create_url($media_document_file);
+            }
+          }
+          // When we render the entity, we need to pull the alias from media entity.
+          else {
+            $media_path = \Drupal::service('path_alias.manager')
+              ->getAliasByPath('/media/' . $media_id, $language);
+          }
+        }
+      }
+      $link = empty($media_path) ? $node_path : $media_path;
+      $variables['link'] = canopy_theme_rel2abs($link);
+      $variables['description'] = empty($desc) ? $variables['title'] : $desc;
+      // Start processing the default elements from the RSS module
+      // For now we need to change all the dc:creator to UKG
+      if (isset($variables['item_elements']) && count($variables['item_elements']) > 0) {
+        foreach ($variables['item_elements'] as $index => &$item) {
+          if ($item['key'] == 'dc:creator') {
+            $item['value'] = 'UKG';
+            continue;
+          }
+          if ($item['key'] == 'comments') {
+            unset($variables['item_elements'][$index]);
+            continue;
+          }
+          if ($item['key'] == 'guid') {
+            // isPermaLink If set to true, the reader may assume that it is a permalink to the item
+            // (a url that points to the full item described by the <item> element).
+            // In this case, the full item described by the item element should be the node content.
+            // The default value is true. If set to false, the guid may not be assumed to be a url
+            $item['value'] = canopy_theme_rel2abs($node_path);
+            $attributes = new Attribute(['isPermaLink' => 'true']);
+            $item['attributes'] = $attributes;
+            continue;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Media Function
+ * Get Media entity by Media ID
+ * Return: Media Entity
+ */
+function canopy_theme_get_media_entity_by_id($media_id) {
+  $media_storage = \Drupal::service('entity.manager')
+    ->getStorage('media');
+  return $media_storage->load($media_id);
+}
+
+/**
+ * Media Function
+ * Get Media document file entity from media entity
+ * Return: File Entity
+ */
+function canopy_theme_get_document_from_media($media) {
+  $document = '';
+  if (isset($media) && $media->bundle() === 'document') {
+    $item = $media->field_media_document[0]->entity;
+    $document = $item->getFileUri();
+  }
+  return $document;
+}
+
+/**
+ * Resource Helper Function
+ * Get the resource overview reference field from resource taxonomy term
+ * Return: Rendered link array
+ */
+function canopy_theme_rss_get_resource_overview($term_object) {
+  $link = '';
+  if ($term_render = canopy_theme_get_term_field_render($term_object, 'field_resource_overview_page')) {
+    // Use the value from this term.
+    $referenced_term = $term_render[0];
+    $link = $referenced_term[0]['#url']->setAbsolute()->toString();;
+  }
+  return $link;
+}
+
+/**
+ * Implement theme suggestion
+ */
+function canopy_theme_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  switch ($hook) {
+    case 'views_view_field':
+      // First Check if it's the news landing view.
+      if ($variables['view']->id() === 'news_landing' || $variables['view']->id() === 'events_landing') {
+        // Check the display mode.
+        switch ($variables['view']->current_display) {
+          case 'news_landing_filter_type':
+          case 'events_landing_filter_type':
+            $suggestions[] = 'views_view_field' . '__' . 'filter_types';
+            break;
+          case 'events_landing_filter_location':
+            $suggestions[] = 'views_view_field' . '__' . 'filter_locations';
+            break;
+          case 'news_landing_filter_category':
+            $suggestions[] = 'views_view_field' . '__' . 'filter_tags';
+            break;
+          case 'news_landing_filter_region':
+          case 'events_landing_filter_region':
+            $suggestions[] = 'views_view_field' . '__' . 'filter_regions';
+            break;
+          default:
+            break;
+        }
+      }
+      break;
+    case 'block':
+      $route_parem = Drupal::routeMatch()->getRouteName();
+      $block_id = $variables['elements']['#id'];
+      if ($route_parem === 'search.view_node_search' && $block_id === 'canopy_theme_content') {
+        $suggestions[] = 'block' . '__' . 'node_search';
+      }
+      break;
+    case 'views_view_unformatted':
+      if ($variables['view']->id() === 'blogs') {
+        switch ($variables['view']->current_display) {
+          case 'blogs_embed_all':
+            $suggestions[] = 'views_view_unformatted' . '__' . 'blog_listing';
+            break;
+        }
+      }
+      break;
+    default:
+
+      break;
+  }
+}
+
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function canopy_theme_theme_suggestions_form_alter(array &$suggestions, array $variables, $hook) {
+  if (isset($variables['element']['#form_id']) && $variables['element']['#form_id'] == 'search_form') {
+    $suggestions[] = $hook . '__' . 'search';
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_taxonomy_term_alter().
+ */
+function canopy_theme_theme_suggestions_taxonomy_term_alter(array &$suggestions, array $variables) {
+  /** @var \Drupal\taxonomy\TermInterface $term */
+  $term = $variables['elements']['#taxonomy_term'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+  // Add view mode theme suggestions.
+  $suggestions[] = 'taxonomy_term__' . $sanitized_view_mode;
+  $suggestions[] = 'taxonomy_term__' . $term->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'taxonomy_term__' . $term->id() . '__' . $sanitized_view_mode;
+}
+
+// Helper Section
+// Node helper section
+// Taxonomy helper section
+
+/**
+ * Get taxonomy label by passing taxonomy id and language id
+ *
+ * @param string $tid
+ *   The Id of the taxonomy.
+ * @param string $language_id
+ *  The Id of the required language
+ *
+ * @return string
+ *   the required taxonomy term.
+ */
+function canopy_theme_get_taxonomy_by_id($tid, $language_id) {
+  $taxonomy_term = FALSE;
+  // Get taxonomy manager and load taxonomy term by id.
+  if ($tid && $taxonomy_term = \Drupal::service('entity_type.manager')
+      ->getStorage('taxonomy_term')
+      ->load($tid)
+  ) {
+    // If current language is different from taxonomy language id.
+    // If current taxonomy is the default translation.
+    // If current taxonomy term has current translation.
+    // Then we load the taxonomy term for current language.
+    if ($taxonomy_term->language()->getId() !== $language_id
+      && $taxonomy_term->isDefaultTranslation()
+      && $taxonomy_term->hasTranslation($language_id)) {
+      $taxonomy_term = $taxonomy_term->getTranslation($language_id);
+    }
+  }
+  return $taxonomy_term;
+}
+
+/**
+ * Get the render array for a taxonomy term or from the parent.
+ *
+ * @param Object $term
+ *   The term entity object.
+ *
+ * @param string|array $fields
+ *   The name of the field to retrieve.
+ *
+ * @return bool|array
+ *   Boolean false or render array.
+ */
+function canopy_theme_get_term_field_render($term, $fields) {
+  // Not able to get render array from the actual term?
+  if (!$render_array = canopy_theme_get_entity_field_render($term, $fields)) {
+    // Get entity manager service so we can access the parent terms.
+    $storage = \Drupal::service('entity_type.manager')
+      ->getStorage('taxonomy_term');
+    // Does this term have a parent term?
+    if ($parents = $storage->loadParents($term->id())) {
+      // Loop through each of the parents.
+      foreach ($parents as $parent) {
+        // Attempt to get the render array from the parent.
+        if ($parent_render = canopy_theme_get_term_field_render($parent, $fields)) {
+          $render_array = $parent_render;
+          break;
+        }
+      }
+    }
+  }
+  return $render_array;
+}
+
+/**
+ * Get node entity from routematch.
+ *
+ * When drupal returns node entity from routeMatch, if it is entity revision
+ * Drupal only outputs numeric (https://www.drupal.org/node/2495703)
+ * In this case, the entity revision page view returns a server error.
+ *
+ * Bug#: KRON-929 (https://kronosweb.atlassian.net/browse/KRON-929)
+ * This function here, gets the node entity if it's a numeric number.
+ *
+ */
+function canopy_theme_get_node_from_routeMatch() {
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+    // When viewing a revision $node will be numeric
+    if (is_numeric($node)) {
+      $node = \Drupal\node\Entity\Node::load($node);
+    }
+    return $node;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Get the render array from entity by field(s) name.
+ *
+ * @param object $entity
+ *   The entity object.
+ *
+ * @param string|array $fields
+ *   The name of the field to retrieve.
+ *
+ * @return bool|array
+ *   Boolean false or render array(s) for the field(s).
+ */
+function canopy_theme_get_entity_field_render($entity, $fields) {
+  $render_array = [];
+
+  // If only passed a single field, treat it as multiple.
+  if (is_string($fields)) {
+    $fields = [$fields];
+  }
+
+  // Loop through each potential field.
+  foreach ($fields as $field_name) {
+    // Does this entity have this field?
+    $render_array[] = canopy_theme_get_field_render_array($entity, $field_name);
+  }
+
+  return $render_array;
+}
+
+// Field helper section
+/**
+ * Get the render array from entity by field name.
+ *
+ * @param object $entity
+ *   The entity object.
+ *
+ * @param string|array $fields
+ *   The name of the field to retrieve.
+ *
+ * @return bool|array
+ *   Boolean false or render array for the field.
+ */
+function canopy_theme_get_field_render_array($entity, $field_name) {
+  $render_array = FALSE;
+  if (isset($entity->$field_name)) {
+    // does this entity have values in this field?
+    if ($entity->$field_name->getValue()) {
+      // It does, so retrieve the render array.
+      $render_array = $entity->$field_name->view();
+    }
+  }
+  return $render_array;
+}
+
+/**
+ * Get the value from entity by field name.
+ *
+ * @param object $entity
+ *   The entity object.
+ *
+ * @param string|array $fields
+ *   The name of the field to retrieve.
+ *
+ * @return bool|array
+ *   Boolean false or render array for the field.
+ */
+function canopy_theme_get_field_value($entity, $field_name, $multiple = TRUE) {
+  $field_value = FALSE;
+  if ($entity->hasField($field_name) && isset($entity->$field_name)) {
+    // does this entity have values in this field?
+    // It does, so retrieve the render array.
+    if (!$entity->$field_name->isEmpty()) {
+      if (!$multiple) {
+        $field_value = $entity->$field_name->first()->getValue();
+      }
+      else {
+        $field_value = $entity->$field_name->getValue();
+      }
+    }
+  }
+  return $field_value;
+}
+
+function canopy_theme_get_image_field_url($entity, $field_name, $image_style = FALSE) {
+  $image_path = FALSE;
+  if ($image_field = canopy_theme_get_field_value($entity, $field_name, FALSE)) {
+    $image_id = $image_field['target_id'];
+    if (isset($image_id)) {
+      // use entity manager to load image storage
+      $image_storage = \Drupal::service('entity.manager')->getStorage('file');
+      // get the image path
+      $image = $image_storage->load($image_id);
+      // if image path exists, get the thumbnail image style:
+      $image_path = isset($image) ? $image->getFileUri() : '';
+      if ($image_style) {
+        $style = \Drupal::entityTypeManager()
+          ->getStorage('image_style')
+          ->load('resource_thumbnail_desktop');
+        $image_path = $style->buildUrl($image_path);
+      }
+    }
+  }
+  // this Returns the image public path, you need to render it to relative path.
+  return $image_path;
+}
+
+// Image Helper
+
+
+// Entity Helper
+/**
+ * Query and return array of entities based on passed paramters and filter.s
+ *
+ * @param string $entity_type
+ *  The entity type
+ * @param string $bundle
+ *  The entity bundle
+ * @param int $limit
+ *  The number of entities to retrieve. (optional, default 1)
+ * @param array $filters
+ *  Filters to apply to the query. (options, default empty array)
+ *
+ * @return \Drupal\Core\Entity\EntityInterface[]|null
+ *  Array of entities or null.
+ */
+function canopy_theme_get_entities($entity_type, $bundle, $limit = 1, $filters = []) {
+  $entities = NULL;
+
+  // Build an entity query.
+  $query = \Drupal::entityQuery($entity_type)
+    ->condition('type', $bundle);
+
+  // Want a specific status?
+  if (isset($filters['status']) && is_int($filters['status'])) {
+    $query->condition('status', $filters['status']);
+  }
+
+  // Have field filters?
+  if (isset($filters['fields'])) {
+    // Add conditions for fields.
+    foreach ($filters['fields'] as $field_name => $conditions) {
+      $query->condition($conditions['query_field'], $conditions['value'], $conditions['operator']);
+    }
+  }
+
+  // Add range.
+  $query->range(0, $limit);
+  // Get ids.
+  if ($ids = $query->execute()) {
+    // Load the entities.
+    $entities = \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->loadMultiple($ids);
+  }
+
+  // Return retrieved entities or null.
+  return $entities;
+}
+
+/**
+ * Builds associative array of facet data in the structure expected by the twig
+ * template.
+ *
+ * Some filters need to be grouped into sub-categories. This function takes
+ * care of the complex logic required to create those sub categories.
+ *
+ * Also takes care of generating the 'All [FACET]' link to remove currently
+ * applied facet value from page.
+ *
+ * @param string $filter
+ *   The name of the filter being built.
+ * @param array $rows
+ *  The array of rows from a view to build facets from.
+ *
+ * @return array
+ *   Array of facets. Potentially grouped into sub categories.
+ */
+function canopy_theme_build_view_facets($filter, $rows, $display_name) {
+  $facets = [];
+  $categories = [];
+  $all_text = t('View All');
+  switch ($filter) {
+    // Type only needs single sub-category, with no title.
+    case 'type':
+      if ($display_name == 'news_landing_filter_type') {
+        // Get only translated values.
+        $rows = canopy_theme_filter_facets_by_language($rows, [
+          'id' => 'taxonomy_term_field_data_node__field_node_taxonomy_news_type_2',
+          'langcode' => 'taxonomy_term_field_data_node__field_node_taxonomy_news_type_1',
+          'relationship' => 'field_node_taxonomy_news_type',
+        ]);
+      }
+      $categories[] = ['filterOptions' => $rows];
+      $all_text = t('All Types');
+      break;
+
+    case 'tags':
+      // Get only translated values.
+      $rows = canopy_theme_filter_facets_by_language($rows, [
+        'id' => 'taxonomy_term_field_data_node__field_node_taxonomy_news_tags_2',
+        'langcode' => 'taxonomy_term_field_data_node__field_node_taxonomy_news_tags_1',
+        'relationship' => 'field_node_taxonomy_news_tags',
+      ]);
+      $categories[] = ['filterOptions' => $rows];
+      $all_text = t('All Categories');
+      break;
+
+  }
+
+  // Have categories been built?
+  if ($categories) {
+    krsort($categories);
+    // Get current URL parameters
+    $query_parameters = \Drupal::request()->query->all();
+    // Remove this filter from parameters
+    unset($query_parameters[$filter]);
+    // Remove any pager parameters
+    unset($query_parameters['page']);
+    // Build facets array
+    $facets = [
+      'categories' => $categories,
+      // Create link for 'all' values of this filter (removes the filter from url).
+      'all_link' => \Drupal\Core\Link::createFromRoute($all_text, '<current>', [], [
+        'query' => $query_parameters,
+        'fragment' => t('results'),
+        'attributes' => [
+          'class' => ['filter__all'],
+        ],
+      ])->toRenderable(),
+    ];
+  }
+
+  return $facets;
+}
+
+
+/**
+ * Returns a array of active filters for list pages based its URL queries.
+ *
+ * @return array
+ *    The returned array will contain all needed values for filter lists
+ *    the values are keyed by their template variable for simplicity.
+ */
+function canopy_theme_get_filter_queries() {
+  // Get the current request object.
+  $request = \Drupal::request();
+  $filters = [];
+  $current_language = \Drupal::languageManager()
+    ->getCurrentLanguage()
+    ->getId();
+  // We check to see if the current request object contains any query parameters.
+  if (!is_null($request->getQueryString())) {
+    // A list of filter types is created
+    // @todo: Update this to reuse kronos_theme_view_displays_facet_list instead.
+    $filter_types = [
+      'type' => t('Type'),
+      'tags' => t('Tags'),
+    ];
+
+    // Loop through each facet item to see if that filter is being used.
+    foreach ($filter_types as $fid => $filter_name) {
+      // Get the query as a string base on the matching facet id.
+      $query = $request->query->get($fid);
+      if (is_array($query) && array_key_exists('target_id', $query[0])) {
+        $query = $query[0]['target_id'];
+      }
+      // Strip the query value.
+      $query = \Drupal\Component\Utility\Html::escape($query);
+      // Check if that facet id's query exists.
+      if (!is_null($query) && !empty($query)) {
+        // Get the array of all query parameters.
+        $query_parms = $request->query->all();
+        // Get the raw filter value.
+        $filter_raw_value = $query_parms[$fid];
+        // Unset the current one so we can create a link without it.
+        unset($query_parms[$fid], $query_parms['page']);
+        // Set filter value to the plain text query value.
+        $filter_value = $query;
+        // Get the actual filter value
+        switch ($fid) {
+          // Get name of taxonomy term.
+          case 'type':
+          case 'tags':
+            if ($terms = taxonomy_term_load_multiple_by_name($filter_value)) {
+              foreach ($terms as $term) {
+                if ($term->language()->getId() === $current_language) {
+                  $filter_value = $term->getName();
+                }
+              }
+            }
+            break;
+          default:
+            // Provide some basic cleanup
+            $filter_value = canopy_theme_strtotitle($filter_value);
+            break;
+        }
+
+        // Add the facet name, query type and clear filter link to the returned
+        // array.
+        $filters[$fid] = [
+          'filterRawQueryValue' => urlencode($filter_raw_value),
+          'filterCurrentLabelCategory' => t(strtoupper($filter_name)),
+          'filterCurrentLabelSubCategory' => canopy_theme_strtotitle($filter_value),
+          'filterCurrentLabelUrl' => \Drupal\Core\Url::fromRoute('<current>', [], [
+            'query' => $query_parms,
+            'fragment' => t('results'),
+          ])->toString(),
+        ];
+      }
+    }
+  }
+  return $filters;
+}
+
+/**
+ * Converts $title to Title Case, and returns the result.
+ */
+function canopy_theme_strtotitle($title) {
+  // Our array of 'small words' which shouldn't be capitalised if
+  // they aren't the first word. Add your own words to taste.
+  $smallwordsarray = [
+    'of',
+    'a',
+    'the',
+    'and',
+    'an',
+    'or',
+    'nor',
+    'but',
+    'is',
+    'if',
+    'then',
+    'else',
+    'when',
+    'at',
+    'from',
+    'by',
+    'on',
+    'off',
+    'for',
+    'in',
+    'out',
+    'over',
+    'to',
+    'into',
+    'with',
+  ];
+
+  // Split the string into separate words
+  $words = explode(' ', $title);
+
+  foreach ($words as $key => $word) {
+    // If this word is the first, or it's not one of our small words, capitalise it
+    // with ucwords().
+    if ($key == 0 or !in_array($word, $smallwordsarray)) {
+      $words[$key] = ucwords($word);
+    }
+  }
+
+  // Join the words back into a string
+  $newtitle = implode(' ', $words);
+
+  return $newtitle;
+}
+
+/**
+ * Update facets to use translated values if available.
+ *
+ * @param $rows
+ * @param $fields
+ *
+ * @return array
+ */
+function canopy_theme_filter_facets_by_language($rows, $fields) {
+  $entities = [];
+  // Group by languages.
+  foreach ($rows as $row) {
+    if (isset($fields['id']) && $row['content']['#row']->{$fields['id']}) {
+      $id = $row['content']['#row']->{$fields['id']};
+      $lang = isset($row['content']['#row']->{$fields['langcode']})
+        ? $row['content']['#row']->{$fields['langcode']}
+        : NULL;
+
+      if (!isset($entities[$id]['translations'])) {
+        $entities[$id]['translations'] = [];
+      }
+      $entities[$id]['translations'][$lang] = $row;
+
+      if (isset($fields['parent']) && isset($row['content']['#row']->_relationship_entities[$fields['parent']])) {
+        if (!isset($entities[$id]['parents'])) {
+          $entities[$id]['parents'] = [
+            'field' => $fields['parent'],
+            'translations' => [],
+          ];
+        }
+        $entities[$id]['parents']['translations'][$lang] = $row['content']['#row']->_relationship_entities[$fields['parent']];
+      }
+    }
+  }
+  // Filter by language.
+  $rows = [];
+  foreach ($entities as $entity) {
+    if ($row = canopy_theme_filter_facets_get_language_row($entity)) {
+      $rows[] = $row;
+    }
+  }
+
+  return $rows;
+}
+
+function canopy_theme_filter_facets_get_language_row($entity) {
+  // Get current language.
+  $current_language = \Drupal::languageManager()
+    ->getCurrentLanguage()
+    ->getId();
+  // Get default language.
+  $site_default_language = \Drupal::languageManager()
+    ->getDefaultLanguage()
+    ->getId();
+
+  $row = NULL;
+  // Does this entity have a single translation?
+  if (count($entity['translations']) == 1) {
+    $row = array_pop($entity['translations']);
+  }
+  // Does this entity have a version in the current language?
+  elseif (isset($entity['translations'][$current_language])) {
+    $row = $entity['translations'][$current_language];
+  }
+  // does this entity have a version in the site default language?
+  elseif (isset($entity['translations'][$site_default_language])) {
+    $row = $entity['translations'][$site_default_language];
+  }
+  // Else use the first one.
+  else {
+    $row = array_pop($entity['translations']);
+  }
+
+  // Fetch parent?
+  if (isset($entity['parents'])) {
+    // Recurs to get the parent.
+    if ($parent = canopy_theme_filter_facets_get_language_row($entity['parents'])) {
+      $row['content']['#row']->_relationship_entities[$entity['parents']['field']] = $parent;
+    }
+  }
+
+  return $row;
+}
+
+/**
+ * Return array of view displays that are used as facet filters.
+ *
+ * @return array
+ *   Key = view display name
+ *   Value = facet name
+ */
+function canopy_theme_view_displays_facet_list() {
+  return [
+    'news_landing_filter_type' => 'type',
+    'news_landing_filter_category' => 'tags',
+  ];
+}
+
+/**
+ *
+ * We append "||" after node title to distinguish the language,
+ * Return the processed title to remove anything after ||.
+ *
+ *  (original version)
+ *  Physical safety, psychological security || UK Version
+ *
+ *  (processed version)
+ *  Physical safety, psychological security
+ *
+ * @return String
+ *   String Processed Title
+ */
+function canopy_theme_process_title($title) {
+  if ($loc = strpos($title, '||')) {
+    $title = substr($title, 0, $loc);
+  }
+  return $title;
+}
+
+
+// Helper Functions
+/**
+ * Render AddToAny block
+ *
+ * @param object $entity
+ *   the content block
+ *
+ * @return bool|string
+ *   Build Array of the block
+ */
+function canopy_theme_helper_block_render_addtoany($entity) {
+  $block = \Drupal\block\Entity\Block::load('addtoanybuttons');
+  $build_array = FALSE;
+  if (isset($block)) {
+    // If the current content type has addtoany enabled, render block
+    $build = \Drupal::entityTypeManager()
+      ->getViewBuilder('block')
+      ->view($block);
+    $renderer = \Drupal::service('renderer');
+    $renderer->addCacheableDependency($build, $entity);
+    $build_array = $build;
+  }
+  return $build_array;
+}
+
+/**
+ * Builds default render array of fields with default image set.
+ *
+ * @return bool|array
+ *   Array of rendered default image.
+ */
+function canopy_theme_get_field_default_settings($entity, $field_name) {
+  if (isset($entity->$field_name)) {
+    // Does this entity have values in this field?
+    if ($field_info = $entity->getFieldDefinition($field_name)) {
+      // Does this image field has default image setting?
+      return $field_info->getDefaultValueLiteral();
+    }
+  }
+  // Return false check for this default image.
+  return FALSE;
+}
+
+
+/**
+ * Helper function
+ * Convert relative path to absolute path.
+ */
+function canopy_theme_rel2abs($rel) {
+  if (trim($rel) == "") {
+    return "";
+  }
+  $path = "";
+  $host = "";
+  $scheme = "";
+  $base = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+  if (strpos($rel, "//") === 0) {
+    return "http:" . $rel;
+  }
+  /* return if  already absolute URL */
+  if (parse_url($rel, PHP_URL_SCHEME) != '') {
+    return $rel;
+  }
+  if (!isset($rel[0])) {
+    $rel[0] = '';
+  }
+  /* queries and  anchors */
+  if ($rel[0] == '#' || $rel[0] == '?') {
+    return $base . $rel;
+  }
+  /* parse base URL  and convert to local variables:
+  $scheme, $host,  $path */
+  extract(parse_url($base));
+  /* remove  non-directory element from path */
+  $path = preg_replace('#/[^/]*$#', '', $path);
+  /* destroy path if  relative url points to root */
+  if ($rel[0] == '/') {
+    $path = '';
+  }
+  /* dirty absolute  URL */
+  $abs = "$host$path/$rel";
+  $abs = str_replace("//", "/", $abs);
+  $re[] = '#/(?!..)[^/]+/../#';
+  for ($n = 1; $n > 0; $abs = preg_replace($re, '/', $abs, -1, $n)) {
+  }
+  /* absolute URL is  ready! */
+  return $scheme . '://' . $abs;
+}

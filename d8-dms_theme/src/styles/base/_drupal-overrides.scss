@@ -1,0 +1,232 @@
+//------------------------------------------------------------------------------
+// DRUPAL-OVERRIDES.SCSS
+// This file provides the possibility to override default drupal styling.
+//------------------------------------------------------------------------------
+
+
+//----------------
+//-- NAVIGATION --
+//----------------
+.menu__list {
+  @include reset-list;
+}
+.menu__item {
+  a {
+    display: block;
+  }
+}
+
+
+//--------------
+//-- MESSAGES --
+//--------------
+.messages {
+  background-color: $dms-blue;
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+  padding: rem(20);
+  color: $white;
+  font-weight: 700;
+  opacity: 0.8;
+  a {
+    color: $white;
+    &:hover {
+      color: rgba($white,0.8);
+    }
+  }
+  &--status {
+    background-color: $dms-green;
+  }
+  &--warning {
+    background-color: $dms-orange;
+  }
+  &--error {
+    background-color: $dms-red;
+  }
+}
+
+
+//----------
+//-- TABS --
+//----------
+.tabs {
+  @include reset-list;
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+  li {
+    display: block;
+    float: left;
+    margin: 0 1px 1px 0;
+    a {
+      background: $dms-grey2;
+      display: block;
+      padding: 0 rem(15);
+      font-size: rem(16);
+      line-height: rem(40);
+      color: $dms-grey4;
+      text-decoration: none;
+      border: 1px solid $dms-grey2;
+      &:hover {
+        background: $dms-grey3;
+      }
+    }
+  }
+}
+
+
+//----------------
+//-- USER FORMS --
+//----------------
+.user-login-form,
+.user-register-form,
+.user-pass {
+  background-color: $grey3;
+  float: left;
+  width: 100%;
+  max-width: rem(700);
+  padding: rem(30);
+  border: 1px solid $grey6;
+  border-bottom: 0;
+}
+.user-login-form {
+  .forgot-password {
+    display: inline-block;
+    margin-top: rem(10);
+  }
+}
+.user-register-form {
+  .is-weak {
+    background-color: $dms-red;
+  }
+  .is-good {
+    background-color: $dms-orange;
+  }
+  .is-strong {
+    background-color: $dms-green;
+  }
+  .password-strength__title {
+    font-size: 80%;
+  }
+  .password-strength__text {
+    font-weight: 900;
+  }
+  .password-confirm {
+    font-size: 80%;
+    span {
+      font-weight: 900;
+    }
+    // .ok { color: $dms-green; }
+    // .error { color: $dms-red; }
+  }
+  .password-suggestions {
+    float: left;
+    width: 100%;
+  }
+}
+
+
+//------------
+//-- BLOCKS --
+//------------
+.block {
+  float: left;
+  width: 100%;
+}
+
+
+//-----------
+//-- PAGER --
+//-----------
+nav.pager {
+  float: left;
+  width: 100%;
+  margin: rem(30) 0;
+}
+.pager__items {
+  @include reset-list;
+  text-align: center;
+}
+.pager__item {
+  display: inline-block;
+  // min-width: rem(30);
+  // height: rem(30);
+  // margin: 0 rem(1);
+  // line-height: rem(30);
+  text-align: center;
+  // border: 1px solid $dms-grey1;
+  a {
+    display: block;
+    // padding: 0 rem(5);
+    // text-decoration: none;
+    // &:hover {
+    //   background: $dms-grey1;
+    // }
+  }
+}
+
+
+//--------------
+//-- THROBBER --
+//--------------
+.ajax-progress-fullscreen {
+  @include center('both');
+  width: rem(60);
+  height: rem(60);
+}
+.flag {
+  .ajax-progress-throbber {
+    background-color: rgba($black,0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    .throbber {
+      @include center('both');
+      width: rem(60);
+      height: rem(60);
+      background-image: url(../img/ajax-loader.gif);
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+
+// FORMS
+.js input.form-autocomplete {
+  background-position: 98% center;
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

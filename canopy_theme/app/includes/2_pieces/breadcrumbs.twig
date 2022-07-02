@@ -1,0 +1,18 @@
+{% if breadcrumbs|length > 1 %}
+  <div class="uk-container">
+    <div class="uk-breadcrumb ukg-breadcrumbs">
+      <ul>
+        {% for breadcrumb in breadcrumbs %}
+          <li>
+            {% if breadcrumb.active == FALSE %}
+              <a class="ukg-breadcrumb-item" href="{{ breadcrumb.url }}" tabindex="900">{{ breadcrumb.text }}</a>
+              <span class="icon-chevron-right"></span>
+            {% else %}
+              <span class="active">{{- breadcrumb.text -}}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endif %}

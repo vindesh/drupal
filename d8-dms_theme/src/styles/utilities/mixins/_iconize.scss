@@ -1,0 +1,34 @@
+/**
+ * Adds a font icon to an element.
+ * @param  {string} $icon: 'angle-right'
+ *                         List to be found in config/icons
+ *                         We default to a simple "next" style angle.
+ * @param  {[string]} $pos:  'before'
+ *                         Positions icon before (default) or after the selector.
+ */
+@mixin iconize($i: 'angle-right', $p: 'after') {
+  @if $p == "before" {
+    &::before {
+      @extend %fa;
+      content: map-get($icons, $i);
+      margin-right: rem(10);
+
+      // IE renders a separate underline for pseudo elements in <A> tags.
+      // This cannot be unset in IE unless a text-decoration is first explicitly declared on the pseudo element.
+      text-decoration: underline;
+    }
+  } @else if $p == "after" {
+    &::after {
+      @extend %fa;
+      content: map-get($icons, $i);
+      margin-left: rem(10);
+
+      text-decoration: underline;
+    }
+  }
+
+  &::before,
+  &::after {
+    text-decoration: none;
+  }
+}

@@ -1,0 +1,70 @@
+// ==========================================================================
+// Paragraph bundle: CALL TO ACTION
+// ==========================================================================
+.paragraph--type--cta {
+  position: relative;
+  .node--type-call-to-action {
+    // padding: rem(18);
+
+    :first-child {
+      margin-top: 0;
+    }
+
+    :last-child {
+      margin-bottom: 0;
+    }
+  }
+  .cta__content {
+    @include center('both');
+    text-align: center;
+    background-color: rgba($white,0.9);
+    width: 90%;
+    max-width: rem(600);
+    padding: rem(30) rem(20);
+    border-radius: rem(20);
+  }
+}
+
+// Style variations
+.pg-cta--light {
+  .node--type-call-to-action {
+    background-color: $pg-bg-light;
+  }
+}
+
+.pg-cta--dark {
+  .node--type-call-to-action {
+    background-color: $pg-bg-dark;
+    color: $white;
+
+    a {
+      color: inherit;
+    }
+
+    @for $i from 1 through 6 {
+      h#{$i} {
+        color: inherit;
+      }
+    }
+  }
+}
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

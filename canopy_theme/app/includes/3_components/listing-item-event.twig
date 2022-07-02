@@ -1,0 +1,13 @@
+<div class="ukg-card-listing ukg-list-default ukg-list-event-landing uk-animation-fade uk-animation-fast"{% if listItem.dataFilters %}{% for filterName, filterValue in listItem.dataFilters %}
+  data-{{ filterName }}="{{ filterValue|replace({'\'':'&#039;'}) }}"{% endfor %}{% endif %}>
+<div class="uk-card">
+    <div class="uk-card-header">
+      {% if listItem.prehead %}
+        <h5 class="ukg-list-prehead events-prehead">{{ listItem.prehead }}</h5>
+      {% endif %}
+      <a class="ukg-list-title" href="{{ listItem.link }}"{% if listItem.external %} target="_blank"{% endif %}>
+        <h3 class="uk-card-title">{{ listItem.title }}</h3>
+      </a>
+    </div>
+  </div>
+</div>

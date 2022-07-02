@@ -1,0 +1,8 @@
+custom_company.user_list:
+  path: '/admin/company/user-list'
+  defaults:
+    _title: 'User List'
+    _controller: '\Drupal\custom_company\Controller\CompanyController::listUsers'
+  requirements:
+    _permission: 'access company user'
+

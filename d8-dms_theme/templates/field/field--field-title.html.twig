@@ -1,0 +1,12 @@
+{%
+  set classes = [
+    'pg-section__title'
+  ]
+%}
+
+<h2{{ attributes.addClass(classes) }}>
+  {% for item in items %}
+    {{ item.content }}
+  {% endfor %}
+</h2>
+

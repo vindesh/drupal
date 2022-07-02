@@ -1,0 +1,37 @@
+{% extends "block.html.twig" %}
+{#
+/**
+ * @file
+ * Bartik's theme implementation for a branding block.
+ *
+ * Each branding element variable (logo, name, slogan) is only available if
+ * enabled in the block configuration.
+ *
+ * Available variables:
+ * - site_logo: Logo for site as defined in Appearance or theme settings.
+ * - site_name: Name for site as defined in Site information settings.
+ * - site_slogan: Slogan for site as defined in Site information settings.
+ */
+#}
+{%
+  set classes = [
+    'block',
+    'block-' ~ configuration.provider|clean_class,
+    'block-' ~ plugin_id|clean_class
+  ]
+%}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% block content %}
+<section id="contact" class="contact-us">
+<div class>
+<div class="row">
+  <div class="contact-form">
+    <h3 class="text-center">{{ 'GET IN TOUCH HERE'|trans }}</h3>
+    {{ content }}
+  </div>
+</div>
+</div>
+</section>
+{% endblock %}

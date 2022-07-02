@@ -1,0 +1,29 @@
+{% set facebook = fields.field_gs_facebook.content|striptags|trim %}
+{% set twitter = fields.field_gs_twitter.content|striptags|trim %}
+{% set pinterest = fields.field_gs_pinterest.content|striptags|trim %}
+{% set instagram = fields.field_gs_instagram.content|striptags|trim %}
+{% set youtube = fields.field_gs_youtube.content|striptags|trim %}
+{% set googleplus = fields.field_gs_googleplus.content|striptags|trim %}
+{% set linkedin = fields.field_gs_linkedin.content|striptags|trim %}
+
+{% if facebook %}
+  <li class="social__item facebook"><a href="{{ facebook }}" class="social__link" title="Facebook" target="_blank"><i class="fa fa-facebook"></i></a></li>
+{% endif %}
+{% if twitter %}
+  <li class="social__item twitter"><a href="{{ twitter }}" class="social__link" title="Twitter" target="_blank"><i class="fa fa-twitter"></i></a></li>
+{% endif %}
+{% if pinterest %}
+  <li class="social__item pinterest"><a href="{{ pinterest }}" class="social__link" title="Pinterest" target="_blank"><i class="fa fa-pinterest-p"></i></a></li>
+{% endif %}
+{% if instagram %}
+  <li class="social__item instagram"><a href="{{ instagram }}" class="social__link" title="Instagram" target="_blank"><i class="fa fa-instagram"></i></a></li>
+{% endif %}
+{% if youtube %}
+  <li class="social__item youtube"><a href="{{ youtube }}" class="social__link" title="YouTube" target="_blank"><i class="fa fa-youtube"></i></a></li>
+{% endif %}
+{% if googleplus %}
+  <li class="social__item googleplus"><a href="{{ googleplus }}" class="social__link" title="Google Plus" target="_blank"><i class="fa fa-google-plus"></i></a></li>
+{% endif %}
+{% if linkedin %}
+  <li class="social__item linkedin"><a href="{{ linkedin }}" class="social__link" title="Linkedin" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+{% endif %}

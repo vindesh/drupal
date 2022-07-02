@@ -1,0 +1,23 @@
+{# TODO: Checken of dit issues oplevert met caching? <prvn> #}
+{% set show_profile = false %}
+{% if logged_in and user.field_profile_visibility.value in ['everyone', 'logged_in'] %}
+    {% set show_profile = true %}
+{% elseif not logged_in and user.field_profile_visibility.value in ['everyone'] %}
+    {% set show_profile = true %}
+{% endif %}
+
+{% if show_profile %}
+	<div class="comment-outer">
+	    <div class="comment__user--picture">{{ content.user_picture }}</div>
+	    <div class="comment__user--name">{{ 'By'|t }} <strong>{{ user.displayname }}</strong></div>
+	</div>
+    {{ comment }}
+    <div class="comment__user--link"><a href="{{ path('entity.user.canonical', {'user': user.id}) }}">{{ 'View profile'|t }}</a></div>
+    
+{% else %}
+	<div class="comment-outer">
+	    <div class="comment__user--picture"></div>
+	     <div class="comment__user--name">{{ 'By'|t }} <strong>{{ 'Anonymous'|t }}</strong></div>
+		{#<div class="comment__user--name">{{ 'By'|t }} <strong>{{ user.displayname }}</strong></div>#}
+    </div>
+{% endif %}

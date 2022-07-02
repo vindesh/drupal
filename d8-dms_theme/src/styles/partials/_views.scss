@@ -1,0 +1,30 @@
+.views-rows {
+  float: left;
+  width: 100%;
+  + footer {
+    float: left;
+    width: 100%;
+    margin: rem(30) 0;
+    text-align: center;
+  }
+}
+
+//personal overviews
+//on /user page
+
+.personal-likes-overview,
+.personal-favorites-overview,
+.personal-projects-overview,
+.related-projects-overview {
+  padding-bottom: rem(45);
+  margin-top: rem(50);
+  border-bottom: 1px solid $grey6;
+  .view {
+    margin-top: rem(40);
+  }
+}
+
+.personal-projects-overview,
+.related-projects-overview {
+  border-bottom: 0;
+}

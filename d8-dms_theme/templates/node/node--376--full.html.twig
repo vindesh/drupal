@@ -1,0 +1,30 @@
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+{% set body = content|without('field_paragraphs')|render %}
+
+<article{{ attributes.addClass(classes) }}>
+  <header class="node__header container">
+    <h1>{{ label }}</h1>
+  </header>
+  {% if not custom.flag %}
+  <div class="node__content">
+    {% if body %}
+      <div class="container">
+        {{ content|without('field_paragraphs') }}
+      </div>
+    {% endif %}
+
+    {{ content.field_paragraphs }}
+  </div>
+  {% endif %}
+  
+</article>

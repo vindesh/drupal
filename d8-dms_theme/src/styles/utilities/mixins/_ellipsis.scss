@@ -1,0 +1,8 @@
+// Truncate single line element and add ellipsis
+@mixin ellipsis($max-width: 100%) {
+  display: inline-block;
+  max-width: $max-width;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

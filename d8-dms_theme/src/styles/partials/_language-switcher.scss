@@ -1,0 +1,133 @@
+//------------------------------------------------------------------------------
+// LANGUAGE-SWITCHER.SCSS
+// Language switcher styling.
+//------------------------------------------------------------------------------
+
+.language-switcher {
+  display: none;
+  float: right;
+  width: auto;
+  margin: 0 0 rem(20) rem(30);
+  position: relative;
+  .language__title {
+    @include iconize('angle-down');
+    padding: 0 rem(10);
+    line-height: rem(38);
+    text-transform: uppercase;
+    border: 1px solid $grey2;
+    border-radius: 4px;
+    cursor: pointer;
+    &:hover {
+      background-color: $grey2;
+    }
+    &.open {
+      @include iconize('angle-up');
+      background-color: $grey2;
+      border-bottom-color: transparent;
+      border-radius: 4px 4px 0 0;
+      // ~ul.links {
+      //   display: block;
+      // }
+    }
+  }
+  ul.links {
+    display: none;
+    @include reset-list;
+    // background-color: $grey3;
+    background-color: $white;
+    width: 100%;
+    padding: rem(10) 0;
+    text-align: center;
+    border: 1px solid $grey2;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+    position: absolute;
+    // top: rem(40);
+    z-index: z('menu');
+    li {
+      display: block;
+      &.is-active {
+        display: none;
+      }
+      a {
+        display: block;
+        color: $body;
+        line-height: rem(30);
+        text-transform: uppercase;
+        text-decoration: none;
+        &:hover {
+          color: $fm-blue;
+          font-weight: 900;
+        }
+        &.is-active {
+          color: $fm-blue;
+          font-weight: 900;
+        }
+      }
+    }
+  }
+}
+
+.off-canvas {
+  .language-switcher {
+    display: block;
+  }
+}
+
+.language-switcher--mobile {
+  float: left;
+  width: 100%;
+  padding: rem(10) 0;
+  border-top: 1px solid $grey6;
+  ul.links {
+    @include reset-list;
+    text-align: center;
+    li {
+      display: inline-block;
+      margin: 0 rem(10);
+      a {
+        display: block;
+        color: $body;
+        line-height: rem(30);
+        text-transform: uppercase;
+        text-decoration: none;
+        &:hover {
+          color: $fm-red;
+        }
+        &.is-active {
+          font-weight: 900;
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .language-switcher {
+    display: block;
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

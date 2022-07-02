@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a breadcrumb trail.
+ *
+ * Available variables:
+ * - breadcrumb: Breadcrumb trail items.
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% if breadcrumb  %}
+	{% include directory ~ '/app/includes/2_pieces/breadcrumbs.twig' with {breadcrumbs: breadcrumb} %}
+{% endif %}

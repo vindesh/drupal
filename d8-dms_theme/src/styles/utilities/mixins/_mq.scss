@@ -1,0 +1,12 @@
+@mixin mq($label) {
+  @if map-has-key($mq-breakpoints, $label) {
+    @media #{map-get($mq-breakpoints, $label)} {
+      @content;
+    }
+  } @else {
+    @media #{$label} {
+      @content;
+    }
+    @warn "Breakpoint '#{$label}' not found. Interpreting as media query string.";
+  }
+}

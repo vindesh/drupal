@@ -1,0 +1,41 @@
+//------------------------------------------------------------------------------
+// CONFIG
+// 
+//------------------------------------------------------------------------------
+
+
+// Fonts
+@import 'config/fonts';
+
+// Icons
+@import 'config/icons';
+
+// Colors
+@import 'config/colors';
+
+// ==========================================================================
+// Breakpoints that are to be used in configuration are set up in the theme's
+// .breakpoints.yml file and can be turned into a _breakpoints partial by
+// running "gulp breakpoints" from the CLI.
+// (ie. breakpoints used for lay-out changes, responsive image configuration,...)
+//
+// DO NOT CHANGE THE BREAKPOINTS PARTIAL MANUALLY!
+//
+// Any additional breakpoints you require specifically for styling can be
+// added below as regular variables containing the media query.
+// ==========================================================================
+// Config breakpoints ///////////////
+@import 'config/breakpoints';
+// Custom breakpoints ///////////////
+//$example: 'all and (min-width: 999px)';
+
+// Z-index
+@import 'config/z-index';
+
+// Grid containers  ///////////////
+@import 'config/grid-containers';
+
+// ==========================================================================
+// Any additional variables to be listed below  ///////////////
+// ==========================================================================
+

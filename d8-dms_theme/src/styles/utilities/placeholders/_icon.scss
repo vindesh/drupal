@@ -1,0 +1,11 @@
+// Stays backwards compatible with regular Font Awesome implementation,
+// but we can now include custom font icons without having to add extra markup.
+.fa,
+%fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 'dmsicons';
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

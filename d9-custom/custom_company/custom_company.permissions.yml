@@ -1,0 +1,4 @@
+access company user:
+    title: 'Allow company user to access'
+    description: 'Allow company user to access this page'
+    restrict access: true

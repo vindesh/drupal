@@ -1,0 +1,157 @@
+//------------------------------------------------------------------------------
+// LOCATOR.SCSS
+// Locator styling.
+//------------------------------------------------------------------------------
+
+.locator {
+  .views-filters {
+    background-color: $grey3;
+    float: left;
+    width: 100%;
+    margin: 0 0 rem(10);
+    padding: rem(20);
+    border: 1px solid $grey2;
+    .description {
+      display: none;
+    }
+    fieldset {
+      legend {
+        @extend label;
+      }
+      &[id^=edit-field-store-characteristics-target-id] {
+        legend span {
+          padding-right: rem(40);
+          position: relative;
+          &::after {
+            content: url(../img/blue-dot.png);
+            position: absolute;
+            top: -8px;
+            right: 0;
+          }
+        }
+        .form-item {
+          width: auto;
+          margin-right: rem(20);
+        }
+      }
+    }
+    .form-item-field-geolocation-proximity {
+      display: none;
+    }
+    .form-checkboxes {
+      label {
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+// FORM
+form.node-store-add-store-form {
+  float: left;
+  width: 100%;
+  max-width: rem(900);
+  margin: 0 0 rem(75);
+  > div {
+    float: left;
+    width: 100%;
+  }
+  .field--type-geolocation {
+    > fieldset {
+      padding: 0;
+      border: 0;
+      > legend {
+        display: none;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .locator {
+    .views-filters {
+      div[id^=edit-countries] {
+        float: left;
+        width: 49%;
+        margin-right: 2%;
+      }
+      .form-item-geolocation-geocoder-google-geocoding-api {
+        width: 49%;
+      }
+      .form-item-field-store-type-target-id {
+        width: 49%;
+        margin-right: 2%;
+        label {
+          // display: none;
+        }
+      }
+      fieldset {
+        &[id^=edit-field-store-characteristics-target-id] {
+          width: 49%;
+          line-height: rem(42);
+        }
+      }
+      .form-item-geolocation-geocoder-google-geocoding-api {}
+    }
+  }
+
+  // FORM
+  form.node-store-add-store-form {
+    .field--name-field-store-phone,
+    .field--name-field-store-email,
+    .field--name-field-store-website,
+    .field--name-field-store-facebook,
+    .field--name-field-store-instagram,
+    .field--name-field-store-pinterest {
+      float: left;
+      width: 32%;
+      margin-right: 2%;
+    }
+    .field--name-field-store-website,
+    .field--name-field-store-pinterest {
+      margin-right: 0;
+    }
+    .field--name-field-store-type,
+    .field--name-field-store-characteristics {
+      float: left;
+      width: 49%;
+      margin-right: 2%;
+      legend {
+        padding: rem(6) 0;
+        line-height: rem(28);
+        font-weight: 700;
+      }
+      label {
+        font-weight: 400;
+      }
+    }
+    .field--name-field-store-characteristics {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

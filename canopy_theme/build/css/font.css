@@ -1,0 +1,92 @@
+@font-face {
+  font-family: 'SourceSansPro';
+  src: url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Regular.woff2') format('woff2'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Regular.woff') format('woff'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SourceSansPro SemiBold';
+  src: url('../../build/fonts/Source_Sans_Pro/SourceSansPro-SemiBold.woff2') format('woff2'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-SemiBold.woff') format('woff'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-SemiBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SourceSansPro Bold';
+  src: url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Bold.woff2') format('woff2'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Bold.woff') format('woff'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SourceSansPro Bold Italic';
+  src: url('../../build/fonts/Source_Sans_Pro/SourceSansPro-BoldItalic.woff2') format('woff2'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-BoldItalic.woff') format('woff'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SourceSansPro Light';
+  src: url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Light.woff2') format('woff2'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Light.woff') format('woff'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SourceSansPro Light Italic';
+  src: url('../../build/fonts/Source_Sans_Pro/SourceSansPro-LightItalic.woff2') format('woff2'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-LightItalic.woff') format('woff'), url('../../build/fonts/Source_Sans_Pro/SourceSansPro-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Volte';
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Bold.eot');
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Bold.eot?#iefix') format('embedded-opentype'), url('../../build/fonts/VolteRounded/VolteRounded-Bold.woff2') format('woff2'), url('../../build/fonts/VolteRounded/VolteRounded-Bold.woff') format('woff'), url('../../build/fonts/VolteRounded/VolteRounded-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Volte Rounded';
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Regular.eot');
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Regular.eot?#iefix') format('embedded-opentype'), url('../../build/fonts/VolteRounded/VolteRounded-Regular.woff2') format('woff2'), url('../../build/fonts/VolteRounded/VolteRounded-Regular.woff') format('woff'), url('../../build/fonts/VolteRounded/VolteRounded-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Volte Rounded';
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Medium.eot');
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Medium.eot?#iefix') format('embedded-opentype'), url('../../build/fonts/VolteRounded/VolteRounded-Medium.woff2') format('woff2'), url('../../build/fonts/VolteRounded/VolteRounded-Medium.woff') format('woff'), url('../../build/fonts/VolteRounded/VolteRounded-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Volte Rounded';
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Semibold.eot');
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Semibold.eot?#iefix') format('embedded-opentype'), url('../../build/fonts/VolteRounded/VolteRounded-Semibold.woff2') format('woff2'), url('../../build/fonts/VolteRounded/VolteRounded-Semibold.woff') format('woff'), url('../../build/fonts/VolteRounded/VolteRounded-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Volte Rounded';
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Light.eot');
+  src: url('../../build/fonts/VolteRounded/VolteRounded-Light.eot?#iefix') format('embedded-opentype'), url('../../build/fonts/VolteRounded/VolteRounded-Light.woff2') format('woff2'), url('../../build/fonts/VolteRounded/VolteRounded-Light.woff') format('woff'), url('../../build/fonts/VolteRounded/VolteRounded-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'icomoon';
+  src: url('../../build/fonts/icomoon/icomoon.eot?fjvrqf');
+  src: url('../../build/fonts/icomoon/icomoon.eot?fjvrqf#iefix') format('embedded-opentype'), url('../../build/fonts/icomoon/icomoon.woff2?fjvrqf') format('woff2'), url('../../build/fonts/icomoon/icomoon.ttf?fjvrqf') format('truetype'), url('../../build/fonts/icomoon/icomoon.woff?fjvrqf') format('woff'), url('../../build/fonts/icomoon/icomoon.svg?fjvrqf#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+/*# sourceMappingURL=maps/font.css.map */

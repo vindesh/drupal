@@ -1,0 +1,25 @@
+{{ attach_library('dms_theme/slick') }}
+
+{%
+  set classes = [
+    'block',
+    'block-' ~ configuration.provider|clean_class,
+    'block-' ~ plugin_id|clean_class,
+  ]
+%}
+
+
+
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {% if label %}
+    <div class="block__title">{{ label }}</div>
+    <div class="overview-link">
+      <a href="#my-likes">{{ 'Overview'|t }} <i class="fa fa-angle-right"></i></a>
+    </div>
+  {% endif %}
+  {{ title_suffix }}
+  {% block content %}
+    {{ content }}
+  {% endblock %}
+</div>

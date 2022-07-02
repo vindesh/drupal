@@ -1,0 +1,56 @@
+// ==========================================================================
+// Paragraph bundle: TEXT COLUMN
+// Individual text blob inside multi-column container.
+// ==========================================================================
+.paragraph--type--text-column {
+
+}
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+  // Enough room for two columns side by side.
+  .pg-textcol--2 {
+    .paragraph--type--text-column {
+      *:first-child {
+        margin-top: 0;
+      }
+
+      *:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+  // Restrict the text width if there's only 1 text blob, for better on-screen legibility.
+  // Give it a bit more leeway than on previous breakpoint.
+  .pg-textcol--2,
+  .pg-textcol--3 {
+    .paragraph--type--text-column {
+        *:first-child {
+          margin-top: 0;
+        }
+
+        *:last-child {
+          margin-bottom: 0;
+        }
+    }
+  }
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

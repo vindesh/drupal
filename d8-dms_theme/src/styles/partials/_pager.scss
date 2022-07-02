@@ -1,0 +1,91 @@
+//------------------------------------------------------------------------------
+// PAGER.SCSS
+// Pager styling.
+//------------------------------------------------------------------------------
+
+@keyframes spin {
+  0%  { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }   
+}
+
+.pager {
+  @include reset-list;
+  float: left;
+  width: 100%;
+  margin: rem(30) 0;
+  // Infinite scroll
+  &[data-drupal-views-infinite-scroll-pager] {
+    .pager__item {
+      display: block;
+      height: auto;
+      border: 0;
+      .button {
+        @include iconize('refresh');
+        background-color: $white;
+        line-height: rem(40);
+        color: $fm-red;
+        border: 1px solid $grey6;
+        &:hover {
+          background-color: $fm-red;
+          color: $white;
+          &::after {
+            animation: spin 1.5s infinite linear;
+          }
+        }
+      }
+    }
+  }
+  + footer {
+    float: left;
+    width: 100%;
+    color: $grey4;
+    text-align: center;
+  }
+}
+
+.full-pager {
+  .pager__item {
+    min-width: rem(25);
+    text-align: center;
+    &.is-active a {
+      color: $fm-red;
+      font-weight: 900;
+    }
+    a {
+      color: $body;
+      text-decoration: none;
+      &:hover {
+        color: $fm-red;
+      }
+    }
+    &--previous {
+      margin-right: rem(10);
+    }
+    &--next {
+      margin-left: rem(10);
+    }
+  }
+}
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

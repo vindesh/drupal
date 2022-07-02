@@ -1,0 +1,40 @@
+// ==========================================================================
+// Paragraph bundle: MEDIA
+// ==========================================================================
+.paragraph--type--media {
+  text-align: center;
+
+  // Make sure title nor intro become ridiculously long.
+  .pg-section__title,
+  .field--name-field-intro {
+    max-width: rem(760);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  // If an intro was added, provide some spacing between it and the media element.
+  .field--name-field-intro {
+    margin-bottom: rem(30);
+  }
+}
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

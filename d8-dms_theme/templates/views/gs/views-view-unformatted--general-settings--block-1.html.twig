@@ -1,0 +1,10 @@
+{% for row in rows %}
+  {%
+    set row_classes = [
+      default_row_class ? 'social__list',
+    ]
+  %}
+  <ul{{ row.attributes.addClass(row_classes) }}>
+    {{ row.content }}
+  </ul>
+{% endfor %}

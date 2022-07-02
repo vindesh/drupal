@@ -1,0 +1,9 @@
+global-styling:
+  version: VERSION
+  css:
+    base:
+      build/css/ukg.css: {}
+global-scripts:
+  version: VERSION
+  js:
+    build/scripts/app.built.js: {}

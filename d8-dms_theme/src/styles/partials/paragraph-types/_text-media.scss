@@ -1,0 +1,60 @@
+// ==========================================================================
+// Paragraph bundle: TEXT & MEDIA
+// ==========================================================================
+.paragraph--type--text-media {
+
+}
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+  .pg--has-media-right {
+    .pg-text-media__text {
+      float: left;
+      width: 48%;
+      margin-right: 4%;
+    }
+
+    .pg-text-media__media {
+      float: left;
+      width: 48%;
+    }
+  }
+
+  .pg--has-media-left {
+    .pg-text-media__media {
+      float: left;
+      width: 48%;
+    }
+
+    .pg-text-media__text {
+      float: right;
+      width: 48%;
+    }
+  }
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+  .pg-text-media__text {
+
+  }
+
+  .pg-text-media__media {
+
+  }
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

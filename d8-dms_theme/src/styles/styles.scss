@@ -1,0 +1,29 @@
+//------------------------------------------------------------------------------
+// STYLES.SCSS
+// This file is the core of the CSS files. Here the different .scss files are
+// being imported.
+//------------------------------------------------------------------------------
+
+// Charset
+@charset "UTF-8";
+
+// Libraries
+@import "../../node_modules/normalize.css/normalize.css";
+
+// Config file that contains centralized variables
+@import "config";
+
+// Utility functions
+@import "utilities/**/*";
+
+// Base styling
+@import "base/breakpoint-dev";
+@import "base/drupal-overrides";
+@import "base/maintenance";
+@import "base/base";
+@import "base/typography";
+@import "base/off-canvas";
+@import "base/forms";
+
+// Custom styling
+@import "partials/**/*";

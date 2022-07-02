@@ -1,0 +1,67 @@
+//------------------------------------------------------------------------------
+// BREADCRUMB.SCSS
+// Breadcrumb styling.
+//------------------------------------------------------------------------------
+
+.block-system-breadcrumb-block {
+  display: none;
+  margin: 0 0 rem(45);
+}
+.nav__breadcrumb {
+  padding: rem(20) 0;
+  font-size: rem(13);
+  line-height: rem(20);
+  color: $dms-grey3;
+}
+.breadcrumb__list {
+  @include reset-list;
+}
+.breadcrumb__item {
+  display: inline-block;
+  &::before {
+    content: '\203a';
+    padding: 0 rem(5);
+  }
+  &:first-child::before {
+    display: none;
+  }
+  a {
+    display: inline;
+    color: $dms-grey4;
+    &:hover {
+      color: $fm-blue;
+    }
+  }
+}
+
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .block-system-breadcrumb-block {
+    display: block;
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

@@ -1,0 +1,15 @@
+<div class="ukg-listing-container{% if listingType %} {{ listingType }}{% endif %}">
+	{% block listing_items %}
+		{% for listItem in listItems %}
+			{% block listing_item %}
+        {% include directory ~ '/app/includes/3_components/listing-item.twig' with {listingItems: listItem} %}
+			{% endblock %}
+		{% endfor %}
+	{% endblock %}
+
+	{% block load_more_button %}
+		{% if loadMore %}
+			<a href="#" class="load-more" role="button">{{ loadMore }}</a>
+		{% endif %}
+	{% endblock %}
+</div>

@@ -1,0 +1,74 @@
+//------------------------------------------------------------------------------
+// WEBFORM.SCSS
+// Webform styling.
+//------------------------------------------------------------------------------
+
+.blog-category__overview {
+  .views-row {
+    float: left;
+    width: 100%;
+    height: rem(400);
+    margin: 0 0 5%;
+  }
+}
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .blog-category__overview {
+    .views-row {
+      width: 49%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(2n) {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .blog-category__overview {
+    // Fancy styling
+    .views-row {
+      height: rem(500);
+      &:nth-child(even) {
+        height: rem(350);
+      }
+      &:nth-child(5) {
+        margin-top: rem(-150);
+      }
+    }
+    // Grid styling
+    .views-row,
+    .views-row:nth-child(2n) {
+      width: 32%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(3n) {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

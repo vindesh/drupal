@@ -1,0 +1,24 @@
+{%
+  set classes = [
+    'block',
+    'block-' ~ configuration.provider|clean_class,
+    'block-' ~ plugin_id|clean_class,
+  ]
+%}
+
+
+
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {% if label %}
+  {% endif %}
+  {{ title_suffix }}
+  {% block content %}
+  <div class="body-background" style="background-image: url({{ content.field_background_image.0 }});">
+    <div class="block__title">{{ label }}</div>
+  </div>
+  <div class="webform-body">
+    {{ content.field_webform }}
+  </div>
+  {% endblock %}
+</div>

@@ -1,0 +1,29 @@
+{%
+  set classes = [
+    'paragraph',
+    'paragraph--type--' ~ paragraph.bundle|clean_class,
+    view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+  ]
+%}
+
+{% if custom.extra_classes is defined %}
+  {% set classes = classes|merge(custom.extra_classes) %}
+{% endif %}
+
+{% block paragraph %}
+  <section{{ attributes.addClass(classes) }}>
+    <div class="pg-section__title-wrapper">
+      <div class="container">
+        {{ content.field_title }}
+      </div>
+    </div>
+    <div class="container">
+    {% block content %}
+      {{ content|without('field_title', 'field_patterns') }}
+    {% endblock %}
+      <div class="promoted-pattern__overview">
+        {{ content|without('field_title') }}
+      </div>
+    </div>
+  </section>
+{% endblock paragraph %}

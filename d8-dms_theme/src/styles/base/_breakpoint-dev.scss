@@ -1,0 +1,36 @@
+//-----------------------
+//-- BREAKPOINT LABELS --
+//-----------------------
+
+body.breakpoint-labels {
+  &::before {
+    content: 'Default';
+    background: #ee1100;
+    padding: 0 rem(15);
+    color: #fff;
+    font-size: rem(16);
+    line-height: rem(40);
+    border-radius: 7px 0 0 0;
+    opacity: 0.75;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: z('mol');
+    @include mq(break1) {
+      content: 'Break 1';
+      background: #ff9933;
+    }
+    @include mq(break2) {
+      content: 'Break 2';
+      background: #aacc22;
+    }
+    @include mq(break3) {
+      content: 'Break 3';
+      background: #11aabb;
+    }
+    @include mq(break4) {
+      content: 'Break 4';
+      background: #442299;
+    }
+  }
+}

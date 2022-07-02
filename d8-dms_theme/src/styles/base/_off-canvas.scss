@@ -1,0 +1,133 @@
+//------------------------------------------------------------------------------
+// OFF-CANVAS.SCSS
+// This file provides default styling for the built-in off-canvas menu.
+//------------------------------------------------------------------------------
+
+// General
+.mm-open {
+  position: relative;
+  overflow: hidden;
+  .off-canvas {
+    overflow-y: scroll;
+  }
+  .wrapper {
+    opacity: 0.1;
+    pointer-events: none;
+    overflow: hidden;
+    box-shadow: none;
+  }
+}
+
+.off-canvas {
+  transition: all .3s ease;
+  position: fixed;
+  z-index: z('mol');
+}
+
+.wrapper {
+  position: relative;
+  left: 0;
+  // right: 0;
+  transition: all .3s ease;
+}
+
+.mm-toggle {
+  display: block;
+  position: relative;
+  z-index: z('mol');
+  .mm-none & {
+    display: none;
+  }
+}
+
+
+// Left
+.mm-left {
+  &.mm-open {
+    .off-canvas {
+      left: 0;
+    }
+    .wrapper {
+      left: rem(320);
+    }
+  }
+  .off-canvas {
+    width: rem(320);
+    position: fixed;
+    top: 0;
+    left: rem(-320);
+    bottom: 0;
+  }
+}
+
+
+// Right
+.mm-right {
+  &.mm-open {
+    .off-canvas {
+      right: 0;
+    }
+    .wrapper {
+      left: rem(-320);
+    }
+  }
+  .off-canvas {
+    width: rem(320);
+    position: fixed;
+    top: 0;
+    right: rem(-320);
+    bottom: 0;
+  }
+}
+
+
+// Top
+.mm-top {
+  &.mm-open {
+    .off-canvas {
+      height: 100%;
+      bottom: 0;
+      overflow-y: scroll;
+    }
+  }
+  .off-canvas {
+    background-color: $white;
+    width: 100%;
+    height: 0;
+    position: fixed;
+    top: 0;
+    bottom: 100%;
+    overflow: hidden;
+    transition: all .5s ease;
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .mm-toggle {
+    display:  none;
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

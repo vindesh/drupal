@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Default theme implementation for Share Everywhere module.
+ *
+ * Available variables:
+ *  - attributes: Remaining HTML attributes for the element, including:
+ *    - class: HTML classes that can be used to style contextually through CSS.
+ *  - title: The title of the module.
+ *  - facebook_like: The rendered Facebook like button if enabled in the settings.
+ *  - share_icon: Universal share icon.
+ *    - id: Unique id.
+ *    - class: Additional classes.
+ *    - src: Path to the share icon.
+ *    - alt: Alt text of the image.
+ *  - se_links_id: Unique id.
+ *  - is_active: Gives se-active class to the ul element if it is setup to be non-collapsible or gives se-inactive by default.
+ *  - buttons: The social buttons to be rendered.
+ *
+ */
+#}
+<div class="se-block {{ attributes.class }}" {{ attributes }}>
+  {% if title %}
+    <p class="se-title">{{ title }}</p>
+  {% endif %}
+  <ul class="se-list {{ is_active }}">
+    {% for key, button in buttons %}
+      <li class="se-item {{ key }}"> {{ button }} </li>
+    {% endfor %}
+    <li class="se-item print"><a href="javascript:window.print()"><i class="fa fa-print"></i></a></li>
+  </ul>
+</div>

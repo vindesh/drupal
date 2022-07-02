@@ -1,0 +1,105 @@
+{#
+/**
+ * @file
+ * Theme override to present all user data.
+ *
+ * This template is used when viewing a registered user's page,
+ * e.g., example.com/user/123. 123 being the user's ID.
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ *   print a subset such as 'content.field_example'. Fields attached to a user
+ *   such as 'user_picture' are available as 'content.user_picture'.
+ * - attributes: HTML attributes for the container element.
+ * - user: A Drupal User entity.
+ *
+ * @see template_preprocess_user()
+ */
+#}
+
+{{ attach_library('dms_theme/modal') }}
+
+{%
+  set classes = [
+    'user',
+    'user--default',
+  ]
+%}
+
+<article {{ attributes.addClass(classes) }}>
+
+  {% if not custom.is_me %}
+    <div class="follow-user">
+    {% if logged_in and content.flag_user_follow %}
+      {{ content.flag_user_follow }}
+    {% else %}
+      <a href="{{url('user.register') }}" class="register-and-follow">{{ 'Register and start following this Fibre Mood user'|t }}</a>
+    {% endif %}
+    </div>
+  {% endif  %}
+
+  <div class="user__content">
+
+    {% if content.field_website|render|striptags|trim is not empty %}
+      <div class="field_website">
+        <span class='label'>{{ 'My website:'|t }}</span>
+        {{ content.field_website }}
+      </div>
+    {% endif %}
+
+    {% if (content.field_instagram|render|striptags|trim is not empty or content.field_facebook|render|striptags|trim is not empty or content.field_pinterest|render|striptags|trim is not empty or content.field_youtube|render|striptags|trim is not empty) %}
+      <div class="field_social">
+        <span class="label">{{ 'Follow me:'|t }}</span>
+        {% if (content.field_instagram|render|striptags|trim) %}
+          <span class="field"><a href="{{ content.field_instagram[0]['#url'] }}" class="instagram icon" target="_blank"></a></span>
+        {% endif %}
+        {% if (content.field_facebook|render|striptags|trim) %}
+          <span class="field"><a href="{{ content.field_facebook[0]['#url'] }}" class="facebook icon" target="_blank"></a></span>
+        {% endif %}
+        {% if (content.field_pinterest|render|striptags|trim) %}
+          <span class="field"><a href="{{ content.field_pinterest[0]['#url'] }}" class="pinterest icon" target="_blank"></a></span>
+        {% endif %}
+        {% if (content.field_youtube|render|striptags|trim) %}
+          <span class="field"><a href="{{ content.field_youtube[0]['#url'] }}" class="youtube icon" target="_blank"></a></span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+
+  {% if custom.is_me and custom.fbshare  %}
+  <div class="user__content user__content--share">
+
+      {{ custom.fbshare }}
+
+  </div>
+  {% endif %}
+
+</article>
+
+
+
+
+
+
+{# badge #}
+{#
+{% if custom.is_me %}
+      <div class="download-badge">
+
+        <div class="badge"></div>
+
+        <a href="#badge-modal" rel="modal:open" class="btn btn--dark">{{ 'Download badge'|t }}</a>
+
+        <div id="badge-modal" class="modal">
+          <div class="badge"></div>
+          <div class="badge-modal__info">
+            <textarea id="badgelink"><a href="{{ url('<current>') }}" title="{{ 'Find me on Fibre Mood!'|t }}" target="_blank"><img src="https://fibremood.stage.dms.be/sites/default/files/2018-04/badge.png" alt="Fibre Mood" /></a></textarea>
+            <a class="btn btn--dark btn--clipboard" data-clipboard-target="#badgelink">{{ 'Copy to clipboard'|t }}</a>
+            <div class="clipboard-copied" style="display:none;">{{ 'Copied!'|t }}</div>
+          </div>
+        </div>
+
+      </div>
+    {% endif %}
+#}

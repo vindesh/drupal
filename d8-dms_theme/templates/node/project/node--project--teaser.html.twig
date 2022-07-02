@@ -1,0 +1,29 @@
+<div class="project__teaser">
+  <div class="project__teaser--image">
+    <a href="{{ url }}">
+      {{ content.field_images.0 }}
+      <div class="project__teaser--more"><span>{{ 'View in detail'|t }}</span></div>
+    </a>
+  </div>
+  <div class="project__teaser--info">
+    <div class="project__teaser--likes">
+      {% if logged_in %}
+        {{ content.flag_project_like }}
+      {% else %}
+        <a href="#creation-modal" rel="modal:open">{{ custom.like_count }}</a>
+      {% endif %}
+    </div>
+    <div class="project__teaser--comments">
+      {% if logged_in %}
+        <a href="{{ url }}#comments">{{ custom.comment_count }}</a>
+      {% else %}
+        <a href="#creation-modal" rel="modal:open">{{ custom.comment_count }}</a>
+      {% endif %}
+    </div>
+    <h3 class="project__teaser--title"><a href="{{ url }}">{{ label }}</a></h3>
+    <div class="project__teaser--author-name">
+      {{ 'by'|t }} <a href="{{ path('entity.user.canonical', {'user': custom.uid }) }}">{{ custom.author_name }}</a>
+    </div>
+  </div>
+  <div id="creation-modal" class="modal">{{ custom.modal|raw }}</div>
+</div>

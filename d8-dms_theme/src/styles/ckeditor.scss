@@ -1,0 +1,28 @@
+//------------------------------------------------------------------------------
+// CKEDITOR.SCSS
+// Basic styling to use in ckeditor.
+//------------------------------------------------------------------------------
+
+
+// Charset
+@charset "UTF-8";
+
+// Libraries
+@import "../../node_modules/normalize.css/normalize.css";
+
+// Config file that contains centralized variables
+@import "config";
+
+// Utility functions
+@import "utilities/**/*";
+
+// Styling needed for ckeditor
+@import "../../fonts/dmsicons.css";
+@import "base/base";
+@import "base/typography";
+
+// Specific styling
+body.cke_editable {
+  background: $white;
+  padding: rem(15) rem(30);
+}

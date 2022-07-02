@@ -1,0 +1,30 @@
+dms_theme.default:
+  label: default-mq
+  mediaQuery: ''
+  weight: 0
+  multipliers:
+    - 1x
+dms_theme.break1:
+  label: break1
+  mediaQuery: 'all and (min-width: 480px)'
+  weight: 1
+  multipliers:
+    - 1x
+dms_theme.break2:
+  label: break2
+  mediaQuery: 'all and (min-width: 768px)'
+  weight: 2
+  multipliers:
+    - 1x
+dms_theme.break3:
+  label: break3
+  mediaQuery: 'all and (min-width: 960px)'
+  weight: 3
+  multipliers:
+    - 1x
+dms_theme.break4:
+  label: break4
+  mediaQuery: 'all and (min-width: 1200px)'
+  weight: 4
+  multipliers:
+    - 1x

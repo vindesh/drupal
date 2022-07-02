@@ -1,0 +1,161 @@
+//------------------------------------------------------------------------------
+// ACTIVITY-FEED.SCSS
+// Activity feed aka message styling.
+//------------------------------------------------------------------------------
+
+.block-views-blockmessages-activity-feed-block-notifications-recent,
+.block-views-blockmessages-activity-feed-block-notifications-earlier {
+  margin: 0 0 rem(30);
+  h2 {
+    margin: 0 0 rem(10);
+    font-size: rem(22);
+    line-height: rem(30);
+    color: $fm-blue;
+  }
+  .views-rows {
+    border: 1px solid $grey6;
+    border-bottom: 0;
+  }
+}
+
+.activity-feed--sticky {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+  .views-row {
+    background-color: $grey3;
+    background-color: rgba($fm-red,1);
+    float: left;
+    width: 100%;
+    margin: 0 0 rem(30);
+    padding: rem(30);
+    border: 1px solid $grey6;
+    .field--name-title {
+      @extend h3;
+      margin: 0 0 rem(30);
+      color: $white;
+    }
+    .field--name-field-message {
+      background-color: $white;
+      padding: 0 rem(30);
+      border: 1px solid $grey6;
+    }
+  }
+}
+
+
+.activity-feed--messages {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+}
+
+.message {
+  background-color: $white;
+  float: left;
+  width: 100%;
+  // margin: 0 0 rem(30);
+  padding: rem(30);
+  // border: 1px solid $grey6;
+  border-bottom: 1px solid $grey6;
+  position: relative;
+  &.new {
+    background-color: $activity-feed-bg;
+  }
+}
+
+.message__header {
+  float: left;
+  width: 100%;
+}
+.message__header--image {
+  background-image: url(../img/bg-user.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left;
+  width: rem(60);
+  height: rem(60);
+  margin-right: rem(20);
+  border: 1px dotted $fm-red;
+}
+.message__header--content {
+  float: left;
+  width: calc(100% - 80px);
+  line-height: rem(30);
+}
+.message__header--title {
+  a {
+    color: $body;
+    font-weight: 900;
+    text-decoration: none;
+    &:hover {
+      color: $fm-red;
+      text-decoration: underline;
+    }
+  }
+}
+.message__header--datetime {
+  @include iconize('clock-o','before');
+  font-size: rem(14);
+}
+
+.message__content {
+  float: left;
+  width: 100%;
+  margin: rem(30) 0 0;
+  &--link {
+    display: block;
+    color: $body;
+    text-decoration: none;
+    text-align: center;
+    background-color: $grey3;
+    h3 {
+      background-color: $white;
+      margin: 0;
+      padding: rem(15) 0 0;
+      span {
+        float: right;
+        color: $body;
+        @include iconize('heart-o','before');
+      }
+    }
+    &:hover {
+      h3 {
+        color: $fm-red;
+      }
+      .more,
+      .garments {
+        color: $fm-red;
+      }
+    }
+  }
+  &--comment {
+    background: $grey3;
+    padding: rem(10) rem(30);
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

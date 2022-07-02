@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'dmsicons';
+    src: url('dmsicons/dmsicons.woff') format('woff'),
+    url('dmsicons/dmsicons.ttf') format('truetype'),
+    url('dmsicons/dmsicons.svg?3gckdg#dmsicons') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

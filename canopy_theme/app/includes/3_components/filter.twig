@@ -1,0 +1,10 @@
+<div class="ukg-dropdown ukg-dropdown-filter{% if width %} {{ width }}{% endif %}">
+  <a class="uk-button uk-button-primary uk-button-dropdown-toggle" data-module="filterToggle"
+     uk-toggle="target: #{{ filterTarget }}" type="button"><h3>{{ filterName }}</h3><span
+      class="ukg-toggle icon-chevron-down">{{ 'Expand'|t }}</span> </a>
+  <div class="filter-container" id="{{ filterTarget }}" hidden>
+    {% block filter_category %}
+      {% include directory ~ '/app/includes/3_components/category-filter.twig' %}
+    {% endblock %}
+  </div>
+</div>

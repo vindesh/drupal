@@ -1,0 +1,14 @@
+{% if listItem.type %}
+	<span><span class="seperator">|</span> {{ listItem.type }}</span>
+{% endif %}
+	{% if listItem.info %}
+		{% block item_info %}
+			<span>{{ listItem.info }}</span>
+		{% endblock %}
+	{% endif %}
+	{% if listItem.tags %}
+		<span class="seperator">|</span>
+		{% block item_tags %}
+			{% include directory ~ '/app/includes/2_pieces/list-tags.twig' with {tags: listItem.tags} %}
+		{% endblock %}
+	{% endif %}

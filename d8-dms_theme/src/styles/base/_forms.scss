@@ -1,0 +1,319 @@
+//------------------------------------------------------------------------------
+// FORMS.SCSS
+// Basic styling for forms.
+//------------------------------------------------------------------------------
+
+select::-ms-expand {
+  display: none;
+}
+
+.webform-submission-form {
+  max-width: rem(500);
+  margin: 0 auto;
+  fieldset {
+    padding: 0;
+    margin: 0 0 rem(25) 0;
+    border: none;
+    legend {
+      padding: 0;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  }
+  .description {
+    display: block;
+    font-size: 80%;
+  }
+}
+
+.form-item {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(10);
+}
+.form-actions {
+  float: left;
+  width: 100%;
+}
+label {
+  display: block;
+  padding: rem(6) 0;
+  font-size: rem(16);
+  line-height: rem(28);
+  font-weight: 900;
+  &.form-required {
+    &::after {
+      content: ' *';
+      font-size: 80%;
+      line-height: 0;
+      vertical-align: super;
+    }
+  }
+  .js-form-type-radio &,
+  .js-form-type-checkbox & {
+    display: inline-block;
+  }
+  &.error {
+    width: 100%;
+    text-align: right;
+    color: $dms-red;
+  }
+  .webform-element-help {
+    width: rem(20);
+    height: rem(20);
+    line-height: rem(18);
+    &:hover {
+      background: $dms-red;
+      border-color: $dms-red;
+    }
+  }
+}
+.description {
+  margin: rem(10) 0 0;
+  font-size: 80%;
+  line-height: rem(20);
+  color: rgba(black,0.5);
+}
+
+input[type="tel"],
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="date"],
+input[type="search"],
+input[type="number"],
+input[type="password"],
+select,
+textarea,
+.file-input-wrapper{
+  background-color: $white;
+  width: 100%;
+  height: rem(42);
+  padding: rem(6) rem(15);
+  font-size: rem(16);
+  line-height: rem(28);
+  color: $body;
+  border: 1px solid $dms-grey2;
+  border-radius: 0;
+  appearance: none;
+  &.error {
+    border: 1px solid #f44336;
+    &:focus {
+      border-color: #f44336;
+    }
+  }
+  &:focus {
+    border: 1px solid $dms-grey4;
+  }
+}
+
+select{
+  padding-right: rem(40);
+  background-image: url('../img/svg/dropdown.svg');
+  background-size: rem(10) rem(10);
+  background-repeat: no-repeat;
+  background-position: right rem(15) center;
+}
+
+textarea {
+  min-height: rem(200);
+  font-size: rem(16);
+  resize: vertical;
+}
+
+
+.js-webform-radios, .js-webform-checkboxes {
+  display: block;
+  width: 100%;
+  padding: rem(6) 0;
+  @include clearfix;
+  .js-form-type-radio, .js-form-type-checkbox {
+    display: block;
+    margin: 0 0 rem(3) 0;
+    input {
+      float: left;
+      margin: rem(8) 0.6rem 0 0;
+    }
+    label {
+      float: left;
+      margin-top: rem(2);
+    }
+  }
+  &.webform-options-display-one-column {
+    columns: 1;
+    .form-item {
+      float: none;
+      clear: both;
+      width: 100%;
+    }
+  }
+  &.webform-options-display-two-columns {
+    columns: 1;
+    .form-item {
+      float: left;
+      width: 50%;
+    }
+  }
+  &.webform-options-display-three-columns {
+    columns: 1;
+    .form-item {
+      float: left;
+      width: 33.33%;
+    }
+  }
+  &.webform-options-display-side-by-side {
+    .form-item {
+      display: inline-block;
+      width: auto;
+      margin-right: rem(15);
+    }
+  }
+}
+
+input[type="radio"] {
+  @extend %visuallyhidden;
+}
+
+input[type="radio"] + label {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: rem(22);
+  position: relative;
+  cursor: pointer;
+
+  &::before {
+    display: block;
+    content: "";
+    width: rem(10);
+    height: rem(10);
+    background: transparent;
+    border: 1px solid $dms-grey3;
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    top: rem(8);
+  }
+}
+
+input[type="radio"]:checked + label::before {
+  background: $black;
+  border-color: $black;
+}
+
+
+input[type="checkbox"]{
+  @extend %visuallyhidden;
+}
+
+input[type="checkbox"] + label {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: rem(22);
+  position: relative;
+  cursor: pointer;
+
+  &::before{
+    content: "";
+    display: block;
+    background: $white;
+    width: rem(11);
+    height: rem(11);
+    color: $body;
+    border: 1px solid $body;
+    border-radius: 2px;
+    position: absolute;
+    left: 0;
+    top: rem(8);
+    font-size: 0.8rem;
+    line-height: rem(9);
+  }
+}
+
+input[type="checkbox"]:checked + label::before{
+  content: "✓";
+}
+
+
+input[type="submit"] {
+  background-color: $body;
+  padding: rem(7) rem(40);
+  font-size: rem(16);
+  line-height: rem(28);
+  color: $white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .3s ease;
+  &:hover {
+    background-color: $fm-red;
+  }
+  &:focus {
+    background-color: $dms-grey3;
+  }
+}
+
+
+.js-form-type-managed-file {
+  width: 100%;
+  position: relative;
+
+  label{
+    position: absolute;
+    left: rem(40);
+    top: 0;
+    z-index: 2;
+    font-weight: normal;
+  }
+
+  .form-managed-file {
+    position: relative;
+
+    .file-input-wrapper {
+      margin: 0 0 rem(5) 0;
+      background-image: url('../img/svg/upload.svg');
+      background-color: transparent;
+      background-size: rem(20) rem(20);
+      background-repeat: no-repeat;
+      background-position: rem(10) center;
+      position: relative;
+
+      input[type="file"] {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+      }
+    }
+  }
+}
+
+.form-managed-file {
+  display: flex;
+  flex-direction: column;
+
+  .file-input-wrapper {
+    order: 1;
+    position: relative;
+    z-index: 8;
+  }
+
+  .file {
+    display: block;
+    padding: 0 0 rem(5) 0;
+    background: #FFF;
+    position: relative;
+    z-index: 3;
+    order: 3;
+  }
+
+  .form-submit {
+    order: 3;
+  }
+
+  .description {
+    order: 4;
+  }
+}

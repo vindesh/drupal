@@ -1,0 +1,12 @@
+{% set filters = {
+  'filterName' : 'Locations' | t,
+  'filterId': 'location',
+  'filterOptions': rows,
+  'filterExpandText': 'Expand'|t
+} %}
+{% if rows|length > 0 %}
+  {% embed directory ~ '/app/includes/3_components/views-filter.twig' %}
+    {% block all_link %}
+    {% endblock %}
+  {% endembed %}
+{% endif %}

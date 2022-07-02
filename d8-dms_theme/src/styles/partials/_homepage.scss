@@ -1,0 +1,95 @@
+//------------------------------------------------------------------------------
+// HOMEPAGE.SCSS
+// Homepage styling.
+//------------------------------------------------------------------------------
+
+.banner {
+  margin: 0 0 rem(60);
+  position: relative;
+}
+.banner__text {
+  @include center('both');
+  text-align: center;
+  width: 90%;
+  .logo-front {
+    display: none;
+  }
+  .inner {
+    background-color: rgba($white,0.9);
+    max-width: rem(600);
+    padding: rem(30) 0;
+    border-radius: rem(20);
+  }
+  h1 {
+    font-size: rem(30);
+    line-height: rem(36);
+    color: $fm-red;
+  }
+  p {
+    padding: 0 rem(20);
+    &:last-child() {
+      margin-bottom: 0;
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .banner__text {
+    // width: auto;
+    .inner {
+      margin: auto;
+      padding: rem(30) rem(60);
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .banner__text {
+    width: auto;
+    .inner {
+      margin: auto;
+    }
+    h1 {
+      font-size: rem(40);
+      line-height: rem(55);
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .banner__text {
+    .logo-front {
+      display: inline-block;
+    }
+    .inner {
+      margin: rem(30) auto 0;
+    }
+    p {
+      padding: 0 rem(50);
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

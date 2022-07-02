@@ -1,0 +1,19 @@
+{% set difficulty = product.field_difficulty|render|striptags|trim %}
+
+
+
+<a href="{{ product_url }}" class="pattern__teaser--link">
+
+  {{ product.field_images.0 }}
+
+  <div class="pattern__teaser--info">
+    <div class="pattern__teaser--header">
+      <h3><div class="difficulty difficulty-{{ difficulty }}"></div>{{ product.title|render }}</h3>
+    </div>
+    <div class="pattern__teaser--footer">
+      <div class="more">{{ 'details'|t }} <i class="fa fa-angle-right"></i></div>
+      <div class="garments">{{ product.field_garments }}</div>
+    </div>
+  </div>
+
+</a>

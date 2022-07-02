@@ -1,0 +1,141 @@
+<div class="wrapper">
+
+
+  {% if page.top %}
+  <div id="top">
+
+    <div class="container">
+
+      {% if page.off_canvas %}
+      <a href="#" class="mm-toggle mm-toggle--wrapper js-mm-toggle"><i class="fa fa-bars"></i></a>
+      {% endif %}
+
+      {{ page.top }}
+
+    </div>
+
+  </div>
+  {% endif %}
+
+
+
+  {% if page.header %}
+  <header id="header">
+
+    <div class="container">
+      <div class="header-inner">
+      
+
+      {{ page.header }}
+
+    </div>
+    </div>
+
+  </header>
+  {% endif %}
+
+
+
+  {% if page.hero %}
+  <div id="hero">{{ page.hero }}</div>
+  {% endif %}
+
+
+
+  {% if page.system %}
+  <div id="system">
+
+    <div class="container">
+
+      {{ page.system }}
+
+    </div>
+
+  </div>
+  {% endif %}
+
+  <main role="main" id="main">
+
+    <a id="main-content" tabindex="-1"></a>
+
+    {% if page.sidebar_first or page.sidebar_second %}
+    <div class="container">
+    {% endif %}
+
+      {% if page.sidebar_first %}
+      <aside id="sidebar-first" role="complementary">
+        {{ page.sidebar_first }}
+      </aside>
+      {% endif %}
+
+      <div id="content">
+        {{ page.content }}
+      </div>
+
+      {% if page.sidebar_second %}
+
+      <aside id="sidebar-second" role="complementary">
+        {% if page.vars.user_page %}
+          <span class='fancy-sidebar'></span>
+        {% endif %}
+
+        {{ page.sidebar_second }}
+
+      </aside>
+      {% endif %}
+
+    {% if page.sidebar_first or page.sidebar_second %}
+    </div>
+    {% endif %}
+
+  </main>
+
+
+
+  {% if page.doormat %}
+  <div id="doormat">
+
+    {{ page.doormat }}
+
+  </div>
+  {% endif %}
+
+
+
+  <footer id="footer">
+
+    <div class="container">
+
+      {{ page.footer }}
+
+    </div>
+
+  </footer>
+
+
+
+  {% if page.bottom %}
+  <div id="bottom">
+
+    <div class="container">
+
+      {{ page.bottom }}
+
+    </div>
+
+  </div>
+  {% endif %}
+
+</div>
+
+
+
+{% if page.off_canvas %}
+<div class="off-canvas">
+
+  <a href="#" class="mm-toggle mm-toggle--offcanvas js-mm-toggle">{{ 'Close'|t }}</a>
+
+  {{ page.off_canvas }}
+
+</div>
+{% endif %}

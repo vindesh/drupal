@@ -1,0 +1,129 @@
+// ==========================================================================
+// Paragraph bundle: LIST
+// ==========================================================================
+.paragraph--type--list {
+  // Make sure title nor intro become ridiculously long.
+  .pg-section__title,
+  .field--name-field-intro {
+    max-width: rem(760);
+    margin-left: auto;
+    margin-right: auto;
+
+    text-align: center;
+  }
+
+  // If an intro was added, provide some spacing between it and the image slider.
+  .field--name-field-intro {
+    margin-bottom: rem(30);
+  }
+}
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+  .paragraph--type--list-item {
+    float: left;
+    width: 48%;
+    margin-right: 4%;
+    margin-bottom: 4%;
+
+    &:nth-of-type(2n) {
+      margin-right: 0;
+    }
+
+    &:nth-of-type(2n+1) {
+      clear: left;
+    }
+  }
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+  .pg-gridcol--2 {
+    // Inherits the layout from Break 2
+  }
+
+  .pg-gridcol--3 {
+    .paragraph--type--list-item {
+      float: left;
+      width: 30%;
+      margin-right: 5%;
+      margin-bottom: 5%;
+
+      // Override previous breakpoint
+      &:nth-of-type(2n) {
+        margin-right: 5%;
+      }
+
+      &:nth-of-type(2n+1) {
+        clear: none;
+      }
+
+      &:nth-of-type(3n) {
+        margin-right: 0;
+      }
+
+      &:nth-of-type(3n+1) {
+        clear: left;
+      }
+    }
+  }
+
+  .pg-gridcol--4 {
+    .paragraph--type--list-item {
+      float: left;
+      width: 23.5%;
+      margin-right: 2%;
+      margin-bottom: 2%;
+
+      // Override previous breakpoint
+      &:nth-of-type(2n) {
+        margin-right: 2%;
+      }
+
+      &:nth-of-type(2n+1) {
+        clear: none;
+      }
+
+      &:nth-of-type(4n) {
+        margin-right: 0;
+      }
+
+      &:nth-of-type(4n+1) {
+        clear: left;
+      }
+    }
+  }
+
+  @supports (grid-area: auto) {
+    .pg-list__wrapper {
+      display: grid;
+      grid-gap: rem(30);
+
+      @for $i from 2 through 4 {
+        .pg-gridcol--#{$i} & {
+          grid-template-columns: repeat(#{$i}, 1fr);
+        }
+      }
+
+      .paragraph--type--list-item {
+        width: 100%;
+        margin: 0;
+      }
+    }
+  }
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

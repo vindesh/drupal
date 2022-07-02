@@ -1,0 +1,15 @@
+<ul class="uk-nav uk-dropdown-nav">
+  {% for subCategory in category.filterSubCategory %}
+    {% for option in subCategory.filterOptions %}
+      <li>
+        {% block filter_option %}
+          <a href="{{ option.filterOptionLink }}">{{ option.filterOptionText }}</a>
+        {% endblock %}
+      </li>
+    {% endfor %}
+  {% endfor %}
+  <li class="uk-nav-divider"></li>
+  {% block all_link %}
+    <a href="#" class="filter__all">All {{ category.filterCategoryName }}</a>
+  {% endblock %}
+</ul>

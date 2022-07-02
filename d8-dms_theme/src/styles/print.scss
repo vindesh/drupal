@@ -1,0 +1,89 @@
+@media print {
+
+  * {
+    background: none;
+    max-width: 100%!important;
+    color: #000;
+  }
+
+  html {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 30pt!important;
+  }
+  h2 {
+    font-size: 20pt!important;
+  }
+  h3, h4 {
+    font-size: 16pt!important;
+  }
+
+  #top,
+  #header,
+  #hero,
+  #system,
+  #sidebar-first,
+  #sidebar-second,
+  #footer,
+  #bottom,
+  #comments {
+    display: none;
+  }
+
+  body,
+  article {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  article {
+    page-break-before: always;
+  }
+  img,
+  ul,
+  ol,
+  li {
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+
+  a {
+    font-weight: bolder;
+    text-decoration: none;
+  }
+  a[href^=http]::after {
+    content:" <" attr(href) "> ";
+    font-size: 10pt;
+  }
+  a[href^="#"]::after {
+    content: "";
+  }
+  a::after > img {
+    content: "";
+  }
+  a:not(:local-link)::after {
+    content:" <" attr(href) "> ";
+    font-size: 10pt;
+  }
+
+  #content {
+    float: left;
+    width: 100%;
+  }
+
+}
+
+@media print and (color) {
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+}

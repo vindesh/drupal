@@ -1,0 +1,122 @@
+//------------------------------------------------------------------------------
+// FACETS.SCSS
+// Facets styling.
+//------------------------------------------------------------------------------
+
+.block-facets {
+  float: left;
+  width: 100%;
+  margin: rem(20) 0 0;
+  padding: rem(20) 0 0;
+  border-top: 1px solid $grey6;
+  label {
+    font-weight: normal;
+  }
+  &[class$="difficulty"],
+  &[class$="moeilijkheidsgraad"] {
+    label {
+      font-size: 0;
+      span {
+        display: inline-block;
+        vertical-align: middle;
+        // background-image: url(../img/house-pink.png);
+        // background-image: url(../img/star-red.png);
+        // width: rem(20);
+        // height: rem(12);
+        background-image: url(../img/stars-1-blue.png);
+        width: rem(96);
+        height: rem(15);
+      }
+      &[for="difficulty-7"],
+      &[for="moeilijkheidsgraad-7"] {
+        span {
+          background-image: url(../img/stars-2-blue.png);
+          // width: rem(40);
+        }
+      }
+      &[for="difficulty-8"],
+      &[for="moeilijkheidsgraad-8"] {
+        span {
+          background-image: url(../img/stars-3-blue.png);
+          // width: rem(60);
+        }
+      }
+      &[for="difficulty-9"],
+      &[for="moeilijkheidsgraad-9"] {
+        span {
+          background-image: url(../img/stars-4-blue.png);
+          // width: rem(80);
+        }
+      }
+      &[for="difficulty-10"],
+      &[for="moeilijkheidsgraad-10"] {
+        span {
+          background-image: url(../img/stars-5-blue.png);
+          // width: rem(100);
+        }
+      }
+    }
+  }
+}
+.facet__title {}
+.item-list__checkbox {
+  @include reset-list;
+}
+
+
+.facet-search {
+  form {
+    position: relative;
+  }
+  .form-item {
+    label {
+      display: none;
+    }
+    input {
+      padding-right: rem(50);
+    }
+  }
+  .form-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    input[type="submit"] {
+      background-color: transparent;
+      background-image: url(../img/search.png);
+      background-repeat: no-repeat;
+      background-position: center;
+      width: rem(40);
+      padding-left: 0;
+      padding-right: 0;
+      text-indent: rem(-9999);
+      &:hover {
+        background-color: $dms-grey2;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

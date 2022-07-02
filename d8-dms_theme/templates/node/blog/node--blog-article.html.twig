@@ -1,0 +1,76 @@
+{% set subtitleClass = '' %}
+{% if content.field_subtitle|render|striptags|trim is not empty %}
+  {% set subtitleClass = 'has-subtitle' %}
+{% endif %}
+
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+    subtitleClass,
+  ]
+%}
+
+{% set subtitle = content.field_subtitle|render|striptags|trim %}
+{% set private = content.field_private|render|striptags|trim %}
+
+<article{{ attributes.addClass(classes) }}>
+
+  <div class="blog__header container-s">
+    <h1>{{ label }}</h1>
+    {% if subtitle is not empty %}
+      <div class="blog__subtitle">{{ subtitle }}</div>
+    {% endif %}
+    {{ content.share_everywhere }}
+  </div>
+
+  <div class="blog__wrapper container-s">
+
+    {% if (private == '0') or (logged_in) %}
+
+      {{ content.field_paragraphs }}
+      
+      {{ content.share_everywhere }}
+      
+      {{ custom.linkpartysubsblock }}
+
+      {{ custom.linkpartyb }}
+
+      <div class="blog__linkparty-overview">
+        {{ custom.linkpartyoverview}}
+      </div>
+
+
+      {% if custom.linkpartyblock %}
+        <div class="blog__linkparty">
+          <div class="pg-section__title">{{ 'Linkparties'|t }}</div>
+          {{ custom.linkpartyblock }}
+        </div>
+      {% endif %}
+
+    {% else %}
+
+      <div class="blog__notice">
+        <h2>{{ 'Woops, this blog article seems to be private'|t }}</h2>
+        <a href="/user/register" class="btn btn--white">{{ 'Register now'|t }}</a>
+      </div>
+
+    {% endif %}
+
+  </div>
+
+  <div class="blog__mailchimp container">
+    {{ custom.mailchimp }}
+  </div>
+
+  {% if logged_in %}
+    {{ content.field_comments }}
+{#   {% else %}
+    {{ custom.cta }} #}
+  {% endif %}
+
+</article>

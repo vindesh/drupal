@@ -1,0 +1,22 @@
+{#-----Products Block-----#}
+{% extends "block.html.twig" %}
+{%
+  set classes = [
+    'block',
+    'block-' ~ configuration.provider|clean_class,
+    'block-' ~ plugin_id|clean_class,
+  ]
+%}
+
+{% set attributes = attributes.addClass(classes) %}
+
+  {% block content %}
+    <section id="products" class="section-padding">
+      <div class="container">
+        <div class="row">
+          {{ content }}
+        </div>
+      </div>
+    </section>
+  {% endblock %}
+

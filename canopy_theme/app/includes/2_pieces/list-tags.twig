@@ -1,0 +1,8 @@
+<div class="tags">
+	{% block tags %}
+		{% for tag in tags %}
+			<a href="{{ tag.link }}" {% if loop.index == 1 %}class="first"{% endif %}><span
+						class="icon-tag"></span><span class="tag-name">{{ tag.name }}</span></a>
+		{% endfor %}
+	{% endblock %}
+</div>

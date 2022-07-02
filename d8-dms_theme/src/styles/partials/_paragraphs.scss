@@ -1,0 +1,57 @@
+// ==========================================================================
+// Defaults for all Paragraphs.
+// Includes white space rules, section backgrounds etc.
+//
+// @dev: paragraph-types subfolder contains extra styles per bundle.
+// ==========================================================================
+.paragraph {
+  padding: rem(45) 0;
+
+  .paragraph {
+    padding: 0;
+  }
+}
+
+.pg-section__title {
+  margin-top: 0;
+}
+
+.pg-bg--light {
+  background-color: $grey3;
+}
+
+.pg-bg--dark {
+  background-color: $body;
+  color: $white;
+
+  a {
+    color: inherit;
+  }
+
+  @for $i from 1 through 6 {
+    h#{$i} {
+      color: inherit;
+    }
+  }
+}
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

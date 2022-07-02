@@ -1,0 +1,16 @@
+<div class="filter-current">
+  {% if filterCurrentTitle %}
+    <h4>{{ filterCurrentTitle }}</h4>
+  {% endif %}
+  {% if filterCurrentLabelList %}
+    {% for label in filterCurrentLabelList %}
+      <a href="{{ label.filterCurrentLabelUrl }}" class="active-label">
+        <span>{{ label.filterCurrentLabelCategory|upper }}</span>
+        <span>{{ label.filterCurrentLabelSubCategory|raw }}</span>
+      </a>
+    {% endfor %}
+  {% endif %}
+  {% block clear_all_filters %}
+    <a href="#" class="clear-filter">Clear All Filters</a>
+  {% endblock %}
+</div>

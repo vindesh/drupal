@@ -1,0 +1,38 @@
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+{% set body = content|without('field_paragraphs')|render %}
+
+<article{{ attributes.addClass(classes) }}>
+
+  {% if custom.background_image_uri is defined %}
+      <div class="background-image-wrap">
+        <div class='background-image' style='background-image: url("{{ custom.background_image_uri }}")'>
+          <div class="node__content">
+            <div class="inner-wrapper">
+
+              <h1>{{ label }}</h1>
+
+              {% if 'anonymous' in user.getRoles() %}
+                <p class='login-text'>{{ 'Please login to continue'|t }}</p>
+                <a href='/user/login' class='btn btn--pink'>{{ 'login or register'|t }}</a>
+              {% else %}
+                {{ content.field_teaser_image }}
+                {% if body %}
+                    {{ content|without('field_paragraphs', 'field_background_image', 'field_teaser_image') }}
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+  {% endif %}
+</article>

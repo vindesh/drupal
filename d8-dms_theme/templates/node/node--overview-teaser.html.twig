@@ -1,0 +1,9 @@
+{% if content.field_partner_url is defined %}
+  {% set url = content.field_partner_url|render|striptags|trim %}
+  {% set extra = 'target="_blank"' %}
+{% endif %}
+
+<a href="{{ url }}" class="overview-block__teaser--link" style="background-image:url({{ custom.bg_image }});" {{ extra }}>
+
+  <div class="overview-block__teaser--label">{{ label }}</div>
+</a>

@@ -1,0 +1,249 @@
+//------------------------------------------------------------------------------
+// COMMENTS.SCSS
+// Comment styling.
+//------------------------------------------------------------------------------
+
+.comments {
+  // background-color: $grey5;
+  float: left;
+  width: 100%;
+  margin: 0;
+  padding: rem(75) 0;
+}
+
+.comment-form {
+  .js-form-type-textarea {
+    margin: 0;
+  }
+  .filter-wrapper {
+    font-size: 70%;
+  }
+  .form-wrapper {
+    float: left;
+    width: 100%;
+  }
+  .field--name-field-images {
+    margin: rem(20) 0;
+    summary {
+    //   color: $fm-red;
+      font-weight: 700;
+    }
+    .tabledrag-toggle-weight-wrapper {
+      display: none;
+    }
+    table {
+      th {
+        text-align: left;
+      }
+      td {
+        width: rem(200);
+        img {
+          max-width: fit-content;
+        }
+      }
+    }
+    label {
+      font-weight: 700;
+      position: relative;
+      top: 0;
+      left: 0;
+    }
+    input[type="file"] {
+      max-width: rem(400);
+      padding: rem(20);
+      border: 1px solid $fm-red;
+      border-radius: 4px;
+    }
+  }
+  .form-actions {
+    input[type="submit"] {
+      background-color: $fm-blue;
+      &:hover {
+        background-color: $body;
+      }
+    }
+  }
+}
+
+.comment {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(40);
+  border: 1px solid $grey6;
+}
+.indented {
+  float: left;
+  width: 100%;
+  // padding-left: rem(40);
+  position: relative;
+  .comment {
+    &::before {
+      content: '\f112';
+      @extend .fa;
+      color: $grey4;
+      transform: rotate(180deg);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+}
+
+.comment__user {
+  background-color: $grey3;
+  float: left;
+  width: 100%;
+  border-spacing: rem(20);
+  padding: rem(20);
+  border-bottom: 1px solid $grey6;
+}
+.comment__user--picture {
+  background-color: $white;
+  background-image: url(../img/bg-user.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left;
+  width: rem(60);
+  height: rem(60);
+  margin-right: rem(20);
+  border: 1px dotted $fm-red;
+  overflow: hidden;
+}
+.comment__user--name {
+  .field {
+    display: inline-block;
+  }
+}
+.comment__user--link {}
+
+.comment__content {
+  background-color: $white;
+  float: left;
+  width: 100%;
+  padding: rem(20);
+}
+.comment__content--images {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(20);
+  border: 1px solid $grey6;
+  .field--name-field-images {
+    float: left;
+    width: 100%;
+    padding: 1%;
+    .field__item {
+      float: left;
+      width: 31.333%;
+      margin: 1%;
+    }
+  }
+}
+.comment__content--footer {
+  > ul {
+    @include reset-list;
+    float: left;
+    li {
+      display: inline-block;
+      margin-right: rem(20);
+      a {
+        color: $fm-red;
+        &:hover {
+          color: $body;
+        }
+      }
+    }
+  }
+  > div {
+    a {
+      color: $grey7;
+      &:hover {
+        color: $black;
+      }
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .comment__content--images {
+    .field--name-field-images {
+      .field__item {
+        width: 23%;
+      }
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .comment {
+    display: flex;
+  }
+  .comment__user {
+    flex: 30;
+    border-right: 1px solid $grey6;
+    border-bottom: 0;
+  }
+  .comment__user--picture {
+    float: none;
+    width: rem(95);
+    height: rem(95);
+    margin: 0 0 rem(20);
+  }
+  // .comment__user--name {
+  //   margin: 0 0 rem(20);
+  // }
+  .comment__user--date {
+    margin: rem(10) 0 0;
+  }
+  .comment__content {
+    flex: 70;
+    padding: rem(20) rem(20) rem(70);
+    position: relative;
+  }
+  .comment__content--images {
+    margin: 0;
+  }
+  .comment__content--footer {
+    position: absolute;
+    left: rem(20);
+    right: rem(20);
+    bottom: rem(20);
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .indented {
+    padding-left: rem(40);
+  }
+  .comment__content--images {
+    .field--name-field-images {
+      .field__item {
+        width: 14.666%;
+      }
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

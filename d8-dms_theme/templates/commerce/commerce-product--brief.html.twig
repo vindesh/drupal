@@ -1,0 +1,64 @@
+{{ attach_library('dms_theme/slick') }}
+{{ attach_library('dms_theme/fancybox') }}
+
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+
+
+<article{{ attributes.addClass(classes) }}>
+  <h1>{{ 'About'|t }}<span>{{ product.title|render|striptags|trim|split(' ')[0] }}<span></h1>
+  <div class="pattern-brief-wrapper">
+    <div class="pattern-brief-outer">
+        <div class="pattern-biref">
+          <div class="pattern__content--details">
+            <div class="pattern__content--details-left">
+              {{ product.field_garments }}
+              {{ product.field_gender }}
+              {{ product.field_types }}
+              {{ product.field_magazine_edition }}
+              {{ product.field_book }}
+              {{ product.field_fabric }}
+              {{ product.field_hashtag }}
+            </div>
+            <div class="pattern__content--details-right">
+              {{ 'Difficulty'|t }}
+              <div class="difficulty difficulty-{{ product.field_difficulty|render|striptags|trim }}"></div>
+            </div>
+          </div>
+
+          {#
+          <div class="pattern__supplies-description">
+            <div class="pattern__supplies-description--title">{{ 'Supplies'|t }}</div>
+            {{ product.field_supplies_description }}
+          </div>
+          #}
+          <div class="product-link">
+          <a href="{{ product_url }}" class="product-details-link">Details</a>
+
+          {% if product.field_url|render|striptags|trim is not empty or (product.field_download|render|striptags|trim is not empty and logged_in) %}
+            <div class="pattern__content--header-extra">
+              {% if product.field_url|render|striptags|trim is not empty %}
+                <a href="{{ product.field_url[0]['#url'] }}" class="purchase" target="_blank">{{ 'Purchase pattern'|t }}</a>
+              {% endif %}
+              {% if logged_in and product.field_download|render|striptags|trim is not empty %}
+                <a href="{{ product.field_download|render|striptags|trim }}" class="download" target="_blank">{{ 'Download pattern'|t }}</a>
+              {% endif %}
+            </div>
+          {% endif %}
+          </div>
+        </div>
+    </div>
+    {{ product.body }}
+  </div>
+
+
+</article>

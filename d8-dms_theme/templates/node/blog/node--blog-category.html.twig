@@ -1,0 +1,37 @@
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+    subtitleClass,
+  ]
+%}
+
+
+
+<article{{ attributes.addClass(classes) }}>
+
+  <div class="blog-category__header container">
+    <h1>{{ label }}</h1>
+  </div>
+
+  <div class="blog-category__overview container">
+    {{ custom.blog_category_overview }}
+  </div>
+
+  {% if content.field_paragraphs is not empty %}
+  <div class="blog-category__paragraphs container">
+    {{ content.field_paragraphs }}
+  </div>
+  {% endif %}
+
+  {% if logged_in %}
+    {{ content.field_comments }}
+  {% else %}
+    {{ custom.cta }}
+  {% endif %}
+
+</article>

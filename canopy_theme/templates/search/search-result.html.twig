@@ -1,0 +1,103 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a single search result.
+ *
+ * This template renders a single search result. The list of results is
+ * rendered using '#theme' => 'item_list', with suggestions of:
+ * - item_list__search_results__(plugin_id)
+ * - item_list__search_results
+ *
+ * Available variables:
+ * - url: URL of the result.
+ * - title: Title of the result.
+ * - snippet: A small preview of the result. Does not apply to user searches.
+ * - info: String of all the meta information ready for print. Does not apply
+ *   to user searches.
+ * - plugin_id: The machine-readable name of the plugin being executed,such
+ *   as "node_search" or "user_search".
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the main title tag that appears in the template.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the main title tag that appears in the template.
+ * - info_split: Contains same data as info, but split into separate parts.
+ *   - info_split.type: Node type (or item type string supplied by module).
+ *   - info_split.user: Author of the node linked to users profile. Depends
+ *     on permission.
+ *   - info_split.date: Last update of the node. Short formatted.
+ *   - info_split.comment: Number of comments output as "% comments", %
+ *     being the count. (Depends on comment.module).
+ * @todo The info variable needs to be made drillable and each of these sub
+ *   items should instead be within info and renamed info.foo, info.bar, etc.
+ *
+ * Other variables:
+ * - title_attributes: HTML attributes for the title.
+ * - content_attributes: HTML attributes for the content.
+ *
+ * Since info_split is keyed, a direct print of the item is possible.
+ * This array does not apply to user searches so it is recommended to check
+ * for its existence before printing. The default keys of 'type', 'user' and
+ * 'date' always exist for node searches. Modules may provide other data.
+ * @code
+ *   {% if (info_split.comment) %}
+ *     <span class="info-comment">
+ *       {{ info_split.comment }}
+ *     </span>
+ *   {% endif %}
+ * @endcode
+ *
+ * To check for all available data within info_split, use the code below.
+ * @code
+ *   <pre>
+ *     {{ dump(info_split) }}
+ *   </pre>
+ * @endcode
+ *
+ * @see template_preprocess_search_result()
+ *
+ * @ingroup themeable
+ */
+#}
+{% set class = 'listing-item-search_' ~ meta_info.node_type|replace({'& ':'',' ':'-'})|lower %}
+
+{% set searchListItem = {
+  'class': class,
+  'link' : url,
+  'title' : title
+} %}
+{% embed directory ~ '/app/includes/3_components/listing-item.twig' %}
+  {% block image %}
+    {% if image_path %}
+      {# <img class="ukg-search-image uk-width-1-4@m" src="{{ file_url(image_path) }}" alt="{{ title }}"> #}
+    {% endif %}
+  {% endblock %}
+  {% block description_container %}
+    {{ description_text|raw }}
+  {% endblock %}
+  {% block meta_container %}
+    {% if meta_info is not empty %}
+      <div class="meta-container uk-flex uk-flex-middle uk-grid-small uk-margin-small-top">
+        {% if meta_info.type %}
+          <div>{{ meta_info.type }}</div>
+        {% endif %}
+        {% if meta_info.node_type == 'news_item' %}
+          {% if meta_info.date is not empty %}
+            <div class="ukg-news-info">
+              <span class="ukg-news-info-date">{{ meta_info.date }}</span><span
+                class="ukg-news-info-location"> | {{ meta_info.location }}</span>
+            </div>
+          {% endif %}
+          {% if meta_info.tags is not empty %}
+            <div class="tags">
+              {% block tags %}
+                {{ meta_info.tags }}
+              {% endblock %}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endblock %}
+{% endembed %}
+
+

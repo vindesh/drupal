@@ -1,0 +1,141 @@
+{{ attach_library('dms_theme/slick') }}
+{{ attach_library('dms_theme/fancybox') }}
+
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+
+
+<article{{ attributes.addClass(classes) }}>
+
+  <div class="pattern__header container">
+    <h1>{{ product.title|render }}</h1>
+  </div>
+
+  <div class="pattern__wrapper container">
+
+    <div class="pattern__images">
+
+      <div class="pattern__images--slider">
+
+        {{ product.field_images }}
+
+      </div>
+
+      <div class="pattern__content--details">
+        <div class="pattern__content--details-left">
+          {{ product.field_garments }}
+          {{ product.field_gender }}
+          {{ product.field_types }}
+          {{ product.field_magazine_edition }}
+          {{ product.field_book }}
+          {{ product.field_fabric }}
+          {{ product.field_hashtag }}
+        </div>
+        <div class="pattern__content--details-right">
+          {{ 'Difficulty'|t }}
+          <div class="difficulty difficulty-{{ product.field_difficulty|render|striptags|trim }}"></div>
+        </div>
+      </div>
+
+      {# {% if logged_in %} #}
+        {% if product.field_supplies_description|render is not empty %}
+        <div class="pattern__supplies-description">
+          <div class="pattern__supplies-description--title">{{ 'Supplies'|t }}</div>
+          {{ product.field_supplies_description }}
+        </div>
+        {% endif %}
+      {# {% endif %} #}
+
+    </div>
+
+    <div class="pattern__content">
+      {% if logged_in %}
+      <div class="pattern__content--header">
+        {{ product.flag_pattern_like }}
+      </div>
+      {% endif %}
+
+      {% if product.field_url|render|striptags|trim is not empty or (product.field_download|render|striptags|trim is not empty and logged_in) %}
+      <div class="pattern__content--header-extra">
+        {% if product.field_url|render|striptags|trim is not empty %}
+          <a href="{{ product.field_url[0]['#url'] }}" class="purchase" target="_blank">{{ 'Purchase pattern'|t }}</a>
+        {% endif %}
+        {% if logged_in and product.field_download|render|striptags|trim is not empty %}
+          <a href="{{ product.field_download|render|striptags|trim }}" class="download" target="_blank">{{ 'Download pattern'|t }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {# {% if logged_in %} #}
+        {% set supplies = product.field_supplies|render|striptags|trim %}
+        {% if supplies is not empty %}
+        <div class="pattern__supplies {{ not logged_in ? 'hl' : 'sl' }}">
+
+          <div class="pattern__supplies--title">{{ 'Instructions'|t }}</div>
+
+          {{ product.field_supplies }}
+          
+        </div>
+        {% endif %}
+
+        {% if not logged_in %}
+          <div id="product-modal" class="modal">{{ custom.modal|raw }}</div>
+        {% endif %}
+      {# {% endif %} #}
+
+      {{ product.body }}
+
+      {{ product.field_video }}
+
+      <div class="pattern__content--footer">
+        {% if product.field_url|render|striptags|trim is not empty %}
+        <a href="{{ product.field_url|render|striptags|trim }}" class="purchase" target="_blank">{{ 'Purchase pattern'|t }}</a>
+        {% endif %}
+        {% if logged_in %}
+          {% if product.field_download|render|striptags|trim is not empty %}
+            <a href="{{ product.field_download|render|striptags|trim }}" class="download" target="_blank">{{ 'Download pattern'|t }}</a>
+          {% endif %}
+          {% if logged_in and product.field_comments is not empty %}
+            <a href="#comments" class="to-comments">{{ 'Add new comment'|t }}</a>
+          {% endif %}
+        {% else %}
+          <div class="pattern__notice">
+            {# <h2>{{ 'The instructions are free for our registered users!'|t }}</h2>
+            <a href="/user/register" class="btn btn--white">{{ 'Register now'|t }}</a> #}
+            {{ custom.projects_notice }}
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  {% if custom.projects_block|render is not empty %}
+    <div class="pattern__content--projects">
+      <div class="container">
+        {{ custom.projects_block }}
+      </div>
+    </div>
+  {% endif %}
+
+
+
+  {% if logged_in %}
+    {{ product.field_comments }}
+{#   {% else %}
+    {{ custom.cta }} #}
+  {% endif %}
+
+</article>

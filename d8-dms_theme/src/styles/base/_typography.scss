@@ -1,0 +1,159 @@
+//------------------------------------------------------------------------------
+// TYPOGRAPHY.SCSS
+// Typography styling.
+//------------------------------------------------------------------------------
+
+h1,h2,h3 {
+  font-family: $avenir;
+  font-weight: 900;
+}
+h1 {
+  margin: 0 0 rem(30);
+  color: $heading;
+  font-size: rem(40);
+  line-height: rem(55);
+  letter-spacing: 2px;
+}
+h2 {
+  color: $heading;
+  font-size: rem(30);
+  line-height: rem(42);
+}
+h3 {
+  color: $heading;
+  font-size: rem(18);
+  line-height: rem(24);
+}
+.nav__title,
+.menu__title,
+.block__title {
+  @extend h2;
+}
+
+img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+p {
+  margin: rem(20) 0;
+}
+
+a {
+  color: $fm-red;
+  text-decoration: underline;
+  transition: all .3s ease;
+  &:hover {
+    color: $fm-blue;
+  }
+}
+
+.btn,
+%btn {
+  display: inline-block;
+  background-color: $white;
+  padding: rem(10) rem(40);
+  color: $body;
+  text-align: center;
+  text-decoration: none;
+  border: 2px solid $white;
+
+  &:hover,
+  &:focus {
+    background-color: transparent;
+    color: $body;
+  }
+
+  &--dark {
+    background-color: $body;
+    color: $white;
+    border-color: $body;
+    border-radius: 4px;
+
+    &:hover,
+    &:focus {
+      color: $body;
+    }
+  }
+
+  &--pink,
+  &--red {
+    background-color: $white;
+    color: $body;
+    border: 1px dashed $fm-red;
+
+    &:hover,
+    &:focus {
+      background-color: $fm-red;
+      color: $white;
+      border-color: $white;
+    }
+  }
+
+  &--white {
+    background-color: transparent;
+    color: $white;
+    border: 1px solid $white;
+    border-radius: 4px;
+
+    &:hover,
+    &:focus {
+      background-color: $white;
+      color: $body;
+    }
+  }
+
+  &--solid-red {
+    background-color: $fm-red;
+    color: $white;
+    border-color: $fm-red;
+
+    &:focus,
+    &:hover {
+      background-color: $fm-blue;
+      color: $white;
+      border-color: $fm-blue;
+    }
+  }
+
+  &--blue {
+    background-color: $blue;
+    color: $white;
+    font-size: rem(18);
+    border-color: $blue;
+    border-radius: 4px;
+
+    &:focus,
+    &:hover {
+      background-color: darken($blue,10%);
+      color: $white;
+      border-color: darken($blue,10%);
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

@@ -1,0 +1,32 @@
+//------------------------------------------------------------------------------
+// MAINTENANCE.SCSS
+// General styling of the maintenance page.
+//------------------------------------------------------------------------------
+
+body.maintenance-page {
+  display: table;
+}
+.maintenance-container {
+  display: table-cell;
+  vertical-align: middle;
+  padding: rem(20);
+  text-align: center;
+}
+.maintenance-content {
+  display: inline-block;
+  background: $white;
+  max-width: rem(720);
+  padding: rem(50);
+  border: 1px solid #ddd;
+}
+.maintenance-icon {
+  display: inline-block;
+  background: #eee;
+  width: rem(120);
+  height: rem(120);
+  margin: 0 0 rem(30);
+  font-size: rem(50);
+  line-height: rem(120);
+  border-radius: 100%;
+}
+.maintenance-notice {}

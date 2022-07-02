@@ -1,0 +1,128 @@
+# fonts:
+#   version: VERSION
+#   css:
+#     theme:
+#       '//fonts.googleapis.com/css?family=Ubuntu:400,500,700': { type: external }
+
+icon_fonts:
+  version: VERSION
+  css:
+    theme:
+      fonts/dmsicons.css: {} # local custom icon font
+      # fonts/didot.css: {}
+      fonts/avenir.css: {}
+
+global_styles:
+  version: 0.1
+  css:
+    theme:
+      css/forum.css: {}
+      css/styles.css: {}
+      css/print.css: { media: print }
+
+global_scripts:
+  version: 0.1
+  js:
+    js/scripts.js: {}
+    js/jquery.autocomplete.js: {}
+    js/custom.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - dms_theme/matchheight
+    - dms_theme/clipboard
+    - dms_theme/countdown
+    - dms_theme/modal
+
+matchheight:
+  version: 0.7.2
+  js:
+    js/libs/matchheight/jquery.matchheight.min.js: { minified: true }
+    js/matchheight.js: {}
+  dependencies:
+    - core/jquery
+
+slick:
+  version: 1.8.0
+  css:
+    theme:
+      js/libs/slick/slick.css: {}
+  js:
+    js/libs/slick/slick.min.js: { minified: true }
+    js/slick.js: {}
+  dependencies:
+    - core/jquery
+    - dms_theme/fancybox
+
+flickity:
+  version: 2.0.10
+  css:
+    theme:
+      js/libs/flickity/flickity.min.css: { minified: true }
+  js:
+    js/libs/flickity/flickity.pkgd.min.js: { minified: true }
+    # js/libs/flickity/flickity-imagesloaded.js: {}
+    js/flickity.js: {}
+  dependencies:
+    - core/jquery
+
+tinyslider:
+  version: 2.6.0
+  remote: https://github.com/ganlanyuan/tiny-slider/
+  license:
+    name: MIT
+    url: https://github.com/ganlanyuan/tiny-slider/blob/master/LICENSE
+    gpl-compatible: true
+  css:
+    theme:
+      js/libs/tinyslider/tinyslider.min.css: { minified: true }
+  js:
+    js/libs/tinyslider/tinyslider.min.js: { minified: true }
+    js/tinyslider.js: {}
+  dependencies:
+    - core/jquery
+
+fancybox:
+  version: 3.2.10
+  css:
+    theme:
+      js/libs/fancybox/jquery.fancybox.min.css: { minified: true }
+  js:
+    js/libs/fancybox/jquery.fancybox.min.js: { minified: true }
+    js/fancybox.js: {}
+  dependencies:
+    - core/jquery
+
+swipebox:
+  version: 1.3.0
+  css:
+    theme:
+      js/libs/swipebox/swipebox.min.css: { minified: true }
+  js:
+    js/libs/swipebox/jquery.swipebox.min.js: { minified: true }
+  dependencies:
+    - core/jquery
+
+modal:
+  version: 0.9.1
+  # css:
+  #   theme:
+  #     //cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css: { type: external }
+  js:
+    //cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js: { type: external }
+  dependencies:
+    - core/jquery
+
+clipboard:
+  version: 2.0.0
+  js:
+    //cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js: { type: external }
+  dependencies:
+    - core/jquery
+
+countdown:
+  version: 2.2.0
+  js:
+    js/libs/countdown/jquery.countdown.min.js: { minified: true }
+  dependencies:
+    - core/jquery

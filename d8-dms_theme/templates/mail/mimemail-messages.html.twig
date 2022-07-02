@@ -1,0 +1,52 @@
+{% set clr_white = '#fff' %}
+{% set clr_body = '#4a4a4a' %}
+{% set clr_red = '#ed515b' %}
+{% set clr_blue = '#3b76be' %}
+{% set bg_mail = '#fbfbfb' %}
+{% set bg_header = '#fff' %}
+{% set bg_footer = '#4a4a4a' %}
+{# {% set bg_footer = '#f6f6f6' %} #}
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    {% if css %}
+    <style type="text/css">
+      {{ css }}
+    </style>
+    {% endif %}
+    <style type="text/css">
+    a {
+      color: #ed515b;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      -ms-word-break: break-all;
+      word-break: break-all;
+      word-break: break-word;
+      -ms-hyphens: auto;
+      -moz-hyphens: auto;
+      -webkit-hyphens: auto;
+      hyphens: auto;
+    }
+    </style>
+  </head>
+  <body style="background:{{ bg_mail }};padding:30px;">
+    <table cellpadding="0" cellspacing="0" width="600" align="center" style="background:{{ clr_white }};">
+      <tr>
+        <td style="background:{{ bg_header }};padding:30px;text-align:center;border-bottom: 2px solid {{ clr_blue }}">
+          <img src="{{ url_base ~ active_theme_path() ~ '/img/mail/logo.png' }}" />
+        </td>
+      </tr>
+      <tr>
+        <td style="background:{{ clr_white }};padding:30px;color:{{ clr_body }};font-size:16px;line-height:26px;">
+          {{ body|nl2br }}
+        </td>
+      </tr>
+      <tr>
+        <td style="background:{{ bg_footer }};padding:30px;color:{{ clr_white }};font-family:Arial;font-size:14px;line-height:30px;text-align:center;">
+          &copy; 2018 Fibre Mood
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

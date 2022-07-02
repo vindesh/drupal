@@ -1,0 +1,127 @@
+//------------------------------------------------------------------------------
+// MAILCHIMP.SCSS
+// Mailchimp styling.
+//------------------------------------------------------------------------------
+
+.mailchimp {
+  background-color: $fm-pink;
+  padding: rem(30);
+  .block__title {
+    font-size: rem(22);
+    line-height: rem(41);
+    font-weight: 900;
+    color: $fm-blue;
+    text-align: center;
+  }
+  .webform-submission-form {
+    width: 100%;
+    max-width: 100%;
+  }
+  label {
+    color: $white;
+  }
+  input[type="text"],
+  input[type="email"] {
+    background-color: lighten($fm-pink,10%);
+    border: 1px solid darken($fm-pink,10%);
+    border-radius: 4px;
+  }
+  input[type="submit"] {
+    background-color: $fm-red;
+    &:hover {
+      background-color: $fm-blue;
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .mailchimp {
+    .webform-submission-form {
+      display: inline-block;
+      vertical-align: middle;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 -2px;
+    }
+    .form-item {
+      display: table-cell;
+      float: none;
+      width: 40%;
+      padding: 0 rem(20) 0 0;
+    }
+    .form-actions {
+      display: table-cell;
+      float: none;
+      vertical-align: bottom;
+    }
+    // When countdown & mailchimp are next to eachother
+    .countdown + & {
+      float: right;
+      width: 39%;
+      .webform-submission-form {
+        .form-item,
+        .form-actions {
+          display: block;
+          float: left;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .mailchimp {
+    .block__title {
+      display: inline-block;
+      vertical-align: middle;
+      width: 30%;
+      margin: 0 -2px;
+      padding: 0 rem(20) 0 0;
+      text-align: left;
+    }
+    .webform-submission-form {
+      width: 70%;
+      max-width: 70%;
+    }
+    // When countdown & mailchimp are next to eachother
+    .countdown + & {
+      float: right;
+      width: 39%;
+      .block__title {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .webform-submission-form {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

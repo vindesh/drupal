@@ -1,0 +1,2 @@
+!function(t,e,a,i){"use strict";e.behaviors.matchheight={attach:function(e,a){void 0!==e.location&&(t(".pattern__teaser--info, .project__teaser--info, .fabric__teaser").matchHeight(),t(".countdown, .mailchimp").matchHeight(),t(".geolocation").matchHeight(),t(".view-stores-related-to-fabric .views-row").matchHeight(),t(i).ajaxComplete(function(){t(".pattern__teaser--info, .project__teaser--info, .fabric__teaser").matchHeight(),t(".geolocation").matchHeight()}))}}}(jQuery,Drupal,0,this.document);
+//# sourceMappingURL=matchheight.js.map

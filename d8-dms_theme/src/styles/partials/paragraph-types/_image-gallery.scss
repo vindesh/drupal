@@ -1,0 +1,184 @@
+// ==========================================================================
+// Paragraph bundle: IMAGE GALLERY
+// ==========================================================================
+.paragraph--type--image-gallery {
+  text-align: center;
+
+  // Make sure title nor intro become ridiculously long.
+  .pg-section__title,
+  .field--name-field-intro {
+    max-width: rem(760);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  // If an intro was added, provide some spacing between it and the image slider.
+  .field--name-field-intro {
+    margin-bottom: rem(30);
+  }
+}
+
+
+// ==========================================================================
+// Slider library: TINY SLIDER
+// ==========================================================================
+.paragraph--type--image-gallery {
+  .tns-outer {
+    position: relative;
+
+    .tns-controls,
+    .tns-nav {
+      position: absolute;
+      z-index: z('controls');
+    }
+
+    .tns-controls {
+      width: 100%;
+      top: 50%;
+
+      button {
+        width: rem(40);
+        height: rem(40);
+        border-radius: 50%;
+        text-align: center;
+        position: absolute;
+        transform: translateY(-50%);
+        appearance: none;
+        padding: 0;
+        
+        border: 0;
+        
+        background-color: rgba($white,0.5);
+        &:hover {
+          background-color: rgba($white,0.75);
+        }
+
+        &[data-controls='prev'] {
+          left: rem(16);
+        }
+
+        &[data-controls='next'] {
+          right: rem(16);
+        }
+      }
+    }
+
+    .carousel__btn {
+      color: $body;
+      font-size: rem(40);
+    }
+
+    .tns-nav {
+      bottom: rem(8);
+      width: 100%;
+
+      text-align: center;
+
+      button {
+        appearance: none;
+        margin-left: rem(4);
+        margin-right: rem(4);
+        padding: 0;
+        width: rem(16);
+        height: rem(16);
+
+        border: 0;
+        border-radius: 50%;
+
+        background-color: rgba($white, .5);
+
+        &.tns-nav-active {
+          background-color: $white;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Slider library: SLICK
+// ==========================================================================
+.paragraph--type--image-gallery {
+  .field--name-field-images {
+    position: relative;
+    img {
+      height: rem(300);
+      border: 5px solid $white;
+    }
+  }
+  .slick-arrow {
+    width: rem(40);
+    height: rem(40);
+    border-radius: 50%;
+    text-align: center;
+    position: absolute;
+    transform: translateY(-50%);
+    appearance: none;
+    padding: 0;
+    
+    border: 0;
+      font-size: rem(34);
+      line-height: rem(46);
+    
+    background-color: rgba($white,0.5);
+    top: 50%;
+    z-index: 1;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba($white,0.75);
+    }
+
+    &.slick-prev {
+      left: rem(16);
+    }
+
+    &.slick-next {
+      right: rem(16);
+    }
+  }
+  .slick-dots {
+    @include reset-list;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    li {
+      display: inline-block;
+      vertical-align: middle;
+      background-color: $grey1;
+      width: rem(10);
+      height: rem(10);
+      margin: 0 rem(5);
+      text-indent: rem(-9999);
+      border-radius: 50%;
+      cursor: pointer;
+      &:hover,
+      &.slick-active {
+        background-color: $fm-red;
+      }
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

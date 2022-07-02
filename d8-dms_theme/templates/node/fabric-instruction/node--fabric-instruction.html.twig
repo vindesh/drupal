@@ -1,0 +1,19 @@
+{{ attach_library('dms_theme/slick') }}
+
+<div class="fabric-instruction">
+
+  <div class="fabric-instruction__image">
+
+    {{ content.field_fabric_instruction_image }}
+
+  </div>
+
+  <div class="fabric-instruction__info">
+
+    <h2>{{ label }}</h2>
+
+    <a href="{{ content.field_document|render|striptags|trim }}" class="btn btn--pink" target="_blank">{{ 'Download the Fabric Plan'|t }}</a>
+
+  </div>
+
+</div>

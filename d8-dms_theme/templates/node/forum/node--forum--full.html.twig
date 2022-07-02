@@ -1,0 +1,44 @@
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+{% set body = content|without('field_paragraphs')|render %}
+
+<article{{ attributes.addClass(classes) }}>
+  <div class="node__content">
+    {% if body %}
+      <div class="container">
+        {{ content.taxonomy_forums }}
+        <div class="forum-inner">
+          <div class="forum-header">
+            <div class="forum-author">
+              {{ author_picture }}
+              <div class="forum-date">
+                  {{ node.createdtime|format_date('forum') }}
+              </div>
+            </div>
+          <div class="title">
+            <h1>{{ label }}</h1>
+          </div>
+          {{ content.body }}
+          <div class="forum-bottom">
+            {{ content.share_everywhere }}
+          </div>
+        </div>
+      </div>
+      {% if content.comment_forum|render|trim is not empty %}
+
+      {{ content.comment_forum }}
+      {% else %}
+        <a class="link-btn" href="{{ url('user.login') }}">{{ 'Login to comment'|t}}</a>
+      {% endif %}
+    {% endif %}
+  </div>
+</article>

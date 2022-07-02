@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <title>Newco Title</title>
+  <link rel="stylesheet" href="build/css/ukg.css">
+</head>
+<body class="home page-template-default page page-id-1">
+<header>
+  <div class="ukg-desktop-nav-container">
+    <div class="uk-container uk-navbar-container">
+      <div class="uk-navbar uk-visible@m" uk-navbar>
+        <div class="uk-navbar-left">
+          <ul class="uk-navbar-nav">
+            <li class="menu-level-1"><a href="/">UKG</a></li>
+            <li class="menu-level-1"><a href="/">Kronos</a></li>
+            <li class="menu-level-1"><a href="/">Ultimate Software</a></li>
+            <li class="menu-level-1"><a href="/">PeopleDoc</a></li>
+          </ul>
+        </div>
+        <div class="uk-navbar-right">
+          <ul class="uk-navbar-nav">
+            <li class="menu-level-1"><a href="#">Contact</a></li>
+            <li class="menu-level-1">
+              <a href="#">Support</a>
+              <div class="uk-navbar-dropdown"
+                   uk-drop="mode: click; boundary: .uk-navbar-right; boundary-align: true; pos: bottom-justify;">
+                <ul class="uk-nav uk-navbar-dropdown-nav ukg-navbar-dropdown-container">
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Support
+                    One</a></li>
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Support
+                    two</a></li>
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Support
+                    three</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="menu-level-1">
+              <a href="#">Blogs</a>
+              <div class="uk-navbar-dropdown"
+                   uk-drop="mode: click; boundary: .uk-navbar-right; boundary-align: true; pos: bottom-justify;">
+                <ul class="uk-nav uk-navbar-dropdown-nav ukg-navbar-dropdown-container">
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">UKG
+                    Blog</a></li>
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Ultimate
+                    Blog</a></li>
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Kronos
+                    Blog</a></li>
+                  <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">PeopleDoc
+                    Blog</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="menu-level-1"><a href="#">Careers</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="uk-navbar ukg-navbar-mobile uk-hidden@m">
+        <div class="uk-navbar-right">
+          <a class="uk-navbar-toggle icon-hamburger" uk-toggle="target: #ukg-nav-mobile;" data-module="navbar">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ukg-mobile-nav-container">
+    <div id="ukg-nav-mobile" class="uk-navbar-item" aria-hidden="true" hidden>
+      <div class="uk-flex ukg-nav-mobile-container">
+        <nav class="ukg-navbar-main uk-navbar uk-width-1-2@s">
+          <ul class="uk-nav-default uk-nav-parent-icon" uk-nav="multiple: false">
+            <li class="menu-level-1 rounded-menu-link"><a href="#">Solutions</a></li>
+            <li class="menu-level-1 rounded-menu-link"><a href="#">Why UKG</a></li>
+            <li class="menu-level-1 rounded-menu-link"><a href="#">Customers</a></li>
+            <li class="menu-level-1 rounded-menu-link uk-parent">
+              <a href="#">About Us</a>
+              <ul class="uk-nav-sub">
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">About
+                  UKG</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Press
+                  Release</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#"
+                                                              role="button">Awards</a>
+                </li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">News
+                  Resources</a></li>
+              </ul>
+            </li>
+            <li class="menu-level-1 rounded-menu-link"><a href="#">Contact</a></li>
+            <li class="menu-level-1 rounded-menu-link uk-parent">
+              <a href="#">Support</a>
+              <ul class="uk-nav-sub">
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Support
+                  One</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Support
+                  two</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Support
+                  three</a></li>
+              </ul>
+            </li>
+            <li class="menu-level-1 rounded-menu-link uk-parent">
+              <a href="#">Blogs</a>
+              <ul class="uk-nav-sub">
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">UKG
+                  Blog</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Ultimate
+                  Blog</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Kronos
+                  Blog</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">PeopleDoc
+                  Blog</a></li>
+              </ul>
+            </li>
+            <li class="menu-level-1 rounded-menu-link"><a href="#">Careers</a></li>
+            <li class="menu-level-1 rounded-menu-link uk-parent">
+              <a href="#">Websites</a>
+              <ul class="uk-nav-sub">
+                <li class="menu-level-2 rounded-menu-link"><a href="/">UKG</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a href="/">Kronos</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a href="/">Ultimate Software</a></li>
+                <li class="menu-level-2 rounded-menu-link"><a href="/">PeopleDoc</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <div class="uk-width-1-2@s uk-visible@s uk-border-pill uk-margin-left">
+          <img src="app/files/images/background/UKG_Reveal_LandingPage_Purpose_375.jpg">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ukg-header">
+    <div class="uk-container ukg-header-container">
+      <div class="ukg-header-right uk-width-auto uk-width-2-3@m">
+        <div class="ukg-header-right-top">
+          <form id="ukg-searchform-desktop" class="uk-visible@m">
+            <div class="search-container">
+              <input type="text" maxlength="40" id="searchInput-desktop" placeholder="Enter your search terms"
+                     tabindex="650">
+              <a type="submit" class="icon-magnifying" value="Submit">Search</a>
+            </div>
+          </form>
+          <div class="ukg-language-selector">
+            <a class="uk-navbar-toggle icon-globe ukg-icon-primary" uk-toggle="target: #ukg-nav-language;">
+            </a>
+          </div>
+        </div>
+        <div class="ukg-header-right-bottom uk-navbar-container uk-visible@m">
+          <nav class="ukg-navbar-main uk-navbar uk-navbar-transparent" uk-navbar>
+            <ul class="uk-navbar-nav">
+              <li class="menu-level-1"><a href="#">Solutions</a></li>
+              <li class="menu-level-1"><a href="#">Why UKG</a></li>
+              <li class="menu-level-1"><a href="#">Customers</a></li>
+              <li class="menu-level-1">
+                <a href="#">About Us</a>
+                <div class="uk-navbar-dropdown uk-navbar-dropdown-width-3"
+                     uk-drop="mode: click; boundary: .ukg-header-right; boundary-align: true; pos: bottom-justify;">
+                  <div class="uk-container uk-flex uk-flex-center">
+                    <ul class="uk-width-1-3 uk-nav uk-navbar-dropdown-nav ukg-navbar-dropdown-container">
+                      <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">About
+                        UKG</a></li>
+                      <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Press
+                        Release</a></li>
+                      <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">Awards</a>
+                      </li>
+                      <li class="menu-level-2 rounded-menu-link"><a class="ukg-dropdown-link" href="#" role="button">News
+                        Resources</a></li>
+                    </ul>
+                    <div class="uk-width-2-3 uk-border-pill uk-margin-left">
+                      <img src="app/files/images/background/UKG_Reveal_LandingPage_Purpose_375.jpg">
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <div class="ukg-logo">
+        <img src="app/files/images/logos/ukg_logo.svg" width="235" alt="Welcome to UKG">
+      </div>
+      <div class="ukg-search">
+        <a class="uk-navbar-toggle icon-magnifying ukg-icon-primary" uk-toggle="target: #ukg-searchform;">
+        </a>
+      </div>
+    </div>
+  </div>
+  <form id="ukg-searchform" hidden>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Enter your search terms" tabindex="650">
+      <a type="submit" class="icon-magnifying" value="Submit"></a>
+    </div>
+  </form>
+  <div class="uk-container" id="ukg-nav-language" hidden>
+    <ul class="uk-nav uk-navbar-dropdown-nav">
+      <li class="rounded-menu-link"><a href="#" role="button">English</a></li>
+      <li class="rounded-menu-link"><a href="#" role="button">French Canada</a></li>
+      <li class="rounded-menu-link"><a href="#" role="button">French</a></li>
+      <li class="rounded-menu-link"><a href="#" role="button">Spanish Mexico</a></li>
+      <li class="rounded-menu-link"><a href="#" role="button">Spanish Spain</a></li>
+      <li class="rounded-menu-link"><a href="#" role="button">German</a></li>
+      <li class="rounded-menu-link"><a href="#" role="button">Dutch</a></li>
+    </ul>
+  </div>
+</header>
+<div class="uk-section-default">
+  <div class="uk-container uk-padding uk-padding-remove-left uk-padding-remove-right uk-text-center">
+    <div class="uk-panel uk-panel-small">
+      <h1>Welcome to UKG</h1>
+      <p>Building on 70 years of experience from two leaders in HR solutions, UKG™ combines the strength and innovation
+        of Ultimate Software and Kronos®. Individually, we’ve always put people at the center of everything we do.
+        Together, we’re committed to inspiring workforces and businesses around the world, helping to pave the way
+        forward for our people, customers, and industry.</p>
+    </div>
+  </div>
+</div>
+<div class="uk-section-default" id="graphic-banner" data-module="SectionToggles">
+  <div
+    class="uk-flex uk-grid uk-grid-collapse uk-child-width-1-3 uk-child-width-1-5@s uk-child-width-1-8@m uk-flex-center uk-flex-row-reverse"
+    uk-grid>
+    <div class="ukg-card-background-image uk-cover-container uk-visible@s" uk-hidden>
+      <div class="uk-card">
+        <canvas width="600" height="850"></canvas>
+        <img src="build/files/images/people/GraphicBanner_PeopleImage_2.jpg" alt="placeholder image 1"
+             srcset="build/files/images/people/GraphicBanner_PeopleImage_2.jpg 2x" uk-cover>
+      </div>
+    </div>
+    <div class="ukg-card-muted ukg-card-center-icon uk-visible@s" uk-hidden>
+      <div class="uk-card">
+        <img src="build/files/images/logos/u_icon.svg" alt="icon" uk-svg>
+      </div>
+    </div>
+    <div class="ukg-card-background-image uk-cover-container">
+      <div class="uk-card">
+        <canvas width="600" height="850"></canvas>
+        <img src="build/files/images/people/GraphicBanner_PeopleImage_1.jpg" alt="placeholder image 1"
+             srcset="build/files/images/people/GraphicBanner_PeopleImage_1.jpg 2x" uk-cover>
+      </div>
+    </div>
+    <div class="ukg-card-blue ukg-card-center-icon">
+      <div class="uk-card">
+        <img src="build/files/images/logos/u_icon.svg" alt="icon" uk-svg>
+      </div>
+    </div>
+    <div class="ukg-card-background-image uk-cover-container">
+      <div class="uk-card">
+        <canvas width="600" height="850"></canvas>
+        <img src="build/files/images/people/GraphicBanner_PeopleImage_3.jpg" alt="placeholder image 1"
+             srcset="build/files/images/people/GraphicBanner_PeopleImage_3.jpg 2x" uk-cover>
+      </div>
+    </div>
+    <div class="ukg-card-muted ukg-card-center-icon uk-visible@m" uk-hidden>
+      <div class="uk-card">
+        <img src="build/files/images/logos/u_icon.svg" alt="icon" uk-svg>
+      </div>
+    </div>
+    <div class="ukg-card-background-image uk-cover-container uk-visible@m" uk-hidden>
+      <div class="uk-card">
+        <canvas width="600" height="850"></canvas>
+        <img src="build/files/images/people/GraphicBanner_PeopleImage_4.jpg" alt="placeholder image 1"
+             srcset="build/files/images/people/GraphicBanner_PeopleImage_4.jpg 2x" uk-cover>
+      </div>
+    </div>
+    <div class="ukg-card-blue ukg-card-center-icon uk-visible@m" uk-hidden>
+      <div class="uk-card">
+        <img src="build/files/images/logos/u_icon.svg" alt="icon" uk-svg>
+      </div>
+    </div>
+  </div>
+</div>
+<div aria-label="Ultimate Software and Kronos rebrand as UKG welcome video" class="uk-section-primary"
+     id="welcome-video" role="main">
+  <div class="ukg-background-primary">
+    <div class="uk-container uk-padding">
+      <div class="uk-panel uk-panel-small">
+        <iframe allowfullscreen="" class="uk-align-center" frameborder="0" height="720"
+                src="https://www.youtube.com/embed/qZzXPHQ-E3Y?rel=0&amp;cc_load_policy=1"
+                title="Ultimate Software and Kronos Rebrand as UKG video" uk-responsive="" uk-video="autoplay: false"
+                width="1280"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-default" id="award-winning-hr-solution">
+  <div class="ukg-background-image-cover"
+       style="background-image: url('build/files/images/background/UKG_Reveal_LandingPage_Customers_2400.jpg')">
+    <div class="uk-container uk-padding-small uk-padding-remove-right uk-padding-remove-right">
+      <h2 class="uk-text-center uk-padding">Award-winning HR solutions — an all-in-one offering</h2>
+      <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match uk-grid" uk-grid
+           uk-height-match="target: > .ukg-card-image > .uk-card > .uk-card-body">
+        <div class="ukg-card-image ukg-card-blue uk-text-center">
+          <div class="uk-card">
+            <div class="uk-card-media-top">
+              <img class="coh-image" src="build/files/images/background/Solutions_Card2_770x276.jpg" alt="" data-module="linkImage">
+            </div>
+            <div class="uk-card-body">
+              <h3 class="uk-card-title">Powerful Global HCM</h3>
+              <p>Drive people-focused results and transform your business with a truly connected global workforce
+                experience – delivered through resilient and mindful HR technology.</p>
+            </div>
+            <div class="uk-card-footer">
+              <a class="uk-button uk-button-default uk-button-small uk-text-uppercase" href="https://www.kronos.com"
+                 target="_blank">Learn More</a>
+              <a class="uk-button uk-button-default uk-button-small uk-text-uppercase" href="https://www.kronos.com"
+                 target="_blank">Get a Demo</a>
+            </div>
+          </div>
+        </div>
+        <div class="ukg-card-image ukg-card-blue uk-text-center">
+          <div class="uk-card">
+            <div class="uk-card-media-top">
+              <img src="build/files/images/background/Solutions_Card2_770x276.jpg" alt="">
+            </div>
+            <div class="uk-card-body">
+              <h3 class="uk-card-title">Global Workforce Management</h3>
+              <p>Discover the power of a workforce solution built on an intelligent platform – providing operational
+                insights that empower your greatest driver of success: your people.</p>
+            </div>
+            <div class="uk-card-footer">
+              <a class="uk-button uk-button-default uk-button-small uk-text-uppercase" href="https://www.kronos.com"
+                 target="_blank">Learn More</a>
+              <a class="uk-button uk-button-default uk-button-small uk-text-uppercase" href="https://www.kronos.com"
+                 target="_blank">Get a Demo</a>
+            </div>
+          </div>
+        </div>
+        <div class="ukg-card-image ukg-card-blue uk-text-center">
+          <div class="uk-card">
+            <div class="uk-card-media-top">
+              <img src="build/files/images/background/Solutions_Card2_770x276.jpg" alt="">
+            </div>
+            <div class="uk-card-body">
+              <h3 class="uk-card-title">Simple, Flexible HR</h3>
+              <p>Manage the entire employee journey from a single solution – giving you the power of HR, talent,
+                payroll, and time to deliver a personalized, people-centered experience.</p>
+            </div>
+            <div class="uk-card-footer">
+              <a class="uk-button uk-button-default uk-button-small uk-text-uppercase" href="https://www.kronos.com"
+                 target="_blank">Learn More</a>
+              <a class="uk-button uk-button-default uk-button-small uk-text-uppercase" href="https://www.kronos.com"
+                 target="_blank">Get a Demo</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="uk-panel uk-panel-small uk-text-center uk-padding">
+        <a class="uk-button uk-button-primary" href="#">See More Solutions</a>
+
+        <div class="uk-flex uk-flex-nowrap uk-margin-medium-top uk-grid-small">
+          <div class="ukg-card-base-link">
+            <div class="uk-card">
+              <div class="uk-card-body">
+                <a class="ukg-image-link" href="#">
+                  <img src="build/files/images/awards/Gartner_Badge.png" alt="" data-module="linkImage">
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="ukg-card-base-link">
+            <div class="uk-card">
+              <div class="uk-card-body">
+                <a class="ukg-image-link" href="#">
+                  <img src="build/files/images/awards/G2_Badge.png" alt="">
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="ukg-card-base-link">
+            <div class="uk-card">
+              <div class="uk-card-body">
+                <a class="ukg-image-link" href="#">
+                  <img src="build/files/images/awards/TrustRadius_Badge.png" alt="">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div aria-label="our purpose as UKG" class="uk-section-default uk-cover-container" id="our-purpose" role="region">
+  <div class="uk-height-large uk-background-center-center uk-background-cover uk-background-norepeat">
+    <div class="uk-overlay uk-overlay-default uk-position-bottom"
+         uk-scrollspy="cls: uk-animation-slide-bottom-medium; repeat: false">
+      <div class="uk-container">
+        <div class="uk-padding-small uk-text-center uk-height-auto">
+          <div class="uk-panel uk-panel-small uk-text-center">
+            <h2>Our purpose is people</h2>
+            <p>This is more than a tagline. We believe when people feel valued, they’re empowered to tap into their
+              unique talents for the good of themselves, their company, and their communities.</p>
+            <h4>Take me to</h4>
+            <a class="uk-button uk-button-primary" href="#">UKG Culture</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-secondary uk-preserve-color">
+  <div class="uk-container uk-padding">
+    <div class="ukg-banner-quote ukg-card-secondary ">
+      <div class="uk-card">
+        <div class="uk-card-header">
+          <div class="ukg-card-quote-icon">
+            <a class="ukg-image-link" href="/">
+            <img data-module="linkImage" class="uk-border-circle" src="app/files/images/avatar/almeda-192x192.png">
+            </a>
+          </div>
+        </div>
+        <div class="uk-card-body">
+          <blockquote cite="#">
+            <p class="uk-margin-small-bottom">The blockquote element represents content that is quoted from another
+              source, optionally with a citation which must be within a footer or cite element.</p>
+            <footer>Dave Almeda, Chief People Officer</footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-default" id="solutions">
+  <div class="uk-container">
+    <div class="uk-panel uk-text-center uk-padding-large">
+      <h2>HR soluction - An all-in-one offering</h2>
+      <p>By bringing together best-in-class solutions from Ultimate Software and Kronos, you can count on a
+        comprehensive suite of products and services, giving you 360-degree visibility into your workforce. With greater
+        insight and the right support at the right time, you can make more strategic decisions for you, your people, and
+        your business at every moment.</p>
+      <div class="ukg-solution-buttons uk-flex-wrap uk-flex-middle uk-flex-between@s uk-margin-auto uk-flex">
+        <div class="uk-text-center uk-width uk-width-1-2@s uk-margin uk-margin-remove-bottom@s">
+          <div class="uk-margin-small button-action">Take me to</div>
+          <a class="uk-button uk-button-secondary uk-button-small uk-text-uppercase" href="https://www.kronos.com">
+            kronos
+          </a>
+        </div>
+        <div class="uk-text-center uk-width uk-width-1-2@s">
+          <div class="uk-margin-small button-action">Take me to</div>
+          <a class="uk-button uk-button-secondary uk-button-small uk-text-uppercase"
+             href="https://www.ultimatesoftware.com">
+            ultimate
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-primary" id="our-customers">
+  <div class="uk-container uk-align-center uk-padding uk-padding-remove-left uk-padding-remove-right">
+    <div class="uk-panel uk-panel-small uk-text-center">
+      <h2>Meet a few of our customers</h2>
+      <p>We think you’re pretty special when you’re a UKG customer. That’s why we build products designed to inspire
+        your people — and your organization — to grow and thrive. Read on to hear what our customers have to say
+        about their UKG experience.</p>
+    </div>
+    <div class="uk-slider ukg-slider ukg-slider-primary ukg-slider-nav-outside" uk-slider>
+      <div class="uk-position-relative">
+        <div class="uk-slider-container">
+          <ul class="uk-slider-items uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-4@m uk-flex-middle">
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Tesla_White.png" alt="Tesla_White">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Marriott_White.png" alt="Marriott">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Yamaha_White.png" alt="Yamaha">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Aramark_White.png" alt="Aramark">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Feeding%20America_White.png" alt="Feeding America">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Samsung_White.png" alt="Samsung">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Sony_Music_White.png" alt="Sony Music">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Dave_Busters_White.png" alt="Dave Busters">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Revlon_White.png" alt="Revlon">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/University%20Toronto_White.png" alt="University Toronto"
+              >
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Salvation_Army_White.png" alt="Salvation Army">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Peets_White.png" alt="Peets">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Northwell%20Health_White.png" alt="Northwell Health"
+              >
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Container%20Store_White.png" alt="Container Store">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Sodexo_White.png" alt="Sodexo">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Miami%20Dolphins_White.png" alt="Miami Dolphins">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Phoenix_Suns_White.png" alt="Phoenix Suns">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Bloomin%20Brands_White.png" alt="Bloomin Brands">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Braums_White.png" alt="Braums">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Texas%20Roadhouse_White.png" alt="Texas Roadhouse">
+            </li>
+            <li class="customer-logo">
+              <img src="app/files/images/customer_logos/Waste%20Management_White.png" alt="Waste Management"
+              >
+            </li>
+          </ul>
+        </div>
+        <!-- the default means the navigation and dotnav all primary color -->
+        <a class="icon-chevron-left uk-slidenav-previous uk-position-center-left-out" href="#"
+           uk-slider-item="previous">Previous</a>
+        <a class="icon-chevron-right uk-slidenav-next uk-position-center-right-out" href="#"
+           uk-slider-item="next">Next</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-default">
+  <div class="uk-container uk-padding-small uk-padding-remove-left uk-padding-remove-right">
+    <div class="uk-panel uk-panel-small uk-text-center">
+      <h2>Upcoming Events</h2>
+      <p>
+        Access trusted information to spark inspiration for you and your people. Stay informed with valuable industry
+        resources and thought leadership events.
+      </p>
+    </div>
+    <div class="uk-section-secondary" id="ukg-hp-resource-board">
+      <div class="ukg-events-callout-board uk-flex uk-grid-small" uk-height-match="target: > div" uk-grid>
+        <div class="ukg-events-callout uk-width-3-5@m">
+          <div
+            class="ukg-callout ukg-callout-image-cover ukg-callout-default uk-text-center uk-text-left@m">
+            <div class="uk-card uk-grid-collapse uk-child-width-1-2@s uk-margin" uk-grid>
+              <div class="uk-flex-last@s uk-card-media-right uk-cover-container">
+                <div class="uk-height-medium uk-height-1-1@m uk-background-cover uk-background-top-left"
+                     data-src="app/files/images/background/UKG-Works-Event-Banner.jpg" uk-img>
+                </div>
+              </div>
+              <div class="ukg-callout-text">
+                <div class="uk-card-header">
+                  <h3 class="uk-card-title">UKG Works 2020</h3>
+                </div>
+                <div class="uk-card-body">
+                  <p> Join us for the year’s most inspiring fully digital workforce event (formerly KronosWorks). Enjoy
+                    two days of tech innovation, thought leadership, and thought-provoking expert sessions.</p>
+                </div>
+                <div class="uk-card-footer">
+                  <a class="uk-button uk-button-primary">REGISTER NOW</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ukg-callout ukg-callout-image ukg-callout-default uk-text-center uk-text-left@m">
+            <div class="uk-card uk-grid-collapse uk-child-width-1-2@s uk-margin" uk-grid>
+              <div class="uk-flex-last@s uk-card-media-right uk-cover-container">
+                <img class="" src="app/files/images/background/UKG-Works-Event-Banner.jpg" uk-cover>
+                <canvas width="500" height="500"></canvas>
+              </div>
+              <div class="ukg-callout-text">
+                <div class="uk-card-header">
+                  <h3 class="uk-card-title">G2 Crowd Award</h3>
+                </div>
+                <div class="uk-card-body">
+                  <p>The European languages are members of the same
+                    family. Their separate existence is a myth. For science,
+                    music, sport, etc, Europe uses the same vocabulary.</p>
+                </div>
+                <div class="uk-card-footer">
+                  <a class="ukg-cta ukg-cta-secondary">Learn more</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ukg-events-listing-board uk-width-2-5@m">
+          <div class="ukg-card-listing ukg-card-secondary60">
+            <div class="uk-card">
+              <div class="uk-card-body">
+                <div class="ukg-list-event ukg-list-transparent">
+                  <h4 class="event-title">Staffing World </h4>
+                  <p>A virtual conference covering the impact of relias on the nation.</p>
+                  <p><i>Tuesday, September 15, 2020 - Wednesday, September 16, 2020</i></p>
+                  <a class="ukg-cta-primary">Learn More</a>
+                </div>
+                <div class="ukg-list-event ukg-list-transparent">
+                  <h4 class="event-title">Staffing World </h4>
+                  <p>A virtual conference covering the impact of relias on the nation.</p>
+                  <p><i>Tuesday, September 15, 2020 - Wednesday, September 16, 2020</i></p>
+                  <a class="ukg-cta-primary">Learn More</a>
+                </div>
+                <div class="ukg-list-event ukg-list-transparent">
+                  <h4 class="event-title">Staffing World </h4>
+                  <p>A virtual conference covering the impact of relias on the nation.</p>
+                  <p><i>Tuesday, September 15, 2020 - Wednesday, September 16, 2020</i></p>
+                  <a class="ukg-cta-primary">Learn More</a>
+                </div>
+                <div class="ukg-list-event ukg-list-transparent">
+                  <h4 class="event-title">Staffing World </h4>
+                  <p>A virtual conference covering the impact of relias on the nation.</p>
+                  <p><i>Tuesday, September 15, 2020 - Wednesday, September 16, 2020</i></p>
+                  <a class="ukg-cta-primary">Learn More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-default">
+  <div class="uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-6@l uk-grid-collapse uk-text-center" uk-grid>
+      <div class="ukg-card-background-image">
+        <div class="uk-card">
+          <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/culture_careerstrip_1.jpg">
+        </div>
+      </div>
+    <div class="ukg-card-background-image">
+      <div class="uk-card">
+        <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/culture_careerstrip_1.jpg">
+      </div>
+    </div>
+    <div class="ukg-card-background-image">
+      <div class="uk-card">
+        <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/culture_careerstrip_1.jpg">
+      </div>
+    </div>
+    <div class="ukg-card-background-image">
+      <div class="uk-card">
+        <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/culture_careerstrip_1.jpg">
+      </div>
+    </div>
+    <div class="ukg-card-background-image">
+      <div class="uk-card">
+        <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/culture_careerstrip_1.jpg">
+      </div>
+    </div>
+    <div class="ukg-card-background-image">
+      <div class="uk-card">
+        <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/culture_careerstrip_1.jpg">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-muted">
+  <div class="ukg-background-muted">
+    <div class="uk-container uk-padding-small uk-padding-remove-left uk-padding-remove-right">
+      <div class="uk-panel uk-panel-small uk-text-center">
+        <h2>Resources</h2>
+        <p>
+          Leverage the most current thought leadership tools and resources to help you make more informed workforce and
+          business decisions.
+        </p>
+      </div>
+      <div class="uk-child-width-1-1 uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid
+           uk-height-match="target: > .ukg-card-icon > .uk-card > .uk-card-body">
+        <div class="ukg-card-icon ukg-card-blue">
+          <div class="uk-card">
+            <div class="uk-card-header">
+              <div class="uk-border-rounded ukg-card-icon-icon uk-margin-auto uk-width-1-4 uk-width-1-3@s">
+                <img src="http://kronosultimatedev.prod.acquia-sites.com/sites/default/files/images/upload/Demo_0.svg">
+              </div>
+            </div>
+            <div class="uk-card-body">
+              <h3 class="uk-card-title">Transforming Workforce Governance and Staffing Models to Withstand Crisis</h3>
+              <p>Many healthcare organizations are prioritizing cost control during crisis response to offset reduction
+                in revenue..</p>
+            </div>
+            <div class="uk-card-footer">
+              <a class="uk-button uk-button-default">Download Whitepaper</a>
+            </div>
+          </div>
+        </div>
+        <div class="ukg-card-icon ukg-card-blue">
+          <div class="uk-card">
+            <div class="uk-card-header">
+              <div class="uk-border-rounded ukg-card-icon-icon uk-margin-auto uk-width-1-4 uk-width-1-3@s">
+                <img
+                  src="http://kronosultimatedev.prod.acquia-sites.com//sites/default/files/images/upload/Analyst%20Report%20w.svg">
+              </div>
+            </div>
+            <div class="uk-card-body">
+              <h3 class="uk-card-title">Transforming Workforce Governance and Staffing Models to Withstand Crisis</h3>
+              <p>Many healthcare organizations are prioritizing cost control during crisis response to offset reduction
+                in revenue..</p>
+            </div>
+            <div class="uk-card-footer">
+              <a class="uk-button uk-button-default">Download Whitepaper</a>
+            </div>
+          </div>
+        </div>
+        <div class="ukg-card-icon ukg-card-blue">
+          <div class="uk-card">
+            <div class="uk-card-header">
+              <div class="uk-border-rounded ukg-card-icon-icon uk-margin-auto uk-width-1-4 uk-width-1-3@s">
+                <img
+                  src="http://kronosultimatedev.prod.acquia-sites.com//sites/default/files/images/upload/Analyst%20Report%20w.svg">
+              </div>
+            </div>
+            <div class="uk-card-body">
+              <h3 class="uk-card-title">Icon Card Feature</h3>
+              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+            </div>
+            <div class="uk-card-footer">
+              <a class="uk-button uk-button-default">Download Whitepaper</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="uk-section-primary">
+  <div class="uk-container uk-padding uk-padding-remove-left uk-padding-remove-right">
+    <div class="uk-panel uk-panel-small uk-text-center">
+      <h2>Latest News and U.S. Workforce Activity Report</h2>
+      <p>
+        There’s a lot happening at UKG. Stay up to date on the latest UKG news, thought leadership, and research,
+        including the U.S Workforce Activity Report, a leading high-frequency economic indicator of weekly workplace
+        trends.
+      </p>
+    </div>
+    <div class="uk-grid-small uk-grid-match uk-child-width-1-2@m" uk-grid>
+      <div class="ukg-card-carousel ukg-card-default uk-text-center">
+        <div class="uk-card">
+          <div class="uk-card-header">
+            <h3 class="uk-card-title">Kronos and Ultimate Software
+              Unveil Plans to Rebrand as “UKG”</h3>
+          </div>
+          <div class="uk-card-body">
+            <div class="ukg-slider ukg-slider-secondary" uk-slider>
+              <div class="uk-position-relative">
+                <div class="uk-slider-container">
+                  <ul class="uk-slider-items uk-child-width-1-1">
+                    <li class="card-slide">
+                      <div class="ukg-card-base ukg-card-transparent uk-text-center">
+                        <div class="uk-card">
+                          <div class="uk-card-header">
+                            <h3 class="uk-card-title">Kronos and Ultimate Software Unveil Plans to Rebrand as “UKG”</h3>
+                          </div>
+                          <div class="uk-card-body">
+                            <p>Company launches new brand identity to chart path forward as one of world’s largest cloud
+                              companies</p>
+                          </div>
+                          <div class="uk-card-footer">
+                            <a class="ukg-cta-primary">Learn More</a>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="card-slide">
+                      <div class="ukg-card-base ukg-card-transparent uk-text-center">
+                        <div class="uk-card">
+                          <div class="uk-card-header">
+                            <h3 class="uk-card-title">Kronos and Ultimate Software Unveil Plans to Rebrand as “UKG”</h3>
+                          </div>
+                          <div class="uk-card-body">
+                            <p>Company launches new brand identity to chart path forward as one of world’s largest cloud
+                              companies</p>
+                          </div>
+                          <div class="uk-card-footer">
+                            <a class="ukg-cta-primary">Learn More</a>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="card-slide">
+                      <div class="ukg-card-base ukg-card-transparent uk-text-center">
+                        <div class="uk-card">
+                          <div class="uk-card-header">
+                            <h3 class="uk-card-title">Kronos and Ultimate Software Unveil Plans to Rebrand as “UKG”</h3>
+                          </div>
+                          <div class="uk-card-body">
+                            <p>Company launches new brand identity to chart path forward as one of world’s largest cloud
+                              companies</p>
+                          </div>
+                          <div class="uk-card-footer">
+                            <a class="ukg-cta-primary">Learn More</a>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="card-slide">
+                      <div class="ukg-card-base ukg-card-transparent uk-text-center">
+                        <div class="uk-card">
+                          <div class="uk-card-header">
+                            <h3 class="uk-card-title">Kronos and Ultimate Software Unveil Plans to Rebrand as “UKG”</h3>
+                          </div>
+                          <div class="uk-card-body">
+                            <p>Company launches new brand identity to chart path forward as one of world’s largest cloud
+                              companies</p>
+                          </div>
+                          <div class="uk-card-footer">
+                            <a class="ukg-cta-primary">Learn More</a>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                  <ul class="uk-slider-nav uk-dotnav"></ul>
+                </div>
+                <a class="icon-chevron-left uk-slidenav-previous-small uk-position-center-left" href="#"
+                   uk-slider-item="previous">Previous</a>
+                <a class="icon-chevron-right uk-slidenav-next-small uk-position-center-right" href="#"
+                   uk-slider-item="next">Next</a>
+              </div>
+            </div>
+          </div>
+          <div class="uk-card-footer">
+            <div class="uk-button uk-button-primary">Learn More</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<footer class="uk-section-default ukg-footer uk-container uk-margin-large-top">
+  <div class="uk-section ukg-footer-links-group uk-flex uk-padding-remove">
+    <div class="ukg-logo uk-width-1-1 uk-width-1-4@m">
+      <img src="app/files/images/logos/ukg_logo.svg" width="235" alt="Welcome to UKG">
+    </div>
+    <div class="ukg-footer-links uk-background-white uk-width-1-1 uk-width-1-2@m">
+      <div class="uk-container uk-flex uk-flex-column uk-width-1-2@s">
+        <a class="footer-link uk-link footer-link-main" href="#">Solutions</a>
+        <a class="footer-link uk-link" href="#">UKG Pro</a>
+        <a class="footer-link uk-link" href="#">UKG Dimensions</a>
+        <a class="footer-link uk-link" href="#">UKG Ready</a>
+        <a class="footer-link uk-link" href="#">Specialized Solutions</a>
+      </div>
+      <div class="uk-container uk-flex uk-flex-column uk-width-1-2@s">
+        <a class="footer-link uk-link footer-link-main" href="#">Why UKG</a>
+        <a class="footer-link uk-link footer-link-main" href="#">Customers</a>
+        <a class="footer-link uk-link footer-link-main" href="#">About Us</a>
+      </div>
+    </div>
+    <div
+      class="uk-padding-small uk-padding-large@m ukg-snippet-follow uk-flex uk-flex-nowrap uk-width-1-1 uk-width-1-4@m">
+      <a class="icon icon-social_twitter" href="https://twitter.com/kronosinc" target="_blank">Twitter</a>
+      <a class="icon icon-social_linked" href="https://www.linkedin.com/company/ukg" target="_blank">Linked In</a>
+      <a class="icon icon-social_fb" href="https://www.facebook.com/KronosIncorporated" target="_blank">Facebook</a>
+      <a class="icon icon-social_ig" href="https://www.instagram.com/ultimatesoftware/"
+         target="_blank">Instagram</a>
+      <a class="icon icon-social_youtube" href="https://www.youtube.com/channel/UCJZMTrZOfBMqMwuL4tfEsmQ "
+         target="_blank">Youtube</a>
+    </div>
+  </div>
+  <nav class="uk-navbar-container uk-navbar-transparent uk-padding-small ukg-footer-nav">
+    <div class="uk-container">
+      <div class="uk-navbar">
+        <div class="uk-navbar-left">
+          <span class="ukg-trademark">©2020 UKG</span>
+        </div>
+        <div class="uk-navbar-right">
+          <a class="uk-link" href="javascript:Didomi.preferences.show()">Cookie Consent Choices</a>
+          <br/>
+          <a class="uk-link" href="https://www.ukg.com/terms-of-use">Terms of Use</a>
+          <a class="uk-link" href="https://www.ukg.com/privacy">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</footer>
+<script src="build/scripts/app.built.js"></script>
+</body>
+</html>

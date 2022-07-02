@@ -1,0 +1,511 @@
+//------------------------------------------------------------------------------
+// FABRIC.SCSS
+// Fabric styling.
+//------------------------------------------------------------------------------
+
+// Tooltip
+.tooltip {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  opacity: .5;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+  .field {
+    float: none;
+    margin: 0!important;
+  }
+  svg {
+    height: rem(26);
+    fill: rgba($body,.5);
+    transition: all .3s ease;
+    path {
+      fill: rgba($body,.5);
+    }
+    &:hover {
+      fill: $fm-red;
+      path {
+        fill: $fm-red;
+      }
+    }
+  }
+}
+.tooltiptext {
+  background-color: $white;
+  width: rem(280);
+  padding: rem(20);
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 -0px 15px 0 rgba($body,.25);
+  position: absolute;
+  z-index: z('default');
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 0;
+  transition: all .3s ease;
+  h4 {
+    margin: 0 0 rem(10);
+    color: $fm-red;
+  }
+  p {
+    margin: 0;
+  }
+  .tooltiptextarrow {
+    width: 50px;
+    height: 25px;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: hidden;
+    &::after {
+      content: '';
+      background-color: $white;
+      width: 20px;
+      height: 20px;
+      box-shadow: 1px 1px 20px 0px rgba($body,.5);
+      position: absolute;
+      transform: translateX(-50%) translateY(-50%) rotate(45deg);
+      top: 100%;
+      left: 50%;
+    }
+  }
+  svg {
+    fill: $fm-red;
+    path {
+      fill: $fm-red;
+    }
+  }
+}
+
+// Overview
+.view-fabrics {
+  .views-rows {}
+  .views-row {
+    float: left;
+    width: 100%;
+    margin: 0 0 5%;
+  }
+}
+
+// Teaser
+.fabric__teaser {
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+.fabric__teaser--image {
+  img {
+    border-radius: 50%;
+  }
+}
+.fabric__teaser--washing-instructions {
+  .field__item {
+    display: inline-block;
+  }
+}
+.fabric__teaser--title {
+  a {
+    color: $body;
+    text-decoration: none;
+    &:hover {
+      color: $fm-red;
+    }
+  }
+}
+.fabric__teaser--more {
+  margin: rem(15) 0;
+  a {
+    font-weight: 700;
+  }
+}
+
+
+
+
+
+// Detail
+.fabric__wrapper {}
+.fabric__image {
+  margin: 0 0 rem(60);
+  text-align: center;
+  h1 {
+    text-align: left;
+  }
+  img {
+    border-radius: 50%;
+  }
+}
+
+.fabric__cta {
+  margin: 0 0 rem(30);
+  text-align: center;
+  .field--name-field-extra {
+    margin: rem(30) 0 0;
+    color: $fm-red;
+    font-size: rem(20);
+  }
+}
+
+.fabric__details {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(60);
+  padding: rem(20);
+  border: 1px solid $grey6;
+  .field {
+    float: left;
+    width: 100%;
+    margin: 0 0 rem(5);
+    &:last-child {
+      margin: 0;
+    }
+  }
+  .field__label {
+    display: block;
+    float: left;
+    width: 45%;
+    font-weight: 700;
+    + .field__items,
+    + .field__item {
+      display: block;
+      float: left;
+      width: 55%;
+      p {
+        margin: 0;
+      }
+    }
+    + .field__items .field__item {
+      display: inline-block;
+      &::after {
+        content: ',';
+        display: inline-block;
+      }
+      &:last-child::after {
+        content: '';
+      }
+    }
+  }
+  .field--name-field-washing-instructions {
+    .field__items .field__item {
+      &::after {
+        content: '';
+      }
+    }
+  }
+}
+
+.fabric__documents {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+}
+.fabric__documents--nav {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(90);
+}
+
+.fabric__pattern-references {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(60);
+  h2 {
+    color: $fm-blue;
+    font-size: rem(24);
+  }
+  .views-row {
+    float: left;
+    width: 100%;
+    margin: 0 0 4%;
+    border: 1px solid $grey6;
+  }
+}
+
+.fabric__gallery {
+  background-color: $grey3;
+  padding: rem(60) 0 rem(100);
+  .field--name-field-gallery-images {
+    position: relative;
+    img {
+      height: rem(300);
+      border: 5px solid transparent;
+    }
+  }
+  .slick-arrow {
+    width: rem(40);
+    height: rem(40);
+    border-radius: 50%;
+    text-align: center;
+    position: absolute;
+    transform: translateY(-50%);
+    appearance: none;
+    padding: 0;
+    
+    border: 0;
+    font-size: rem(34);
+    line-height: rem(46);
+    
+    background-color: rgba($white,0.5);
+    top: 50%;
+    z-index: 1;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba($white,0.75);
+    }
+
+    &.slick-prev {
+      left: rem(16);
+    }
+
+    &.slick-next {
+      right: rem(16);
+    }
+  }
+  .slick-dots {
+    @include reset-list;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    line-height: rem(40);
+    li {
+      display: inline-block;
+      vertical-align: middle;
+      background-color: $grey1;
+      width: rem(12);
+      height: rem(12);
+      margin: 0 rem(5);
+      text-indent: rem(-9999);
+      border-radius: 50%;
+      cursor: pointer;
+      &:hover {
+        background-color: $fm-red;
+      }
+      &.slick-active {
+        background-color: $body;
+      }
+    }
+  }
+}
+
+.fabric__shops {
+  padding: rem(60) 0;
+  h2 {
+    color: $fm-blue;
+    font-size: rem(24);
+  }
+}
+.view-stores-related-to-fabric {
+  float: left;
+  width: 100%;
+  .views-row-tab {
+    float: left;
+    width: auto;
+    margin: rem(3);
+    padding: rem(5) rem(15);
+    color: $body;
+    border: 1px solid $body;
+    border-radius: 4px;
+    cursor: pointer;
+    .views-field {
+      @include iconize('angle-right');
+      &::after {
+        vertical-align: middle;
+      }
+    }
+    &:hover {
+      background-color: $grey2;
+    }
+    &.active {
+      background-color: $fm-blue;
+      color: $white;
+      border-color: $fm-blue;
+    }
+  }
+  .views-row-group {
+    display: none;
+    float: left;
+    width: 100%;
+    margin-top: rem(30);
+    &.active {
+      display: block;
+    }
+  }
+  .views-row {
+    padding: rem(10);
+    border-bottom: 1px solid $grey6;
+    p {
+      margin: 0;
+    }
+    .views-field-title {
+      font-weight: 700;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  // Overview
+  .view-fabrics {
+    .views-rows {}
+    .views-row {
+      float: left;
+      width: 48%;
+      margin: 0 4% 4% 0;
+      &:nth-child(2n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  // Detail
+  .fabric__cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 rem(60);
+    .field--name-field-extra {
+      margin: 0;
+    }
+  }
+  .fabric__details {
+    padding: rem(40);
+  }
+  .fabric__pattern-references {
+    .views-row {
+      float: left;
+      width: 48%;
+      margin: 0 4% 4% 0;
+      &:nth-child(2n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .view-stores-related-to-fabric {
+    .views-row {
+      float: left;
+      width: 50%;
+      border-bottom: 1px solid $grey6;
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  // Overview
+  .view-fabrics {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n) {
+      float: left;
+      width: 32%;
+      margin: 0 2% 2% 0;
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .view-stores-related-to-fabric {
+    .views-row {
+      float: left;
+      width: 33.333%;
+      border-bottom: 1px solid $grey6;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  // Detail
+  .fabric__left {
+    float: left;
+    width: 47.5%;
+  }
+  .fabric__right {
+    float: right;
+    width: 47.5%;
+  }
+  .fabric__gallery {
+    padding: rem(100) 20% rem(140);
+    .slick-arrow {
+      background: transparent;
+      &:hover {
+        background: transparent;
+        color: $fm-red;
+      }
+      &.slick-prev {
+        left: rem(-120);
+      }
+      &.slick-next {
+        right: rem(-120);
+      }
+    }
+  }
+
+  .view-stores-related-to-fabric {
+    .views-row-tab {
+      padding: rem(10) rem(25);
+      font-size: rem(18);
+    }
+    .views-row {
+      width: 25%;
+      padding: rem(20);
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {
+
+  // Overview
+  .view-fabrics {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n) {
+      float: left;
+      width: 32%;
+      margin: 0 2% 2% 0;
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  // Detail
+  .fabric__gallery {
+    padding: rem(100) 30% rem(140);
+  }
+
+}

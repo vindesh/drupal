@@ -1,0 +1,96 @@
+{{ attach_library('dms_theme/slick') }}
+{{ attach_library('dms_theme/fancybox') }}
+{{ attach_library('dms_theme/modal') }}
+
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+
+
+<article{{ attributes.addClass(classes) }}>
+
+  <div class="project__header container">
+    <h1>{{ label }}</h1>
+  </div>
+
+  <div class="project__wrapper container">
+
+    <div class="project__images">
+
+      <div class="project__images--slider">
+
+        {{ content.field_images }}
+
+      </div>
+
+      {# <div class="thumb">
+        <a href="#" class="gallery-link">
+          <img src="{{ content.field_images.0 }}">
+        </a>
+      </div>
+
+      {% if content.field_images.1 is not empty %}
+      <div class="link-to-all">
+        <a href="#" class="gallery-link">
+          {{ 'View all images'|t }}
+        </a>
+      </div>
+      {% endif %}
+
+      <div id="gallery" class="gallery" style="display:none;">
+        {% for img in custom.gallery_images %}
+          <a href="{{ img }}" data-fancybox="gallery"></a>
+        {% endfor %}
+      </div> #}
+      
+    </div>
+
+    <div class="project__content">
+      {% if logged_in %}
+      <div class="project__content--header">
+        {{ content.flag_project_like }}
+      </div>
+      {% endif %}
+
+      {{ content.body }}
+
+      <div class="project__content--used-pattern">
+        {{ 'Used pattern'|t }}: {{ content.field_patterns }}
+      </div>
+
+      {% if logged_in %}
+      <div class="project__content--footer">
+        {{ content.flag_project_like }}
+        {{ content.flag_project_report }}
+      </div>
+      {% endif %}
+
+      <div class="project__content--author">
+        <div class="project__content--author-image">{{ custom.author_image }}</div>
+        <div class="project__content--author-name"></div>
+        {{ 'By'|t }} <span>{{ custom.author_name }}</span>
+        <div class="project__content--author-link"><a href="{{ path('entity.user.canonical', {'user': custom.uid }) }}">{{ 'View profile'|t }}</a></div>
+      </div>
+    </div>
+
+  </div>
+  
+  <div class="container">
+    {{ custom.pattern_view}}
+  </div>
+
+  {% if logged_in %}
+    {{ content.field_comments }}
+{#   {% else %}
+    {{ custom.cta }} #}
+  {% endif %}
+
+</article>

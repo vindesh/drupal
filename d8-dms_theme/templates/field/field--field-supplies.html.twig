@@ -1,0 +1,12 @@
+{%
+  set classes = [
+    'pattern__supplies--files'
+  ]
+%}
+
+
+<div{{ attributes.addClass(classes) }}>
+  {% for item in items %}
+    {{ item.content }}
+  {% endfor %}
+</div>

@@ -1,0 +1,47 @@
+{% set tags = FALSE %}
+{% if node.field_node_taxonomy_blog_tags.count > 0 %}
+  {% set tags = [] %}
+  {% for n in 0..(node.field_node_taxonomy_blog_tags.count-1) %}
+    {% set tags = tags|merge([{
+      'link': '/blogs/tags/' ~ content.field_node_taxonomy_blog_tags[n]['#title']|replace({'& ':'',' ':'-'})|lower,
+      'name': content.field_node_taxonomy_blog_tags[n]['#title']
+    }]) %}
+  {% endfor %}
+{% endif %}
+{% set blog = {
+  'title': label,
+  'description':  content.field_node_description.0['#context']['value'],
+} %}
+<div
+  class="ukg-card-listing ukg-list-image-wide ukg-list-blog ukg-list-default ukg-list-alternate uk-text-left">
+  <div class="uk-card uk-grid-collapse uk-margin" uk-grid>
+    <div class="uk-card-media uk-width-1-3@s uk-width-1-5@s uk-visible@m">
+      {% if node.field_node_image.count > 0 %}
+        <a href="{{ url }}">
+          <img class="uk-border-rounded" src="{{ content.field_node_image.0['#markup'] }}">
+        </a>
+      {% endif %}
+    </div>
+    <div class="ukg-list-text uk-width-2-3@s uk-width-4-5@s">
+      <div class="uk-card-header">
+        <a href="{{ url }}">
+          <h3 class="uk-card-title">{{- label -}}</h3>
+        </a>
+      </div>
+      <div class="uk-card-body">
+        <p>{{ blog.description|length > 160 ? blog.description|slice(0, 160) ~ '...' : blog.description }}</p>
+      </div>
+      <div class="uk-card-footer">
+        <div class="meta-container">
+          <span class="blog-date">{{ content.field_blog_date }}</span>
+          {% if tags %}
+            {% for tag in tags %}
+              <a href="{{ tag.link }}" {% if loop.first %}class="first"{% endif %}><span class="icon-tag"></span><span
+                  class="tag-name">{{ tag.name }}</span></a>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

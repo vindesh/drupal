@@ -1,0 +1,40 @@
+.node--view-mode-full.node--type-quick-response {
+
+  .background-image-wrap {
+    width: 100%;
+
+  }
+
+  .background-image {
+    padding: 20% 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .field--name-field-teaser-image {
+    margin-bottom: rem(30);
+  }
+
+  .node__content {
+    text-align: center;
+    width: 90%;
+    margin: 0 auto;
+    padding: rem(60) rem(30);
+    background-color: rgba(255,255,255,.9);
+    border-radius: 1.25rem;
+    max-width: 37.5rem;
+
+    h1 {
+      font-size: rem(30);
+      line-height: rem(36);
+      color: $fm-red;
+    }
+  }
+
+  @include mq(break2) {
+    .background-image {
+      padding: 6% 0;
+    }
+  }
+}

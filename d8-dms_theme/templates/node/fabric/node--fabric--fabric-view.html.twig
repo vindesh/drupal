@@ -1,0 +1,9 @@
+{% if 0 in content.field_hide_in_overview.0 %}
+<div{{ item.attributes.addClass('field__item') }}>
+<div class="fabric_img">{{ content.field_fabric_image }}</div>
+<div class="fabric_img_lower">
+<label>{{ label }}</label>
+<a class="pg-list-item__link pg-list-item__link--more" href="{{ url }}">{{ 'Meer uitleg over deze stof'|t }}</a>
+</div>
+</div>
+{% endif %}

@@ -1,0 +1,30 @@
+<div class="container">
+
+  {% if multiple %}
+    <h2>{{ 'Text Formats'|t }}</h2>
+  {% endif %}
+
+  {% if tips|length %}
+    {% for name, tip in tips %}
+
+      {% if multiple %}
+        <div{{ attributes }}>
+        <h3>{{ tip.name }}</h3>
+      {% endif %}
+
+      {% if tip.list|length %}
+        <ul>
+        {% for item in tip.list %}
+          <li{{ tip.attributes }}>{{ item.tip }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if multiple %}
+        </div>
+      {% endif %}
+
+    {% endfor %}
+  {% endif %}
+
+</div>

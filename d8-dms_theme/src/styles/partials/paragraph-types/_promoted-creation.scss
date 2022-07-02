@@ -1,0 +1,72 @@
+// Promoted creation
+.paragraph--type--promoted-creation {
+  .pg-section__title {
+    margin: 0 0 rem(20);
+    font-size: rem(20);
+    line-height: rem(26);
+    color: $blue;
+  }
+  .promoted-creation__content {
+    display: flex;
+    flex-direction: column;
+    &--creation,
+    &--info {
+      margin: 0 0 rem(45);
+    }
+    &--info {
+      background-color: $fm-pink;
+      padding: rem(10);
+      color: $white;
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .paragraph--type--promoted-creation {
+    .promoted-creation__content {
+      flex-direction: row;
+      &--creation,
+      &--info {
+        width: 50%;
+      }
+      &--info {
+        padding: rem(20);
+      }
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .paragraph--type--promoted-creation {
+    .promoted-creation__content {
+      &--info {
+        padding: rem(30) rem(45);
+        font-size: rem(18);
+      }
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

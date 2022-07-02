@@ -1,0 +1,13 @@
+{
+    "name": "custom_company",
+    "type": "drupal-module",
+    "description": "The custom company module for getting company related information.",
+    "keywords": [
+    ],
+    "homepage": "https://www.drupal.org/project/custom_company",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/custom_company",
+        "source": "http://cgit.drupalcode.org/custom_company",
+    },
+}

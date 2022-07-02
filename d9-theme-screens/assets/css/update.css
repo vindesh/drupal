@@ -1,0 +1,227 @@
+#blog .btn.btn-default.btn-light-bg:hover{
+	color: #fff;
+
+}
+.newsletter.section-padding label {
+	display: none;
+}
+.newsletter.section-padding  input[type="submit"]{
+	width: 100px;
+	height: 45px;
+	background-color: #f37420;
+	color: #fff;
+	border: 1px solid #f37420;
+}
+.newsletter.section-padding  input[type="submit"]:hover{
+	color: #333;
+	background-color: #fff;
+}
+.newsletter.section-padding  input[type="text"]{
+	padding: 8px 15px;
+	border: 1px solid #ccc;
+}
+.newsletter.section-padding  input[type="text"]:hover{
+	border: 1px solid #f37420;
+}
+#contact label{
+	display: none;
+}
+@media(min-width: 992px){
+	#contact .webform-component--name{
+		width: 33.3%;
+		float: left;
+		padding-right: 10px;
+		
+	}
+	#contact .webform-component--email{
+		width: 33.3%;
+		float: left;
+		padding-left: 10px;
+		
+	}
+	#contact .webform-component--mobile{
+		width: 33.3%;
+		float: left;
+		padding-left: 10px;
+	}
+	#contact .webform-component--message{
+		width: 56.6%;
+		float: left;
+	}
+	#contact .captcha.form-wrapper{
+		width: 33.4%;
+		float: left;
+		padding-left: 10px;
+	}
+	#contact .captcha.form-wrapper img{
+
+	}
+	#contact .form-actions{
+		float: left;
+		margin-top: 166px;
+		margin-left: 10px;
+	}
+	
+}
+#contact form input[type=text]{
+	width: 100%;
+	height: 45px;
+	color: #333;
+	border: 1px solid#ccc;
+	padding: 10px;
+	margin-bottom: 30px;
+}
+#contact form input[type=email]{
+	width: 100%;
+	height: 45px;
+	color: #333;
+	border: 1px solid#ccc;
+	padding: 10px;
+	margin-bottom: 30px;
+}
+#contact  form textarea{
+	height: 208px;
+	color: #333;
+	border: 1px solid#ccc;
+	padding: 10px;
+	margin-bottom: 30px;
+	width: 100%;
+}
+#contact form input[type=submit]{
+	height: 45px;
+	border: 1px solid #f37420;
+	width: 100px;
+	background-color: #f37420;
+	color: #fff;
+	clear: both;
+    float: left;
+}
+#contact form input[type=submit]:hover{
+	background-color: #fff;
+	color: #f37420;
+
+}
+
+#contact form input[type=text]:hover{
+	border: 1px solid #f37420;
+}
+#contact form input[type=email]:hover{
+	border: 1px solid #f37420;
+}
+#contact  form textarea:hover{
+	border: 1px solid #f37420;
+}
+.col-md-4.col-sm-4.col-xs-12.no-padding:nth-child(2n){
+ background-color: #58BFE8 ;
+/* padding: 40px 20px;
+ color: #fff;*/
+}
+.col-md-4.col-sm-4.col-xs-12.no-padding:nth-child(2n+1){
+ background-color: #f37420  ;
+ /*padding: 40px 20px;
+ color: #fff;*/
+}
+.container1{
+	margin-left: 100px;
+	padding-top: 150px;
+	padding-bottom: 50px;
+}
+
+.container1 img{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+	height: 50%;
+}
+.container1 .field-name-body.field-type-text-with-summary{
+	margin-top: 50px;
+	text-align: left;
+	
+}
+.container1 #comments input[type="submit"]{
+     width: 100px;
+     height: 50px;
+     background-color: #f37420;
+     color: #fff;
+     border: 1px solid #f37420;
+     margin-top: 20px;
+     margin-bottom: 20px;
+}
+.container1 #comments input[type="submit"]:hover{
+	background-color: #fff;
+	color: #f37420;
+}
+.container1 #user-login input[type="submit"]{
+     width: 100px;
+     height: 45px;
+     background-color: #f37420;
+     color: #fff;
+     border: 1px solid #f37420;
+     margin-top: 20px;
+     margin-bottom: 20px;
+}
+#user-login .description{
+    font-size: 16px;
+    font-style: italic;
+}
+#user-login {
+	margin-top: 50px;
+}
+#user-register-form{
+	margin-top: 50px;
+}
+#user-register-form .description{
+	font-size: 16px;
+    font-style: italic;
+}
+#user-pass{
+	margin-top: 50px;
+}
+.container1 #user-register-form input[type="submit"]{
+     width: 200px;
+     height: 45px;
+     background-color: #f37420;
+     color: #fff;
+     border: 1px solid #f37420;
+     margin-top: 20px;
+     margin-bottom: 20px;
+}
+#user-login input[type="text"]{
+	padding: 8px 12px;
+}
+#user-login input[type="password"]{
+	padding: 8px 12px;
+}
+#user-register-form input[type="text"]{
+	padding: 8px 12px;
+}
+ #user-pass input[type="text"]{
+ 	padding: 8px 12px;
+ }
+
+.container1 #user-pass input[type="submit"]{
+     width: 200px;
+     height: 45px;
+     background-color: #f37420;
+     color: #fff;
+     border: 1px solid #f37420;
+     margin-top: 20px;
+     margin-bottom: 20px;
+}
+
+#team .team_description{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	transition: all 0.45s ease-in-out 0s;
+	
+}
+div.status{
+	background-color: none;
+}

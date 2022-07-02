@@ -1,0 +1,129 @@
+'use strict';
+
+const $ = require('jquery');
+const UIkit = require('uikit');
+const enquire = require('enquire.js');
+const helper = require('../info/helper');
+const log = helper.SettingLogLevel();
+const logFormat_debug = 'link-image.main.js: Function Name: {0}, {1}::{2}';
+const format = require('string-format');
+
+//module.exports = class linkImage {
+//  constructor($el) {
+const init = function ($el) {
+
+    log.debug('link-image JS module..... starts');
+    console.log('******link-image JS module..... starts******');
+    this.$el = $el;
+    let that = this;
+
+    /**
+     *  Js code for ukg-card-icon
+     */  
+    console.log('js calling for ukg-card-icon');
+    linkImage('div.coh-container .ukg-card-icon', 
+      '.uk-card .uk-card-header img.coh-image',
+      '.uk-card .uk-card-header a.ukg-image-link img', 
+      '.uk-card .uk-card-header a.ukg-image-link', 
+      '.uk-card .uk-card-footer a.coh-link'
+      );
+    //end of ukg-card-icon...
+
+    /**
+     *  Js code for ukg-card-quote
+     */
+    console.log('js calling for ukg-card-quote...');
+    linkImage('div.coh-container .ukg-card-quote', 
+      '.uk-card .uk-card-header img.coh-image',
+      '.uk-card .uk-card-header a.ukg-image-link img', 
+      '.uk-card .uk-card-header a.ukg-image-link', 
+      '.uk-card .uk-card-footer a.coh-link'
+      );
+    //end of ukg-card-quote...
+
+    /**
+     *  JS code for ukg-card-customer
+     */
+    console.log('js calling for ukg-card-customer...');
+    linkImage('div.coh-container .ukg-card-customer', 
+      '.uk-card .uk-card-media-top img.coh-image',
+      '.uk-card .uk-card-media-top a.ukg-image-link img', 
+      '.uk-card .uk-card-media-top a.ukg-image-link', 
+      '.uk-card .uk-card-footer a.coh-link'
+      );
+    //end of ukg-card-customer... 
+
+
+    /**
+     *  JS code for ukg-card-image
+     */
+    console.log('js calling for ukg-card-image...');
+    linkImage('div.coh-container .ukg-card-image', 
+      '.uk-card .uk-card-media-top img.coh-image',
+      '.uk-card .uk-card-media-top a.ukg-image-link img', 
+      '.uk-card .uk-card-media-top a.ukg-image-link', 
+      '.uk-card .uk-card-footer a.coh-link'
+      );
+    //end of ukg-card-image...  
+
+    /**
+     *  UiKit Hero With Image and CTA 
+     *  JS code for ukg-card-hero-image
+     */
+    console.log('js calling for ukg-card-hero-image...');
+    linkImage('div.coh-container .ukg-card-hero-image', 
+      '.ukg-card-media img.coh-image',
+      '.ukg-card-media a.ukg-image-link img', 
+      '.ukg-card-media a.ukg-image-link', 
+      '.ukg-card-text .uk-card-footer a.coh-link'
+      );
+    //end of ukg-card-hero-image...
+
+
+  /**
+   *  linkImage function - Working
+   *  1. When no image link is provided, we fetch the url from the first cta in the 
+   *  component cta dropzone. We also use match the alt, title, from the cta as well.
+   *  2. If no image link or cta, we remove the parent link container for image.
+   */
+  function linkImage(mainClass, headerImage, headerLinkImage, headerLink, ctaLink){
+    console.log('linkImage function calling for....'+mainClass);
+    $(mainClass).each(function() { 
+      if($(this).find(headerLinkImage).text() != ''){
+        let link_href = $(this).find(headerLink).attr('href');
+        if(link_href == '' || link_href =='/'){
+          var cta = $(this).find(ctaLink).eq(0);
+          let cta_href = cta.attr('href');
+          if(cta_href.length() > 0){
+            link_href.val(cta_href);
+          }else{
+            let img_link = $(this).find(headerLink);
+            $(img_link).attr('href', 'javascript:void(0)');
+            $(img_link).css('cursor', 'default');
+          }
+        }
+      }else{
+        var cta = $(this).find(ctaLink).eq(0);
+        let cta_href = cta.attr('href');
+        console.log('cta-href='+cta_href);
+        let val_link_title = cta.attr('title');
+        if (!cta_href) { console.log('TRUE....');
+          //$(cta).attr('href', 'javascript:void(0)');
+          //$(cta).css('cursor', 'none');
+          //$(this).find(headerImage).wrap('<a href="javascript:void(0)" title="'+val_link_title+'" style="cursor:none;"></a>');
+        }
+        else {
+          $(this).find(headerImage).wrap('<a href="'+cta_href+'" title="'+val_link_title+'"></a>');
+        }
+      }
+    });
+  }//end of linkImage function
+
+
+
+  //}
+}
+
+module.exports = {
+  init
+};

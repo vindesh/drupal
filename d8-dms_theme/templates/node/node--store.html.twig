@@ -1,0 +1,75 @@
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+{% set body = content|without('field_paragraphs')|render %}
+
+<article{{ attributes.addClass(classes) }}>
+  <header class="node__header container">
+    <h1>{{ label }}</h1>
+  </header>
+
+  <div class="node__content">
+    {% if body %}
+      <div class="container">
+        {{ content.field_header_img }}
+        {{ content.body }}
+        {{ content.field_link_to_website }}
+      </div>
+      <div class="store-about-outer">
+        <div class="container">
+          {{ content.field_about   }}
+          {% if 'On' in content.field_check_link.0 %}
+          {{ content.field_link_to_internal_page }}
+          {% endif %}
+        </div>
+      </div>
+      <div class="container">
+        {{ content.field_mid_row }}
+      </div>
+        <div class="store-fabric">
+          <div class="container">
+            <h2>{{ 'Fabrics'|t }}</h2>
+            <p>{{ 'At'|t }} {{ label }} {{'you will find these fabrics from Fibre Mood'|t }}.</p>
+            <div class="fabric-content">
+            {{ content.field_fabrics }}
+            
+            </div>
+            <div class="store-fabric-links">
+            <a href="{{path('entity.node.canonical', {'node': 1274}) }}">{{ 'View more fabrics'|t }}</a>
+            {{ content.field_febric_link_to_website }}
+          </div>
+          </div>
+        </div>
+
+      <div class="container">
+        
+            <div class="location-heading"><h2>{{ 'Location '|t }}</h2></div>
+        <div class="location">
+          <div class="left-sec">
+            {{ content.field_store_address }}
+            <p>{{ content.field_store_phone }}</p>
+            <p>{{ content.field_store_email }}</p>
+            <p>{{ content.field_store_website }}</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p><a class="location-link" href="https://www.fibremood.com/nl/winkels">{{ 'Find other stores in your area'|t }}</a></p>
+          </div>
+          <div class="right-sec">
+          {{ content.field_geolocation }}
+          </div>
+        </div>
+        {{ content.field_footer_img }}
+      </div>
+    {% endif %}
+
+    {{ content.field_paragraphs }}
+  </div>
+</article>

@@ -1,0 +1,42 @@
+<div class="ukg-card-listing ukg-list-default ukg-list-image-wide uk-animation-fade uk-animation-fast"{% if listItem.dataFilters %}{% for filterName, filterValue in listItem.dataFilters %}
+  data-{{ filterName }}="{{ filterValue|replace({'\'':'&#039;'}) }}"{% endfor %}{% endif %}{% if listItem.classes %}class="{% for class in listItem.classes %}{% if loop.first %}{{ class }}{% else %} {{ class }}{% endif %}{% endfor %}{% endif %}">
+  <div class="uk-card uk-grid-collapse uk-margin" uk-grid>
+    <div class="uk-card-footer">
+      {% block footer_cta %}
+        <a class="uk-button uk-button-primary"{% if listItem.external %} target="_blank"{% endif %}>Read More</a>
+      {% endblock %}
+    </div>
+    <div class="uk-card-media uk-width-1-3@s uk-width-1-5@s uk-visible@s">
+      <a href="{{ listItem.link }}"{% if listItem.external %} target="_blank"{% endif %}>
+        <img class="uk-border-rounded" src="{{ listItem.img_src }}" alt="{{ listItem.img_title }}">
+      </a>
+    </div>
+    <div class="ukg-list-text uk-width-2-3@s uk-width-4-5@s">
+      <div class="uk-card-header">
+        <a href="{{ listItem.link }}"{% if listItem.external %} target="_blank"{% endif %}>
+          <h3 class="uk-card-title">{{ listItem.title }}</h3>
+        </a>
+      </div>
+      <div class="uk-card-body">
+        {% block list_body %}
+          {% if listItem.description %}
+            <p>{% if listItem.intro %}<strong>{{ listItem.intro }} </strong>{% endif %}
+              {{ listItem.description }}</p>
+          {% endif %}
+        {% endblock %}
+      </div>
+      <div class="uk-card-footer">
+        {% block list_footer %}
+        <div class="meta-container">
+          <span class="blog-date"><time datetime="2021-02-23T22:00:00Z">Feb 23, 2021</time></span>
+          <div class="meta-tags">
+            <a href="/blogs/tags/employee-well-being" class="first"><span class="icon-tag"></span><span
+                class="tag-name">Employee Well-Being</span></a>
+            <a href="/blogs/tags/hr"><span class="icon-tag"></span><span class="tag-name">HR</span></a>
+          </div>
+        </div>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</div>

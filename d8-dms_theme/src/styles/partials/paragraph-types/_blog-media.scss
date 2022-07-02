@@ -1,0 +1,32 @@
+// ==========================================================================
+// Paragraph bundle: BLOG MEDIA
+// ==========================================================================
+.paragraph--type--blog-media {
+  text-align: center;
+
+  // .field--name-field-media {
+  //   background-color: $grey3;
+  //   border: 1px solid $grey2;
+  // }
+}
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

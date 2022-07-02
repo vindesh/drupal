@@ -1,0 +1,187 @@
+//------------------------------------------------------------------------------
+// LINKPARTY.SCSS
+// Linkparty styling.
+//------------------------------------------------------------------------------
+
+.flagging-blog-article-link-party-add-form {
+  .js-form-type-managed-file {
+    color: rgba($body,0.75);
+    label {
+      color: $dms-grey4;
+      font-weight: 900;
+      position: relative;
+      top: auto;
+      left: auto;
+    }
+    input[type="file"] {
+      display: inline-block;
+      background: $grey3;
+      padding: rem(10);
+      border: 1px solid $grey6;
+    }
+    .description {
+      margin: rem(10) 0 0;
+      line-height: rem(20);
+    }
+  }
+}
+
+// OVERVIEW
+.linkparty-overview {
+  .views-row {
+    float: left;
+    width: 49%;
+    margin: 0 2% 2% 0;
+  }
+  .views-row:nth-child(2n) {
+    margin-right: 0;
+  }
+}
+
+// ENTRIES
+.linkparty-entries {
+  .block__title {
+    margin: 0 0 rem(30);
+    text-align: center;
+  }
+  .views-row {
+    float: left;
+    width: 49%;
+    margin: 0 2% 2% 0;
+  }
+  .views-row:nth-child(2n) {
+    margin-right: 0;
+  }
+}
+
+// ENTRIES
+.linkparty-entry--link {
+  display: block;
+  color: $white;
+  text-decoration: none;
+  position: relative;
+  &:hover {
+    h3 {
+      background-color: rgba($fm-red,1);
+    }
+  }
+  h3 {
+    background-color: rgba($black,0.5);
+    width: 100%;
+    margin: 0;
+    padding: rem(15);
+    font-size: rem(14);
+    line-height: rem(18);
+    color: $white;
+    transition: all .5s ease;
+    position: absolute;
+    bottom: 0;
+  }
+}
+
+// Enter linkparty
+.flagging-blog-article-link-party-add-form,
+.flagging-blog-article-link-party-edit-form {
+  max-width: rem(700);
+  .js-form-type-managed-file label {
+    position: relative;
+    top: auto;
+    left: auto;
+  }
+  img {
+    max-width: rem(370); // max width of image style used => overview
+  }
+  .image-widget {
+    input[type="submit"] {
+      background-color: $body;
+      max-width: rem(190);
+      padding: rem(7) 0;
+      &:hover {
+        background-color: $dms-grey3;
+      }
+    }
+  }
+  input[type="submit"] {
+    background-color: $fm-red;
+    &:hover {
+      background-color: $fm-blue;
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .linkparty-overview {
+    .views-row,
+    .views-row:nth-child(2n) {
+      width: 32%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(3n) {
+      margin-right: 0;
+    }
+  }
+
+  .linkparty-entries {
+    .views-row,
+    .views-row:nth-child(2n) {
+      width: 32%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(3n) {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .linkparty-overview {
+    .views-row,
+    .views-row:nth-child(2n),
+    .views-row:nth-child(3n) {
+      width: 23.5%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(4n) {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .linkparty-overview {
+    .views-row,
+    .views-row:nth-child(2n),
+    .views-row:nth-child(3n),
+    .views-row:nth-child(4n) {
+      width: 18.4%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(5n) {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

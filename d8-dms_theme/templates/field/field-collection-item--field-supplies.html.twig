@@ -1,0 +1,13 @@
+{%
+  set classes = [
+    'pattern__supplies--file'
+  ]
+%}
+
+{% if content.field_file|render|striptags|trim is not empty %}
+{{kint(content.field_file)}}
+<div{{ attributes.addClass(classes) }}>
+  <i class="fa fa-file-o"></i> {{ content.field_file|render }}
+</div>
+
+{% endif %}

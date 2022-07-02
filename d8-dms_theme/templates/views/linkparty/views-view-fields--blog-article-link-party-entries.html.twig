@@ -1,0 +1,10 @@
+{% set url = fields.field_url.content|striptags|trim %}
+{% set title = fields.field_title.content %}
+{% set image = fields.field_image.content %}
+
+
+
+<a href="{{ url }}" class="linkparty-entry--link" target="_blank">
+  {{ image }}
+  <h3>{{ title|raw }}</h3>
+</a>

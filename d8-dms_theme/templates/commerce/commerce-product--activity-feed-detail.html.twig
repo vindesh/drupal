@@ -1,0 +1,21 @@
+{% set difficulty = product.field_difficulty|render|striptags|trim %}
+
+<div class="message__content message__content--pattern">
+
+  <a href="{{ product_url }}" class="message__content--link">
+
+    {{ product.field_images.0 }}
+
+    <div class="pattern__activity-feed--info">
+      <div class="pattern__activity-feed--header">
+        <h3><div class="difficulty difficulty-{{ difficulty }}"></div>{{ product.title|render }}</h3>
+      </div>
+      <div class="pattern__activity-feed--footer">
+        <div class="more">{{ 'details'|t }} <i class="fa fa-angle-right"></i></div>
+        <div class="garments">{{ product.field_garments }}</div>
+      </div>
+    </div>
+
+  </a>
+
+</div>

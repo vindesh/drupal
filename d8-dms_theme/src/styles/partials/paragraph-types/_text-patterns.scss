@@ -1,0 +1,96 @@
+.paragraph--type--text-patterns {
+  .field--name-field-intro {
+    // float: left;
+    // width: 60%;
+    p:first-child {
+      margin-top: 0;
+    }
+  }
+  .field--name-field-patterns2 {
+    // float: right;
+    // width: 30%;
+  }
+  &:not(.pg-patterns--1) {
+    .field--name-field-patterns2 {
+      float: left;
+      width: 100%;
+      .field__item {
+        float: left;
+        width: 100%;
+        // width: 23.5%;
+        // margin: 0 2% 2% 0;
+        margin: 0 0 5%;
+      }
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .paragraph--type--text-patterns {
+    &:not(.pg-patterns--1) {
+      .field--name-field-patterns2 {
+        .field__item {
+          width: 49%;
+          margin: 0 2% 2% 0;
+          &:nth-child(2n) {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .paragraph--type--text-patterns {
+    .field--name-field-intro {
+      float: left;
+      width: 60%;
+    }
+    .field--name-field-patterns2 {
+      float: right;
+      width: 30%;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .paragraph--type--text-patterns {
+    &:not(.pg-patterns--1) {
+      .field--name-field-patterns2 {
+        .field__item,
+        .field__item:nth-child(2n) {
+          width: 23.5%;
+          margin: 0 2% 2% 0;
+        }
+        .field__item:nth-child(4n) {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

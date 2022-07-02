@@ -1,0 +1,14 @@
+<a class="uk-button uk-button-primary uk-button-dropdown-toggle" data-module="filterToggle"
+   uk-toggle="target: #{{ filters.filterId }}" type="button">
+  <h4>{{ filters.filterName }}</h4><span class="ukg-toggle icon-chevron-down">{{ filters.filterExpandText }}</span>
+</a>
+<div class="filter-container" id="{{ filters.filterId }}" aria-hidden="true" hidden>
+  <ul class="uk-nav uk-dropdown-nav">
+    {% for row in filters.filterOptions %}
+      {{ row.content }}
+    {% endfor %}
+    {% block all_link %}
+      <a href="#" class="filter__all">All {{ filters.filterName }}</a>
+    {% endblock %}
+  </ul>
+</div>

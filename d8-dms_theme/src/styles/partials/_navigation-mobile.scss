@@ -1,0 +1,24 @@
+.mm-toggle--wrapper {
+  float: right;
+  font-size: rem(20);
+  line-height: rem(24);
+  color: $fm-blue;
+  text-decoration: none;
+  &:hover {
+    color: $fm-red;
+  }
+}
+.mm-toggle--offcanvas {
+  @include iconize('close','before');
+  width: 100%;
+  font-size: rem(14);
+  text-transform: uppercase;
+  font-weight: 900;
+  line-height: rem(40);
+  color: $fm-blue;
+  text-align: center;
+  text-decoration: none;
+  &:hover {
+    color: $fm-red;
+  }
+}

@@ -1,0 +1,189 @@
+//------------------------------------------------------------------------------
+// STRUCTURE.SCSS
+// Structure styling.
+//------------------------------------------------------------------------------
+
+#top,
+#header,
+#hero,
+#system,
+#main,
+#content,
+#sidebar-first,
+#sidebar-second,
+#doormat,
+#footer,
+#bottom {
+  float: left;
+  width: 100%;
+}
+
+
+
+#top {
+  padding: rem(20) 0;
+}
+
+#header {
+  border-top: 2px solid $grey2;
+  // max-width: $container-max;
+  // padding: rem(10) 0;
+  // .front & {
+  //   background-color: $white;
+  // }
+  // .not-front & {
+  //   background-color: $grey5;
+  // }
+  .not-front & {
+    margin-bottom: rem(30);
+  }
+}
+
+#hero {}
+
+#system {}
+
+#main {}
+
+#content {
+  .not-front & {
+    padding-bottom: rem(75);
+  }
+  .node-type-quick_response & {
+    padding-bottom: 0;
+  }
+
+  .path-user &,
+  .path-search & {
+    @extend .container;
+    float: none;
+    padding-bottom: rem(75);
+  }
+}
+
+#sidebar-first {
+  background-color: $grey3;
+  padding: rem(30);
+}
+
+#sidebar-second {
+  position: relative;
+}
+
+.fancy-sidebar {
+  display: none;
+}
+
+#footer {
+  background-color: $grey8;
+  padding: rem(60) 0;
+}
+
+#bottom {
+  background-color: $grey9;
+  padding: rem(60) 0;
+}
+
+
+// Sidebar logic
+.sidebar-first,
+.sidebar-second {
+  #sidebar-first,
+  #content,
+  #sidebar-second {
+    margin: 0 0 rem(75);
+  }
+}
+
+.doormat_background {
+  background-color: $grey5;
+  padding: rem(20) 0 rem(50) 0;
+}
+
+
+
+.node__header {
+  .node-id-9 & {
+    text-align: center;
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  #header {
+    .not-front & {
+      margin-bottom: 0;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  #top {
+    padding: rem(40) 0;
+  }
+
+  #header {
+    padding: rem(25) 0;
+    border-bottom: 2px solid $grey2;
+  }
+
+  .sidebar-first {
+    #sidebar-first {
+      float: left;
+      width: 25%;
+    }
+    #content {
+      float: right;
+      width: 70%;
+    }
+  }
+  .sidebar-second {
+    #content {
+      float: left;
+      width: 57.5%;
+    }
+    #sidebar-second {
+      float: right;
+      width: 37.5%;
+    }
+  }
+
+  .fancy-sidebar {
+    display: block;
+    position: absolute;
+    height: calc(100% - 30px);
+    width: 24px;
+    border-left: 2px dashed rgba($fm-red,0.5);
+    left: -24px;
+
+    // &:after {
+    //   content: url('../img/naald.png');
+    //   position: absolute;
+    //   bottom: rem(-85);
+    //   left: rem(-4);
+    // }
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

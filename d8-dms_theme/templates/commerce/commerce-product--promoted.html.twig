@@ -1,0 +1,25 @@
+{% set bg = product.field_images.0 %}
+{% set difficulty = product.field_difficulty|render|striptags|trim %}
+
+{# {% for image in product.field_images['#items'] %}
+  {% if loop.first %}
+    {% set bg = file_url(image.entity.uri.value) %}
+  {% endif %}
+{% endfor %}
+ #}
+{# {{ product.field_images.0 }} #}
+
+
+<a href="{{ product_url }}" class="promoted-product__teaser--link" style="background-image:url({{ bg }});">
+
+  <div class="promoted-product__teaser--info">
+    <div class="promoted-product__teaser--header">
+      <h3><div class="difficulty difficulty-{{ difficulty }}"></div>{{ product.title|render }}</h3>
+    </div>
+    <div class="promoted-product__teaser--footer">
+      <div class="more">{{ 'details'|t }} <i class="fa fa-angle-right"></i></div>
+      <div class="garments">{{ product.field_garments }}</div>
+    </div>
+  </div>
+
+</a>

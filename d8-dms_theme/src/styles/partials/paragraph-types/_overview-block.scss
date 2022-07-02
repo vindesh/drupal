@@ -1,0 +1,233 @@
+// ==========================================================================
+// Paragraph bundle: LIST
+// ==========================================================================
+.paragraph--type--overview-block {
+  // Make sure title nor intro become ridiculously long.
+  .pg-section__title,
+  .field--name-field-intro {
+    max-width: rem(760);
+    margin-left: auto;
+    margin-right: auto;
+
+    text-align: center;
+  }
+
+  // If an intro was added, provide some spacing between it and the image slider.
+  .field--name-field-intro {
+    margin-bottom: rem(30);
+  }
+
+  .field--name-field-references {
+    text-align: center;
+    .field__item {
+      // display: inline-block;
+      // margin: rem(5) rem(3);
+      display: block;
+      float: left;
+      width: 100%;
+      height: rem(250);
+      margin: 0;
+      border: 10px solid $white;
+    }
+  }
+}
+
+.overview-block__teaser--link {
+  display: block;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+  padding: 0;
+  font-size: rem(18);
+  line-height: rem(30);
+  color: $fm-blue;
+  position: relative;
+  &:hover {
+    color: $fm-red;
+    .blog-category__teaser--label {
+      background-color: $white;
+    }
+  }
+}
+
+.overview-block__teaser--label {
+  background-color: rgba($white,0.8);
+  padding: rem(20);
+  position: absolute;
+  bottom: 0;
+  transition: all .2s linear;
+}
+
+// .overview-block__teaser--link {
+//   display: block;
+//   background-color: $fm-red;
+//   padding: 0 rem(20);
+//   // font-size: rem(20);
+//   line-height: rem(40);
+//   font-weight: 700;
+//   color: $white;
+//   text-decoration: none;
+//   transition: all .2s linear;
+//   &:hover {
+//     background-color: $fm-blue;
+//     color: $white;
+//   }
+// }
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+// @media screen and (max-width: 767px) {
+//   .overview-block__teaser--link {
+//     background-image: none!important;
+//   }
+// }
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .paragraph--type--overview-block {
+    .field--name-field-references {
+      .field__item {
+        display: block;
+        float: left;
+        width: 100%;
+        height: rem(250);
+        margin: 0;
+        border: 10px solid $white;
+      }
+    }
+
+    &.pg-references--1 .field__item {
+      &:nth-child(1) {
+        height: rem(400);
+      }
+    }
+    &.pg-references--2 .field__item {
+      &:nth-child(1) {
+        width: 60%;
+        height: rem(400);
+      }
+      &:nth-child(2) {
+        width: 40%;
+        height: rem(400);
+      }
+    }
+    &.pg-references--3 .field__item {
+      &:nth-child(1),
+      &:nth-child(2),
+      &:nth-child(3) {
+        width: 33.333%;
+        height: rem(400);
+      }
+    }
+    &.pg-references--4 .field__item {
+      &:nth-child(1),
+      &:nth-child(4) {
+        width: 60%;
+      }
+      &:nth-child(2),
+      &:nth-child(3) {
+        width: 40%;
+      }
+    }
+    &.pg-references--5 .field__item {
+      &:nth-child(1),
+      &:nth-child(2),
+      &:nth-child(3) {
+        width: 33.333%;
+        height: rem(300);
+      }
+      &:nth-child(4),
+      &:nth-child(5) {
+        width: 50%;
+        height: rem(300);
+      }
+    }
+    &.pg-references--6 .field__item {
+      &:nth-child(1),
+      &:nth-child(4),
+      &:nth-child(5) {
+        width: 60%;
+      }
+      &:nth-child(2),
+      &:nth-child(3),
+      &:nth-child(6) {
+        width: 40%;
+      }
+    }
+    &.pg-references--7 .field__item {
+      &:nth-child(1),
+      &:nth-child(2),
+      &:nth-child(6),
+      &:nth-child(7) {
+        width: 50%;
+      }
+      &:nth-child(3),
+      &:nth-child(4),
+      &:nth-child(5) {
+        width: 33.333%;
+      }
+    }
+    &.pg-references--8 .field__item {
+      &:nth-child(1),
+      &:nth-child(2),
+      &:nth-child(3),
+      &:nth-child(6),
+      &:nth-child(7),
+      &:nth-child(8) {
+        width: 33.333%;
+      }
+      &:nth-child(4),
+      &:nth-child(5) {
+        width: 50%;
+      }
+    }
+  }
+
+  .overview-block__teaser--link {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    padding: 0;
+    font-size: rem(18);
+    line-height: rem(30);
+    color: $fm-blue;
+    position: relative;
+    &:hover {
+      color: $fm-red;
+      .blog-category__teaser--label {
+        background-color: $white;
+      }
+    }
+  }
+
+  .overview-block__teaser--label {
+    background-color: rgba($white,0.8);
+    padding: rem(20);
+    position: absolute;
+    bottom: 0;
+    transition: all .2s linear;
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

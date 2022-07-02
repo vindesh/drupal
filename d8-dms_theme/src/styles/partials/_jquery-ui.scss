@@ -1,0 +1,61 @@
+//------------------------------------------------------------------------------
+// JQUERY-UI.SCSS
+// Jquery UI overrides.
+//------------------------------------------------------------------------------
+
+.ui-widget-overlay {
+  background: rgba($black,0.75);
+  opacity: 1;
+}
+
+.ui-widget {
+  .ui-widget-content {
+  }
+}
+
+.ui-dialog {
+  max-width: rem(500);
+  margin: 0 auto;
+  .ui-dialog-titlebar-close {}
+  .ui-dialog-buttonpane {
+    .ui-dialog-buttonset {
+      float: left;
+    }
+    button {
+      @extend input[type="submit"];
+      background-color: $fm-red;
+      &:hover {
+        background-color: $fm-blue;
+      }
+    }
+  }
+}
+
+.ui-widget-header {
+  // background-color: $fm-blue;
+  // color: $white;
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

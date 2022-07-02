@@ -1,0 +1,31 @@
+name: DMS theme
+type: theme
+description: 'DMS theme'
+core: 8.x
+base theme: dms_basetheme
+
+libraries:
+  - dms_theme/fonts
+  - dms_theme/icon_fonts
+  - dms_theme/global_styles
+  - dms_theme/global_scripts
+
+ckeditor_stylesheets:
+  - css/ckeditor.css
+
+regions:
+  top: 'Top'
+  header: 'Header'
+  hero: 'Hero'
+  system: 'System'
+  content_top: 'Content Top'
+  content: 'Content'
+  content_front_users: 'Content for logged in users on the frontpage'
+  sidebar_first: 'Sidebar first'
+  sidebar_second: 'Sidebar second'
+  doormat: 'Doormat'
+  footer: 'Footer'
+  bottom: 'Bottom'
+  off_canvas: 'Off canvas'
+  paragraph_blocks: 'Blocks allowed for Paragraph UI embedding'
+  block_reference: 'Block reference'

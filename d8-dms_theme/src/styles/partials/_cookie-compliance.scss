@@ -1,0 +1,22 @@
+#sliding-popup {
+  padding: rem(10) 0;
+  .popup-content {
+    #popup-buttons {
+      button {
+        background: $white;
+        padding: rem(5) rem(15);
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        font-family: inherit;
+        text-shadow: none;
+        font-weight: normal;
+        transition: all .2s linear;
+        &:hover {
+          background: $body;
+          color: $white;
+        }
+      }
+    }
+  }
+}

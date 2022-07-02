@@ -1,0 +1,10 @@
+// This mixin will return both the px & rem values
+// The only reason is to support IE8
+// @Mike: Do we need this?
+@mixin font-size($size) {
+  @if (unitless($size)) {
+    $size: $size * 1px;
+  }
+  font-size: $size;
+  font-size: rem($size);
+}

@@ -1,0 +1,82 @@
+//------------------------------------------------------------------------------
+// GEOLOCATION.SCSS
+// Geolocation styling.
+//------------------------------------------------------------------------------
+
+.geolocation-common-map-locations {
+  float: left;
+  width: 100%;
+  margin: rem(30) 0 0;
+}
+.geolocation {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+  padding: rem(20);
+  border: 1px solid $grey3;
+  &:hover {
+    background-color: $grey3;
+  }
+  h3 {
+    margin-top: 0;
+  }
+  a {
+    color: $body;
+    text-decoration: none;
+    &:hover {
+      color: $fm-red;
+    }
+  }
+}
+.views-field-field-store-facebook,
+.views-field-field-store-instagram,
+.views-field-field-store-pinterest {
+  float: left;
+  margin: rem(20) rem(20) 0 0;
+  font-size: rem(20);
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .geolocation {
+    width: 49%;
+    margin: 0 2% 2% 0;
+  }
+  .geolocation:nth-child(2n) {
+    margin-right: 0;
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  .geolocation,
+  .geolocation:nth-child(2n) {
+    width: 32%;
+    margin: 0 2% 2% 0;
+  }
+  .geolocation:nth-child(3n) {
+    margin-right: 0;
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

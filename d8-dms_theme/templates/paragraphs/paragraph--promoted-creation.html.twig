@@ -1,0 +1,31 @@
+{%
+  set classes = [
+    'paragraph',
+    'paragraph--type--' ~ paragraph.bundle|clean_class,
+    view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+  ]
+%}
+
+{% if custom.extra_classes is defined %}
+  {% set classes = classes|merge(custom.extra_classes) %}
+{% endif %}
+
+{% block paragraph %}
+  <section{{ attributes.addClass(classes) }}>
+    <div class="pg-section__title-wrapper">
+      <div class="container container-s">
+        {{ content.field_title }}
+      </div>
+    </div>
+    <div class="container container-s">
+      <div class="promoted-creation__content">
+        <div class="promoted-creation__content--creation">
+          {{ content.field_creation }}
+        </div>
+        <div class="promoted-creation__content--info">
+          {{ content.field_extra_information }}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock paragraph %}

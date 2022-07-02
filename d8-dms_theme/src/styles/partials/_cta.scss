@@ -1,0 +1,52 @@
+.cta {
+  position: relative;
+  .cta__content {
+    @include center('both');
+    text-align: center;
+    background-color: rgba($white,0.9);
+    width: 90%;
+    max-width: rem(600);
+    padding: rem(30) rem(20);
+    border-radius: rem(20);
+    h2 {
+      @extend h1;
+      color: $fm-red;
+    }
+    p {
+      padding: 0 rem(50);
+    }
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  .cta {
+    .cta__content {
+      width: auto;
+      padding: rem(30) rem(60);
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

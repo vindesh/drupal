@@ -1,0 +1,26 @@
+<div class="ukg-card-listing ukg-list-default ukg-list-news-item uk-animation-fade uk-animation-fast"{% if listItem.dataFilters %}{% for filterName, filterValue in listItem.dataFilters %}
+  data-{{ filterName }}="{{ filterValue|replace({'\'':'&#039;'}) }}"{% endfor %}{% endif %}>
+<div class="uk-card">
+    <div class="uk-card-header">
+      {% if listItem.prehead %}
+        <h5 class="ukg-list-prehead">{{ listItem.prehead }}</h5>
+      {% endif %}
+      <a class="ukg-list-title" href="{{ listItem.link }}"{% if listItem.external %} target="_blank"{% endif %}>
+        <h3 class="uk-card-title">{{ listItem.title }}</h3>
+      </a>
+    </div>
+    <div class="uk-card-body">
+      {% block content_description %}
+        {% if listItem.description %}
+          <p>{% if listItem.intro %}<strong>{{ listItem.intro }} </strong>{% endif %}
+         {{ listItem.description }}</p>
+        {% endif %}
+      {% endblock %}
+    </div>
+    <div class="uk-card-footer">
+      {% block footer_cta %}
+        <a class="uk-button uk-button-primary"{% if listItem.external %} target="_blank"{% endif %}>Read More</a>
+      {% endblock %}
+    </div>
+  </div>
+</div>

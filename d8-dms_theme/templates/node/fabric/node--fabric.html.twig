@@ -1,0 +1,126 @@
+{{ attach_library('dms_theme/slick') }}
+{{ attach_library('dms_theme/fancybox') }}
+
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+
+
+
+<article{{ attributes.addClass(classes) }}>
+
+  <div class="fabric__wrapper container">
+
+    <div class="fabric__left">
+
+      <h1>{{ label }}</h1>
+
+      <div class="fabric__image">
+
+        {{ content.field_fabric_image }}
+        
+      </div>
+
+    </div>
+
+    
+
+    <div class="fabric__right">
+
+      <div class="fabric__cta">
+
+        <a href="#" class="scroll-to btn btn--pink" data-scroll="shops">{{ 'Where can you buy this fabric?'|t }}</a>
+
+        {{ content.field_extra }}
+
+      </div>
+
+      <div class="fabric__details">
+
+        {{ content.field_reference }}
+        {{ content.field_composition }}
+        {{ content.field_properties }}
+        {{ content.field_width }}
+        {{ content.field_weight }}
+        {{ content.field_color }}
+        {{ content.field_pattern }}
+        {{ content.field_washing_instructions }}
+        {{ content.body }}
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="fabric__wrapper container">
+
+    {% if content.field_documents|render|striptags|trim is not empty %}
+    <div class="fabric__left">
+
+      <div class="fabric__documents">
+
+        {{ content.field_documents }}
+
+      </div>
+
+      <div class="fabric__documents--nav">{{ content.field_documents }}</div>
+
+    </div>
+    {% endif %}
+
+    {% if custom.related_patterns|render|striptags|trim is not empty %}
+    <div class="fabric__right">
+
+      <div class="fabric__pattern-references">
+
+        <h2>{{ 'Patterns with this fabric'|t }}</h2>
+
+        {{ custom.related_patterns }}
+
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+
+
+
+  {% if content.field_gallery_images|render|trim is not empty %}
+  <div class="fabric__gallery">
+
+    <div class="container">
+
+      {{ content.field_gallery_images }}
+
+    </div>
+
+  </div>
+  {% endif %}
+
+
+  {% if custom.related_stores|render|striptags|trim is not empty %}
+  <div id="shops" class="fabric__shops">
+
+    <div class="container">
+
+      <h2>{{ 'Shops with this fabric'|t }}</h2>
+
+      {{ custom.related_stores }}
+
+    </div>
+
+  </div>
+  {% endif %}
+
+</article>

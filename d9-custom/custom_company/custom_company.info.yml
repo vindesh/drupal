@@ -1,0 +1,9 @@
+name: 'Custom Company Module'
+type: module
+description: 'The custom company module for getting company related information.'
+core_version_requirement: ^8.8 || ^9
+package: 'Custom'
+# Information added by Drupal.org packaging script on 2022-04-17
+version: '3.0.1'
+project: 'custom_company'
+datestamp: 1622266169

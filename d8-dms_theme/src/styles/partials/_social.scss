@@ -1,0 +1,61 @@
+//------------------------------------------------------------------------------
+// WEBFORM.SCSS
+// Webform styling.
+//------------------------------------------------------------------------------
+
+.social {
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+.social__list {
+  @include reset-list;
+}
+.social__item {
+  display: inline-block;
+  margin: 0 rem(10);
+}
+.social__link {
+  font-size: rem(24);
+  line-height: rem(30);
+  color: $body;
+  &:hover {
+    color: $fm-red;
+  }
+}
+
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {
+
+  .social {
+    width: 20%;
+    padding: rem(120) 0 0;
+    text-align: right;
+  }
+  .social__item {
+    margin: 0 0 0 rem(20);
+  }
+
+}

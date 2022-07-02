@@ -1,0 +1,29 @@
+name: canopy theme
+type: theme
+description: Canopy Site custom theme
+core_version_requirement: ^8.8.0 || ^9
+
+# Defines the base theme.
+base theme: cohesion_theme
+
+libraries:
+  - canopy_theme/global-styling
+  - canopy_theme/global-scripts
+libraries-override:
+  cohesion/coh-theme:
+    css:
+      base:
+        css/reset.css: false
+# Defines theme regions available.
+regions:
+  admin: Administration
+  header: Header
+  featured: Featured
+  content: Content
+  sidebar_first: First sidebar
+  sidebar_second: Second sidebar
+  footer: Footer
+  dx8_hidden: Site Studio hidden region
+# Define css styles for CKEditor
+ckeditor_stylesheets:
+  - build/css/ukg.css

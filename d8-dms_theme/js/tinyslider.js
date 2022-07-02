@@ -1,0 +1,2 @@
+!function(a,t,e,n){"use strict";t.behaviors.tinyslider={attach:function(t,e){if(void 0!==t.location&&a(".paragraph--type--image-gallery").length)tns({container:".field--name-field-images",controlsText:["<span class='fa fa-angle-left carousel__btn'></span>","<span class='fa fa-angle-right carousel__btn'></span>"],autoWidth:!0,autoHeight:!0,loop:!1,gutter:10,mouseDrag:!0,nav:!1})}}}(jQuery,Drupal,0,this.document);
+//# sourceMappingURL=tinyslider.js.map

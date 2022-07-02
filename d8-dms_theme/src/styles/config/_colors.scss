@@ -1,0 +1,59 @@
+//------------------------------------------------------------------------------
+// COLORS
+// This file contains all of the variables for the colors.
+//------------------------------------------------------------------------------
+
+// Basic colors
+$black: #000000;
+$white: #ffffff;
+$dms-grey1: #efefef;
+$dms-grey2: #cccccc;
+$dms-grey3: #aaaaaa;
+$dms-grey4: #333333;
+
+$dms-highlight1: #052e5c;
+$dms-highlight2: #ff8a00;
+
+$dms-blue: #2196f3;
+$dms-green: #4caf50;
+$dms-orange: #ff9800;
+$dms-red: #f44336;
+
+
+
+// Functional color vars
+$link: $dms-blue;
+$body: $dms-grey4;
+$heading: $body;
+$pg-bg-light: $dms-grey2;
+$pg-bg-dark:  $dms-grey4;
+$shadow: $dms-grey3;
+
+
+
+// Theme specific colors
+$body: #4a4a4a;
+$pink: #f27197;
+$blue: #0f7090;
+
+$grey1: #b6b6b6; // lightgrey text
+$grey2: #ebebeb; // footer line
+$grey3: #f6f6f6; // bottom bg & facets bg & comments profile bg (light bg)
+$grey4: #a0a0a0; // bottom text
+$grey5: #fbfbfb; // (very light bg)
+$grey6: #eaeaea; // comment border
+$grey7: #9b9b9b; // report link on project
+
+$grey8: #fafafa; // $grey5 ?
+$grey9: #f5f5f5; // $grey3 ?
+
+
+$fm-blue: #3b76be;
+$fm-red: #ed515b;
+$fm-pink: #fabeb6;
+
+$fm-salmon: #e7e2e1;
+
+$activity-feed-bg: #fef8f7;
+
+$link: $fm-blue;

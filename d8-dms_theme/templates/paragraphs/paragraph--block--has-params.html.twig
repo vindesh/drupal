@@ -1,0 +1,25 @@
+{#
+  * This template uses the render array result from hook_preprocess_paragraph.
+#}
+{%
+  set classes = [
+  'paragraph',
+  'paragraph--type--' ~ paragraph.bundle|clean_class,
+  view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+]
+%}
+
+{% if custom.extra_classes is defined %}
+  {% set classes = classes|merge(custom.extra_classes) %}
+{% endif %}
+
+{% block paragraph %}
+  <div{{ attributes.addClass(classes) }}>
+    {% block content %}
+      {{ content|without('field_block_embed', 'custom_block_embed') }}
+    {% endblock %}
+    {% if content.custom_block_embed %}
+      <div class="custom-block-embed">{{ content.custom_block_embed }}</div>
+    {% endif %}
+  </div>
+{% endblock paragraph %}

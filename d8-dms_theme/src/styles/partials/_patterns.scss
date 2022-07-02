@@ -1,0 +1,618 @@
+//------------------------------------------------------------------------------
+// PATTERN.SCSS
+// Pattern styling.
+//------------------------------------------------------------------------------
+
+// Overview
+.view-patterns {
+  .views-rows {}
+  .views-row {
+    float: left;
+    width: 100%;
+    margin: 0 0 5%;
+  }
+}
+
+// Teaser
+.pattern__teaser {
+  float: left;
+  width: 100%;
+}
+.pattern__teaser--link {
+  display: block;
+  text-decoration: none;
+  &:hover {
+    .pattern__teaser--info {
+      // background-color: $fm-red;
+      background-color: $fm-blue;
+    }
+    .pattern__teaser--header {
+      h3 {
+        color: $white;
+      }
+      .difficulty {
+        // background-image: url(../img/house-white.png);
+        // background-image: url(../img/star-white.png);
+        background-image: url(../img/stars-1-white.png);
+        &-7 {
+          background-image: url(../img/stars-2-white.png);
+        }
+        &-8 {
+          background-image: url(../img/stars-3-white.png);
+        }
+        &-9 {
+          background-image: url(../img/stars-4-white.png);
+        }
+        &-10 {
+          background-image: url(../img/stars-5-white.png);
+        }
+      }
+    }
+    .pattern__teaser--footer {
+      .more,
+      .garments {
+        color: $white;
+      }
+    }
+  }
+}
+.pattern__teaser--info {
+  background-color: $white;
+  float: left;
+  width: 100%;
+  padding: rem(10) rem(15);
+}
+.pattern__teaser--header {
+  h3 {
+    margin: 0;
+    // color: $fm-red;
+    color: $fm-blue;
+  }
+  .difficulty {
+    display: block;
+    float: right;
+    // background-image: url(../img/house-pink.png);
+    // background-image: url(../img/star-red.png);
+    background-image: url(../img/stars-1-blue.png);
+    // width: rem(20);
+    // height: rem(12);
+    width: rem(96);
+    height: rem(15);
+    &-7 {
+      background-image: url(../img/stars-2-blue.png);
+      // width: rem(40);
+    }
+    &-8 {
+      background-image: url(../img/stars-3-blue.png);
+      // width: rem(60);
+    }
+    &-9 {
+      background-image: url(../img/stars-4-blue.png);
+      // width: rem(80);
+    }
+    &-10 {
+      background-image: url(../img/stars-5-blue.png);
+      // width: rem(100);
+    }
+  }
+}
+.pattern__teaser--footer {
+  .more {
+    float: left;
+    color: $body;
+  }
+  .garments {
+    float: right;
+    // color: $fm-red;
+    color: $fm-blue;
+  }
+}
+
+// Detail
+.pattern__wrapper {
+  margin-bottom: rem(75);
+}
+.pattern__images {
+  margin: 0 0 rem(75);
+  text-align: center;
+  // .thumb {
+  //   background-color: $grey3;
+  //   border: 1px solid $grey6;
+  //   text-align: center;
+  // }
+  // .thumb,
+  // .link-to-all {
+  //   float: left;
+  //   width: 100%;
+  //   margin: 0 0 rem(30);
+  // }
+  // a {
+  //   color: $fm-red;
+  //   &:hover {
+  //     color: $body;
+  //   }
+  // }
+  .pattern__content--details {
+    text-align: left;
+  }
+}
+
+.pattern__images--slider {
+  margin: 0 0 rem(75);
+  img {
+    margin: 0 auto;
+  }
+  .slick-arrow {
+    width: rem(40);
+    height: rem(40);
+    border-radius: 50%;
+    text-align: center;
+    position: absolute;
+    transform: translateY(-50%);
+    appearance: none;
+    padding: 0;
+    border: 0;
+    font-size: rem(34);
+    line-height: rem(46);
+    background-color: rgba($white,0.5);
+    top: 50%;
+    z-index: 1;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba($white,0.75);
+    }
+    &.slick-prev {
+      left: rem(16);
+    }
+    &.slick-next {
+      right: rem(16);
+    }
+    &.slick-disabled {
+      // display: none;
+      opacity: .25;
+    }
+  }
+}
+
+.pattern__supplies {
+  background-color: $grey3;
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+  padding: rem(20) rem(30);
+  text-align: left;
+  border: 1px solid $grey6;
+}
+.pattern__supplies--title {
+  margin: 0 0 rem(10);
+  font-weight: 900;
+}
+.pattern__supplies--files {
+  // display: table;
+  width: 100%;
+}
+.pattern__supplies--file {
+  display: inline-block;//table-cell;
+  width: 100%;
+  margin: 0 -2px;
+  font-size: rem(14);
+  .field--name-field-file {
+    display: inline-block;
+  }
+}
+
+.pattern__supplies-description {
+  background-color: $grey3;
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(75);
+  padding: rem(30) rem(30) rem(10);
+  text-align: left;
+  border: 1px solid $grey6;
+}
+.pattern__supplies-description--title {
+  margin: 0 0 rem(10);
+  font-weight: 900;
+}
+
+.pattern__content {
+  float: left;
+  width: 100%;
+}
+.pattern__content--details {
+  background-color: $white;
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(50);
+  padding: rem(20);
+  border: 1px solid $grey6;
+  .field__label {
+    display: inline-block;
+    font-weight: 900;
+    &::after {
+      content: ': ';
+    }
+  }
+  .field__items,
+  .field__item {
+    display: inline-block;
+  }
+  .difficulty {
+    display: inline-block;
+    // background-image: url(../img/house-pink.png);
+    // background-image: url(../img/star-red.png);
+    // width: rem(20);
+    // height: rem(12);
+    background-image: url(../img/stars-1-blue.png);
+    width: rem(96);
+    height: rem(15);
+    &-7 {
+      background-image: url(../img/stars-2-blue.png);
+      // width: rem(40);
+    }
+    &-8 {
+      background-image: url(../img/stars-3-blue.png);
+      // width: rem(60);
+    }
+    &-9 {
+      background-image: url(../img/stars-4-blue.png);
+      // width: rem(80);
+    }
+    &-10 {
+      background-image: url(../img/stars-5-blue.png);
+      // width: rem(100);
+    }
+  }
+}
+.pattern__content--details-right {
+  text-align: right;
+}
+.pattern__content--header {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+}
+.pattern__content--header-extra {
+  float: left;
+  width: 100%;
+  margin: 0 0 rem(30);
+  .purchase,
+  .download {
+    display: inline-block;
+    background-color: $fm-red;
+    margin: 0 rem(10) rem(10) 0;
+    padding: 0 rem(20);
+    color: $white;
+    line-height: rem(38);
+    border: 1px solid $fm-red;
+    border-radius: 4px;
+    text-decoration: none;
+    &:hover {
+      background-color: $fm-blue;
+      border-color: $fm-blue;
+    }
+  }
+}
+.pattern__content--footer {
+  float: left;
+  width: 100%;
+  margin: rem(30) 0 0;
+  .purchase,
+  .download {
+    display: inline-block;
+    background-color: $fm-red;
+    margin: 0 rem(10) rem(10) 0;
+    padding: 0 rem(20);
+    color: $white;
+    line-height: rem(38);
+    border: 1px solid $fm-red;
+    border-radius: 4px;
+    text-decoration: none;
+    &:hover {
+      background-color: $fm-blue;
+      border-color: $fm-blue;
+    }
+  }
+  .to-comments {
+    display: inline-block;
+    padding: 0 rem(20);
+    color: $grey4;
+    line-height: rem(38);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-decoration: none;
+    &:hover {
+      background-color: $grey3;
+      color: $body;
+      border-color: $grey4;
+    }
+    &:hover {
+      color: $body;
+    }
+  }
+}
+
+
+.pattern__notice {
+  background-color: $fm-blue;
+  float: left;
+  width: 100%;
+  padding: rem(30);
+  color: $white;
+  text-align: center;
+  h2, h3 {
+    color: $white;
+  }
+}
+
+// Creations based on pattern
+.pattern__content--projects {
+  background-color: $grey5;
+  padding: rem(75) 0;
+}
+.related-projects-overview {
+  .views-row {
+    float: left;
+    width: 100%;
+    margin: 0 0 rem(30);
+    &:last-child {
+      margin: 0;
+    }
+  }
+}
+
+
+// Flags
+.flag {
+  &.flag-pattern-like {
+    float: left;
+    color: $black;
+    a {
+      @include iconize('star-o','before');
+      color: $body;
+      font-size: rem(18);
+      text-decoration: none;
+      &::before {
+        vertical-align: text-bottom;
+        color: $fm-red;
+        font-size: rem(30);
+      }
+    }
+
+    &.action-unflag {
+      a {
+        @include iconize('star','before');
+        &::before {
+          color: $fm-red;
+          font-size: rem(30);
+        }
+      }
+    }
+  }
+}
+
+
+
+.personal-favorites-overview {
+  .block__title {
+    @include iconize('star-o');
+    &::after {
+      color: $fm-red;
+      margin-left: rem(20);
+      vertical-align: middle;
+    }
+  }
+
+  .views-row {
+    float: left;
+    width: 100%;
+    margin: 0 0 rem(30);
+    &:last-child {
+      margin: 0;
+    }
+  }
+}
+
+// Activity feed
+.pattern__activity-feed--info {
+  background-color: $white;
+  float: left;
+  width: 100%;
+  padding: rem(10) 0;
+  color: $body;
+  text-align: left;
+}
+.pattern__activity-feed--header {
+  h3 {
+    margin: 0;
+  }
+  .difficulty {
+    display: block;
+    float: right;
+    // background-image: url(../img/house-pink.png);
+    background-image: url(../img/star-red.png);
+    width: rem(20);
+    height: rem(12);
+    &-7 {
+      width: rem(40);
+    }
+    &-8 {
+      width: rem(60);
+    }
+    &-9 {
+      width: rem(80);
+    }
+    &-10 {
+      width: rem(100);
+    }
+  }
+}
+.pattern__activity-feed--footer {
+  .more {
+    float: left;
+  }
+  .garments {
+    float: right;
+  }
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {
+
+  // Overview
+  .view-patterns,
+  .personal-favorites-overview  {
+    .views-rows {}
+    .views-row {
+      float: left;
+      width: 48%;
+      margin: 0 4% 4% 0;
+      &:nth-child(2n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  // Detail
+  .pattern__content--details-left {
+    float: left;
+    width: 70%;
+  }
+  .pattern__content--details-right {
+    float: right;
+    width: 30%;
+  }
+  .pattern__supplies--file {
+    width: 50%;
+  }
+
+  // Related projects
+  .related-projects-overview {
+    .views-rows {}
+    .views-row {
+      float: left;
+      width: 48%;
+      margin: 0 4% 4% 0;
+      &:nth-child(2n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  // Overview
+  .view-patterns,
+  .personal-favorites-overview  {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n) {
+      float: left;
+      width: 32%;
+      margin: 0 2% 2% 0;
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  // Detail
+  .pattern__supplies--file {
+    width: auto;
+    margin: 0 rem(20) 0 0;
+    // width: 25%;
+  }
+
+  // Related projects overview
+  .related-projects-overview {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n) {
+      float: left;
+      width: 32%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(3n) {
+      margin-right: 0;
+    }
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {
+
+  // Detail
+  .pattern__images {
+    float: left;
+    width: 47.5%;
+  }
+  .pattern__content {
+    float: right;
+    width: 47.5%;
+  }
+
+}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {
+
+  // Overview
+  .view-patterns {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n) {
+      float: left;
+      width: 32%;
+      margin: 0 2% 2% 0;
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .personal-favorites-overview {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n),
+    .views-row:nth-child(3n) {
+      float: left;
+      width: 23.5%;
+      margin: 0 2% 2% 0;
+      &:nth-child(4n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  // Related projects overview
+  .related-projects-overview  {
+    .views-rows {}
+    .views-row,
+    .views-row:nth-child(2n),
+    .views-row:nth-child(3n) {
+      float: left;
+      width: 23.5%;
+      margin: 0 2% 2% 0;
+    }
+    .views-row:nth-child(4n) {
+      margin-right: 0;
+    }
+  }
+
+}

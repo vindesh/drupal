@@ -1,0 +1,74 @@
+// ==========================================================================
+// Paragraph bundle: LIST ITEM
+// ==========================================================================
+.paragraph--type--list-item {
+  background-color: $white;
+  margin-bottom: rem(24);
+  text-align: center;
+}
+
+.pg-list-item__link {
+  text-decoration: none;
+
+  &--more {
+    @include iconize();
+    text-decoration: underline;
+
+    &:hover {
+      &::after {
+        animation: bounce 2s infinite;
+      }
+    }
+  }
+
+  &--block {
+    display: block;
+    height: 100%;
+    box-shadow: 0 0 rem(10) $shadow;
+    transition: box-shadow 250ms ease;
+
+    &:hover {
+      box-shadow: 0 0 rem(15) rem(5) $shadow;
+    }
+  }
+}
+
+.pg-list-item__body {
+  padding: rem(16);
+
+  color: $body;
+
+  .pg-list-item__link {
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+}
+
+.pg-list-item__title {
+  display: inline-block;
+  margin: 0;
+}
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}

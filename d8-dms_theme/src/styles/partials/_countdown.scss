@@ -1,0 +1,63 @@
+//------------------------------------------------------------------------------
+// COUNTDOWN.SCSS
+// Countdown styling.
+//------------------------------------------------------------------------------
+
+.countdown {
+  background-color: rgba($fm-blue,0.5);
+  background-color: rgba($fm-blue,1);
+  padding: rem(30);
+  text-align: center;
+  color: $white;
+  h2,h3 {
+    color: $white;
+  }
+  a {
+    color: $white;
+    &:hover {
+      color: $black;
+    }
+  }
+}
+
+#countdown-timer {
+  display: inline-block;
+  background-color: $white;
+  padding: 0 rem(10);
+  font-size: rem(70);
+  line-height: rem(80);
+  color: $body;
+  font-weight: 900;
+  border-radius: 4px;
+}
+
+
+
+
+
+//*******************//
+//*** BREAKPOINTS ***//
+//*******************//
+
+/*  BREAK 1
+-------------*/
+@include mq(break1) {}
+
+/*  BREAK 2
+-------------*/
+@include mq(break2) {
+
+  .countdown {
+    float: left;
+    width: 59%;
+  }
+
+}
+
+/*  BREAK 3
+-------------*/
+@include mq(break3) {}
+
+/*  BREAK 4
+-------------*/
+@include mq(break4) {}
